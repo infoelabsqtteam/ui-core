@@ -9,6 +9,9 @@ npm run my-libbuild
 cd dist/my-lib/
 npm pack
 
+go to project folder - 
+npm install ../my-workspace/dist/my-lib/my-lib-0.0.1.tgz
+
 
 # How to publish a version
 
