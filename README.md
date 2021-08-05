@@ -1,11 +1,11 @@
 # how to just build on local library 
 
-npm run my-libbuild
+npm run my-lib-build
 
 
 # how to pack library
 
-npm run my-libbuild
+npm run my-lib-build
 cd dist/my-lib/
 npm pack
 
