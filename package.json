@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "my-lib-build": "ng build my-lib",
-	"my-lib-publish": "ng build my-lib && cd dist/my-lib && npm publish"
+    "my-lib-publish": "ng build my-lib && cd dist/my-lib && npm publish"
   },
   "private": true,
   "dependencies": {
@@ -22,6 +22,7 @@
     "@angular/platform-browser": "^12.1.2",
     "@angular/platform-browser-dynamic": "~12.1.2",
     "@angular/router": "~12.1.2",
+    "@core/service-lib": "^1.1.0",
     "rxjs": "~6.6.0",
     "tslib": "^2.2.0",
     "zone.js": "~0.11.4"
