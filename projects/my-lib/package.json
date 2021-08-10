@@ -1,6 +1,6 @@
 {
-  "name": "@gourav/my-lib",
-  "version": "1.0.2",
+  "name": "@core/service-lib",
+  "version": "1.1.5",
   "peerDependencies": {
     "@angular/common": "^12.1.2",
     "@angular/core": "^12.1.2",

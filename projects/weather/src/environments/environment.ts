@@ -3,7 +3,12 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  baseUrl: 'https://omoknow.com/rest/',
+  serverhost : "http://localhost:8104/rest/",
+  // serverhost : 'https://sitserverpharmalinkage.pharmalinkage.com/rest/',
+  appName: "pharmalinkage",
+  appId: "ELABS",
 };
 
 /*

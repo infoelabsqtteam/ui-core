@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { MyLibModule } from 'my-lib';
+import { MyLibModule } from '@core/service-lib';
 import { AppComponent } from './app.component';
+import { environment } from '../environments/environment';
+
 
 @NgModule({
   declarations: [
@@ -9,7 +11,7 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    MyLibModule
+    MyLibModule.forRoot(environment)
   ],
   providers: [],
   bootstrap: [AppComponent]
