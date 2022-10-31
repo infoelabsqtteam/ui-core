@@ -21,9 +21,9 @@ Update version in file =>
 
 
 # Export Token
-export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain libs --domain-owner 698866732047 --query authorizationToken --output text`
+export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ui-libs --domain-owner 292474393014 --region ap-south-1 --query authorizationToken --output text`
 
-aws codeartifact login --tool npm --repository code-arti-lib --domain libs --domain-owner 698866732047
+aws codeartifact login --tool npm --repository ui-library --domain ui-libs --domain-owner 292474393014 --region ap-south-1
 
 
 npm run my-lib-publish
@@ -31,9 +31,9 @@ npm run my-lib-publish
 
 #How to install new library version in application 
 
-export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain libs --domain-owner 698866732047 --query authorizationToken --output text`
+export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ui-libs --domain-owner 292474393014 --region ap-south-1 --query authorizationToken --output text`
 
-aws codeartifact login --tool npm --repository code-arti-lib --domain libs --domain-owner 698866732047
+aws codeartifact login --tool npm --repository ui-library --domain ui-libs --domain-owner 292474393014 --region ap-south-1
 
 npm install  @gourav/my-lib@1.0.0
 
