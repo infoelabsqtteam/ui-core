@@ -11,22 +11,11 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
-//import { AppRoutingModule } from './app-routing.module';
-//import { AppComponent } from './app.component';
-import { WeatherComponent } from './weather/weather.component';
-import { WeatherDetailComponent } from './weather/weather-detail/weather-detail.component';
-import { TestComponent } from './test/test.component';
-import { CitySearchComponent } from './city-search/city-search.component';
 import { EnvService } from './services/env/env.service';
 
 
 @NgModule({
   declarations: [
-//    MyLibComponent
-    WeatherComponent,
-    WeatherDetailComponent,
-    TestComponent,
-    CitySearchComponent
   ],
   imports: [
     BrowserModule,
@@ -42,10 +31,6 @@ import { EnvService } from './services/env/env.service';
   exports: [
   //  MyLibComponent
   CommonModule,
-  WeatherComponent,
-  WeatherDetailComponent,
-  TestComponent,
-  CitySearchComponent,
   BrowserModule,
     HttpClientModule,
     FormsModule,
