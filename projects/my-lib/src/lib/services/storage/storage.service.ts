@@ -15,22 +15,41 @@ export class StorageService {
   ACCESS_TOKEN: string = 'ACCESS_TOKEN';
   REFRESH_TOKEN: string = 'REFRESH_TOKEN';
   RESET_PASS_SESSION:string = 'RESET_PASS_SESSION';
-  // EXPIRY_IN:any=86400;
   EXPIRY_IN:any= 'EXPIRY_IN';
   USER_KEY: string = 'USER';
   ACTIVE_MENU: string = 'MENU';
+  MENU_TYPE: string = 'MENU_TYPE';
   ID_TOKEN_EXPIRY_TIME: string = 'ID_TOKEN_EXPIRY_TIME';
   REFRESH_TOKEN_EXPIRY_TIME:string='REFRESH_TOKEN_EXPIRY_TIME';
   userInfo: any;
   log: any;
   age:any=3540000; //59 minuts 
   refreshTokenAge:any=2505600000 //refresh token age 29 days
+  packDetails: any = {};
+
+  HOST_NAME : string = 'HOST_NAME';
+  PROJECT_FOLDER_NAME: string = 'PROJECT_FOLDER_NAME';
+  TEMP_NAME:string = "TEMP_NAME";
+  TEMP_THEME:string = "TEMP_THEME";
+  PAGE_TITLE:string = "PAGE_TITLE";
+  VERIFY_TYPE:string = "VERIFY_TYPE";
+  MODULE:string = "MODULE";
+  TEAM_NAME:string = "TEAM_NAME";
+  USER_PREFERENCE:any;
+  REDIRECT_URL:string = "REDIRECT_URL";
+  CHILD_WINDOW_URL:string = "CHILD_WINDOW_URL";
+  MODIFY_MODULES:any = 'MODIFY_MODULES';
   appName:any;
   
   constructor(private http: HttpClient,private envService:EnvService) { 
     this.appName = this.envService.getAppName();
   }
-
+  setModule(module:string){
+    sessionStorage.setItem("MODULE",module);
+  }
+  getModule(){
+    return sessionStorage.getItem('MODULE');
+  }
   setAppId(appId:string){
     localStorage.setItem('appId', appId);
   }
@@ -45,6 +64,9 @@ export class StorageService {
   }
   getExpiresIn(){
     return localStorage.getItem(this.EXPIRY_IN);
+  }
+  setUserPreference(user_preference:any){
+    localStorage.setItem("USER_PREFERENCE",JSON.stringify(user_preference));
   }
   SetIdToken(token: any) {
     const setTokenObj:{ [key: string]: any[] } = {};
@@ -247,4 +269,71 @@ export class StorageService {
     const session = localStorage.getItem('RESET_PASS_SESSION');
     return session;
   }
+  getHostNameDinamically(){
+    return localStorage.getItem(this.HOST_NAME);
+  }
+  setHostNameDinamically(host:string){
+    localStorage.setItem(this.HOST_NAME, host);
+  }
+  getApplicationSetting(){
+    return JSON.parse(<any>localStorage.getItem('APPLICATION_SETTING'));
+  }
+  getApplicationValueByKey(key:any){
+    let value:any = "";
+    let applicationSetting = this.getApplicationSetting();
+    if(applicationSetting && applicationSetting[key] != undefined && applicationSetting[key] != null && applicationSetting[key] != ""){
+      value = applicationSetting[key];
+    }    
+    return value;
+  }
+  getVerifyType(){
+    return this.getApplicationValueByKey('varify_mode');
+  }
+  getChildWindowUrl(){
+    return localStorage.getItem('CHILD_WINDOW_URL');
+  }
+  setRedirectUrl(url:string){
+    sessionStorage.setItem("REDIRECT_URL",url);
+  }
+  getRedirectUrl(){
+    return sessionStorage.getItem('REDIRECT_URL');
+  }
+  getUserPreference(){
+    return JSON.parse(localStorage.getItem('USER_PREFERENCE')!);
+  }
+  getLogoPath(){
+    let projectFolderName:any = this.getApplicationValueByKey('folder')
+    return 'assets/img/logo/' + projectFolderName + '/';
+  }
+  getTemplateName(){
+    return this.getApplicationValueByKey('temp_name');
+  }
+  getTeamName(){
+    return this.getApplicationValueByKey('teamname');
+  }
+  setChildWindowUrl(url:string){
+    localStorage.setItem("CHILD_WINDOW_URL",url);
+  }
+  SetModifyModules(modules:any){
+    localStorage.setItem(this.MODIFY_MODULES,JSON.stringify(modules));
+  }
+  getBucketName(){    
+    return this.getApplicationValueByKey('bucket');
+  }
+  GetModifyModules(){
+    return JSON.parse(<any>localStorage.getItem(this.MODIFY_MODULES));
+  }
+  getPageTitle(){
+    return this.getApplicationValueByKey('title');
+  }
+  getPageThmem(){
+    return this.getApplicationValueByKey('theme');    
+  }
+  setApplicationSetting(applicationSetting:any){
+    localStorage.setItem("APPLICATION_SETTING",JSON.stringify(applicationSetting));
+  }
+  setThemeSetting(settingObj:any){
+    localStorage.setItem("THEME_SETTING",JSON.stringify(settingObj));
+  }
+  
 }

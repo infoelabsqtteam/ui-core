@@ -18,7 +18,10 @@ export class CoreUtilityService {
   horizontalPosition: MatSnackBarHorizontalPosition = 'right';
   verticalPosition: MatSnackBarVerticalPosition = 'top';
 
-  constructor(private envService:EnvService,private _snackBar: MatSnackBar) { }
+  constructor(
+    private envService: EnvService,
+    private _snackBar: MatSnackBar
+  ) { }
 
   baseUrl(applicationAction: string) {    
       return this.envService.getBaseUrl() +  (<any>EndPoint)[applicationAction];
@@ -42,5 +45,12 @@ export class CoreUtilityService {
       horizontalPosition: this.horizontalPosition,
       verticalPosition: this.verticalPosition
     });
+  }
+  isNotBlank(value:any){
+    if(value && value != undefined && value != null && value != '' && JSON.stringify(value) != "{}" && JSON.stringify(value) != "[]"){
+      return true;
+    }else{
+      return false;
+    }
   }
 }
