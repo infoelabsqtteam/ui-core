@@ -41,7 +41,10 @@ export class EnvService {
     return baseUrl;
   }
   getAppName(){
-    return this.env.appName;
+    if(this.coreFunctionService.isNotBlank(this.env.appName)){
+      this.storageService.setAppName(this.env.appName);
+      return this.env.appName;
+    }
   }
   getAppId(){
     return this.env.appId;
