@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, tap, switchMap } from 'rxjs/operators';
 import { StorageTokenStatus } from '../../shared/enums/storage-token-status.enum';
-import { EnvService } from '../env/env.service';
 
 
 
@@ -41,9 +40,17 @@ export class StorageService {
   MODIFY_MODULES:any = 'MODIFY_MODULES';
   appName:any;
   
-  constructor(private http: HttpClient,private envService:EnvService) { 
-    this.appName = this.envService.getAppName();
+  constructor(private http: HttpClient,) { 
+    // this.appName = this.envService.getAppName();
   }
+  setAppName(appname:string){
+      this.appName = appname;
+      localStorage.setItem("AppName", JSON.stringify(appname));
+  }  
+  getAppName(){
+    return localStorage.getItem('AppName');
+  }
+
   setModule(module:string){
     sessionStorage.setItem("MODULE",module);
   }
