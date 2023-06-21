@@ -1,24 +1,14 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { DatePipe, CurrencyPipe, TitleCasePipe } from '@angular/common';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { DatePipe, CurrencyPipe } from '@angular/common';
 import { StorageService } from '../../services/storage/storage.service';
 import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
-
 import { CustomvalidationService } from '../customvalidation/customvalidation.service';
-
-import {
-  MatSnackBar,
-  MatSnackBarHorizontalPosition,
-  MatSnackBarVerticalPosition,
-} from '@angular/material/snack-bar';
 import { NotificationService } from '../notify/notification.service';
 import { ApiService } from '../api/api.service';
 import { ModelService } from '../model/model.service';
 import { EnvService } from '../env/env.service';
-import { I, L } from '@angular/cdk/keycodes';
 import { Common } from '../../shared/enums/common.enum';
-import { PermissionService } from '../permission/permission.service';
 
 
 @Injectable({
@@ -27,8 +17,6 @@ import { PermissionService } from '../permission/permission.service';
 export class CommonFunctionService {
   userInfo: any;
   localTas:any;
-  horizontalPosition: MatSnackBarHorizontalPosition = 'right';
-  verticalPosition: MatSnackBarVerticalPosition = 'top';
   pageNumber: number = Common.PAGE_NO;
   itemNumOfGrid: any = Common.ITEM_NUM_OF_GRID;
 
@@ -38,15 +26,11 @@ export class CommonFunctionService {
     private modalService: ModelService, 
     private datePipe: DatePipe, 
     private CurrencyPipe: CurrencyPipe, 
-    private _snackBar: MatSnackBar, 
-    private titlecasePipe: TitleCasePipe,
     private customvalidationService:CustomvalidationService,
-    private http: HttpClient,
     private notificationService:NotificationService,
     private apiService:ApiService,
     private coreFunctionService:CoreFunctionService,
-    private envService:EnvService,
-    private permissionService:PermissionService
+    private envService:EnvService
     ) {
     this.userInfo = this.storageService.GetUserInfo();
   }
