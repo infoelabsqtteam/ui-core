@@ -47,7 +47,7 @@ jobs:
       uses: jacobtomlinson/gha-find-replace@v3
       with:
         find: "[##VERSION##]"
-        replace: "$VERSION"
+        replace: "$(date +%Y%m%d)"
         include: "**package.json"
       
     - name: Get Availability
