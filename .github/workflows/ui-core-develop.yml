@@ -44,12 +44,14 @@ jobs:
       run: echo "VERSION=$(date +%Y%m%d)" >> $GITHUB_ENV
     
     - name: Find and Replace Version
-      uses: jacobtomlinson/gha-find-replace@v3
-      with:
-        find: "[##VERSION##]"
-        replace: "$(date +%Y%m%d)"
-        include: "**package.json"
-      
+      #uses: jacobtomlinson/gha-find-replace@v3
+      #with:
+      #  find: "[##VERSION##]"
+      #  replace: "$(date +%Y%m%d)"
+      #  include: "**package.json"
+      run: |
+        find . -name "**package.json" -exec sed -i "s/[##VERSION##]/$VERSION/g" {} +
+        
     - name: Get Availability
       run: echo "Availability=UI-LIB" >> $GITHUB_ENV
       
