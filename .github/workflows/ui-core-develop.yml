@@ -26,6 +26,20 @@ jobs:
     - name: List of the GitHub Actions environment variables on Ubunt
       run: env  
 
+    - name: Set up Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    
+    - name: Installing source NPM dependencies...
+      run: npm install
+      
+    - name: Installing Angular
+      run: npm install -g @angular/cli@13.0.0
+    
+    - name: Set Node Options
+      run: echo "NODE_OPTIONS=--max_old_space_size=${{ secrets.RAM }}" >> $GITHUB_ENV
+
     - name: Get VERSION
       run: echo "VERSION=$(date +%Y%m%d)" >> $GITHUB_ENV
       
@@ -33,15 +47,12 @@ jobs:
       run: echo "Availability=UI-LIB" >> $GITHUB_ENV
       
     - name: Build, tag, and push image to Amazon ECR
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: elabs-client
       #  IMAGE_TAG: $VERSION-$GITHUB_RUN_NUMBER-$Availability -> not working
       run: |
         aws codeartifact login --tool npm --repository ui-library --domain ui-libs --domain-owner 292474393014 --region ap-south-1
         npm run my-lib-build
         ng build
-        npm run my-lib-publish 
-        cd service-lib
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION-$GITHUB_RUN_NUMBER-$Availability .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION-$GITHUB_RUN_NUMBER-$Availability
+        npm run my-lib-publish
+        #cd service-lib
+        #docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION-$GITHUB_RUN_NUMBER-$Availability .
+        #docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION-$GITHUB_RUN_NUMBER-$Availability
