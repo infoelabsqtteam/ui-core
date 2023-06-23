@@ -41,7 +41,7 @@ jobs:
       run: echo "NODE_OPTIONS=--max_old_space_size=${{ secrets.RAM }}" >> $GITHUB_ENV
 
     - name: Get VERSION
-      run: echo "VERSION=$(date +%Y%m%d)" >> $GITHUB_ENV
+      run: echo "VERSION=$(date +%Y.%m.%d).$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
     
     - name: Find and Replace Version
       #uses: jacobtomlinson/gha-find-replace@v3
@@ -50,11 +50,8 @@ jobs:
       #  replace: "$(date +%Y%m%d)"
       #  include: "**package.json"
       run: |
-        find . -name "**package.json" -exec sed -i "s/[##VERSION##]/$VERSION/g" {} +
-        
-    - name: Get Availability
-      run: echo "Availability=UI-LIB" >> $GITHUB_ENV
-      
+        find . -name "**package.json" -exec sed -i "s/##VERSION##/$VERSION/g" {} +
+
     - name: Build, tag, and push image to Amazon ECR
       #  IMAGE_TAG: $VERSION-$GITHUB_RUN_NUMBER-$Availability -> not working
       run: |
