@@ -1,6 +1,6 @@
 {
   "name": "@core/service-lib",
-  "version": "[##VERSION##]",
+  "version": "##VERSION##",
   "peerDependencies": {
     "@angular/common": "^12.1.2",
     "@angular/core": "^12.1.2",
