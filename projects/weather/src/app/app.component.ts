@@ -1,5 +1,5 @@
 import { Component,OnInit } from '@angular/core';
-import { CoreUtilityService,StorageService } from '@core/service-lib';
+import { CoreUtilityService,StorageService } from '@core/web-core';
 
 
 @Component({
