@@ -38,3 +38,10 @@ aws codeartifact login --tool npm --repository ui-core --domain ui-libs --domain
 npm install  @core/my-lib@1.0.0
 
 
+#####Get latest library version
+
+export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ui-libs --region ap-south-1 --domain-owner 292474393014 --query authorizationToken --output text`
+
+aws codeartifact list-package-versions --domain ui-libs --domain-owner 292474393014 --repository ui-library --format npm --namespace core --status Published --sort-by PUBLISHED_TIME --max-items 1 --query 'versions[*].[version]' --output text --package service-lib
+
+
