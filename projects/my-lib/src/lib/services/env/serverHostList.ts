@@ -1,5 +1,5 @@
 export const serverHostList = [
-  {"clientEndpoint": "localhost", "serverEndpoint": "https://sitmultaniserver.e-labs.ai"},
+  {"clientEndpoint": "localhost", "serverEndpoint": "http://localhost:8104"},
   {"clientEndpoint": "sit.e-labs.ai", "serverEndpoint": "https://sitserverelabs.e-labs.ai"},
   {"clientEndpoint": "dev.e-labs.ai", "serverEndpoint": "https://devserverelabs.e-labs.ai"}, 
   {"clientEndpoint": "uat.e-labs.ai", "serverEndpoint": "https://uatserverelabs.e-labs.ai"},  
@@ -9,9 +9,9 @@ export const serverHostList = [
   {"clientEndpoint": "demolab.e-labs.ai", "serverEndpoint": "https://serverhardgoodlabs.e-labs.ai"},
   {"clientEndpoint": "lite-demolab.e-labs.ai", "serverEndpoint": "https://serverhardgoodlabs.e-labs.ai"},
   {"clientEndpoint": "standard-demolab.e-labs.ai", "serverEndpoint": "https://serverhardgoodlabs.e-labs.ai"},
-  {"clientEndpoint": "test.ascgroup.in", "serverEndpoint": "https://sitserverascgroup.e-labs.ai"},
   {"clientEndpoint": "ascgroup.e-labs.ai", "serverEndpoint": "https://sitserverascgroup.e-labs.ai"},
-  {"clientEndpoint": "erp.ascgroup.in", "serverEndpoint": "https://prodserverascgroup.e-labs.ai"},
+  {"clientEndpoint": "uatclients.e-labs.ai", "serverEndpoint": "https://sitserverascgroup.e-labs.ai"},
+  {"clientEndpoint": "erpsuite.ascgroup.co.in", "serverEndpoint": "https://prodserverascgroup.e-labs.ai"},
   {"clientEndpoint": "itclabs.e-labs.ai", "serverEndpoint": "https://serveritclabs.e-labs.ai"},
   {"clientEndpoint": "dev-itclabs.e-labs.ai", "serverEndpoint": "https://devserveritclabs.e-labs.ai"},
   {"clientEndpoint": "uat-itclabs.e-labs.ai", "serverEndpoint": "https://uatserveritclabs.e-labs.ai"},
@@ -37,6 +37,7 @@ export const serverHostList = [
   {"clientEndpoint": "sit-central.e-labs.ai", "serverEndpoint": "https://sitservercentrallims.e-labs.ai"},
   {"clientEndpoint": "central.e-labs.ai", "serverEndpoint": "https://prodservercentral.e-labs.ai"},
   {"clientEndpoint": "upma-lims.e-labs.ai", "serverEndpoint": "https://prodserverupma.e-labs.ai"},
-  {"clientEndpoint": "erp.iirt.co.in", "serverEndpoint": "https://prodiirtserver.e-labs.ai"}
+  {"clientEndpoint": "erp.iirt.co.in", "serverEndpoint": "https://prodiirtserver.e-labs.ai"},
+  {"clientEndpoint": "compassgroup.e-labs.ai", "serverEndpoint": "https://prodservercompassgroup.e-labs.ai"}
 ]
 
