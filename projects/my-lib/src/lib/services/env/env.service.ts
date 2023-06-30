@@ -103,7 +103,7 @@ export class EnvService {
     let serverHostName = this.getHostKeyValue('serverEndpoint');
     //let themedata = this.getHostKeyValue('theme_setting');    
     //this.setApplicationSetting();
-    if(serverHostName != '' || serverHostName != setHostName) {
+    if(serverHostName != '' || serverHostName != setHostName) {      
       const hostName = serverHostName +'/rest/';
       this.storageService.setHostNameDinamically(hostName);
       //this.setThemeSetting(themedata);
@@ -112,8 +112,10 @@ export class EnvService {
   
   getHostKeyValue(keyName:string){
     let hostname:string = this.getHostName('hostname');
-    let value:any = '';    
-    if(serverHostList && serverHostList.length > 0){
+    let value:any = '';   
+    if(hostname == 'localhost'){
+      value = this.env.serverhost;
+    }else if(serverHostList && serverHostList.length > 0){
       for (let index = 0; index < serverHostList.length; index++) {
         const element:any = serverHostList[index];
         if(hostname == element.clientEndpoint){
