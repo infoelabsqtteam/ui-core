@@ -13,7 +13,6 @@ import { CoreFunctionService } from '../../services/common-utils/core-function/c
   providedIn: 'root'
 })
 export class EnvService {
-  environment:any;
   requestType: any = '';
   constructor(
     @Inject('env') private env:any,
@@ -88,7 +87,6 @@ export class EnvService {
     }
     return this.requestType;
   }
-  
   checkLogedIn(){
     if (this.storageService != null && this.storageService.GetIdToken() != null) {
       if(this.storageService.GetIdTokenStatus() == StorageTokenStatus.ID_TOKEN_ACTIVE){
@@ -135,7 +133,6 @@ export class EnvService {
   getHostName(key:string){
     let mydocument:any = this.document;
     return mydocument.location[key];
-    // return this.document.location[key];
   }
 
   setGoogleLocation(geolocation:any){
