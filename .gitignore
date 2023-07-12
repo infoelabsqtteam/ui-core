@@ -9,6 +9,8 @@
 
 # dependencies
 /node_modules
+/projects/my-lib/node_modules
+/projects/my-lib/package-lock.json
 
 # profiling files
 chrome-profiler-events*.json
@@ -31,6 +33,7 @@ chrome-profiler-events*.json
 .history/*
 
 # misc
+/.angular/cache
 /.sass-cache
 /connect.lock
 /coverage
