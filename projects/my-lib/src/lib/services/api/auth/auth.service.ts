@@ -10,6 +10,8 @@ import { DataShareService } from '../../data-share/data-share.service';
 import { CommonFunctionService } from '../../common-utils/common-function.service';
 import { ApiService } from '../api.service';
 import { Common } from '../../../shared/enums/common.enum';
+import { CoreFunctionService } from '../../common-utils/core-function/core-function.service';
+//import { MenuOrModuleCommonService } from 'dist/my-lib/public-api';
 
 
 @Injectable({
@@ -27,7 +29,8 @@ export class AuthService implements OnInit{
     private storageService:StorageService,
     private router:Router,
     private encryptionService:EncryptionService,
-    private commonFunctionService:CommonFunctionService
+    private commonFunctionService:CommonFunctionService,
+    private coreFunctionService:CoreFunctionService
     ) { }
 
 
@@ -96,7 +99,9 @@ export class AuthService implements OnInit{
     this.http.post(api, reqBody).subscribe(
       (respData:any) =>{
         if (respData && respData.user) {
-          this.storageService.SetUserInfo(respData);
+          let modifyData = this.coreFunctionService.getModulesFormMapObject(respData);
+          console.log(modifyData);
+          this.storageService.SetUserInfo(modifyData);
           this.storageService.GetUserInfo();
           this.envService.setRequestType('PRIVATE');  
           this.commonFunctionService.getApplicationAllSettings();        

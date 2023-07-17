@@ -207,12 +207,12 @@ export class StorageService {
       return [];
     } 
   }
-  SetModifyModules(modules:any){
-    localStorage.setItem(this.MODIFY_MODULES,JSON.stringify(modules));
-  }
-  GetModifyModules(){
-    return JSON.parse(<any>localStorage.getItem(this.MODIFY_MODULES));
-  }
+  // SetModifyModules(modules:any){
+  //   localStorage.setItem(this.MODIFY_MODULES,JSON.stringify(modules));
+  // }
+  // GetModifyModules(){
+  //   return JSON.parse(<any>localStorage.getItem(this.MODIFY_MODULES));
+  // }
   GetMenuType(){
     const menu_Type = this.getApplicationValueByKey('menu_type');
     if(menu_Type){
