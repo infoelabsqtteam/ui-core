@@ -18,7 +18,6 @@ export * from './lib/services/data-share/doc-data-share/doc-data-share.service';
 export * from './lib/services/data-share/public-data-share/public-data-share.service';
 export * from './lib/services/encryption/encryption.service';
 export * from './lib/services/env/env.service';
-export * from './lib/services/ExceptionsHandling/exceptions-handling.service';
 export * from './lib/services/grid-common-function/grid-common-function.service';
 export * from './lib/services/loader/loader.service';
 export * from './lib/services/menu-or-module-common/menu-or-module-common.service';
