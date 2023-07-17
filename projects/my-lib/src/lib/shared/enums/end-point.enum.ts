@@ -1,6 +1,6 @@
 export enum EndPoint {
 
-    GET_USER_PERMISSION = "user/utvn",
+    GET_USER_PERMISSION = "user/utvn/v2",
     SAVE_CUSTOM_TEMPLATE = "ins/save/templates",
     SAVE_FORM_DATA = "ins/save",
     DELETE_GRID_ROW = "del/delete",

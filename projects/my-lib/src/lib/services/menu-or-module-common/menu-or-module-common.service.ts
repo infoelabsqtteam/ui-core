@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../api/api.service';
-import { AuthService } from '../api/auth/auth.service';
 import { CommonFunctionService } from '../common-utils/common-function.service';
 import { DataShareService } from '../data-share/data-share.service';
-import { NotificationService } from '../notify/notification.service';
 import { PermissionService } from '../permission/permission.service';
 import { StorageService } from '../storage/storage.service';
 
@@ -18,32 +16,30 @@ constructor(
   private permissionService:PermissionService,
   private commonFunctionService:CommonFunctionService,
   private dataShareService:DataShareService,
-  private notificationService:NotificationService,
   private apiService:ApiService,
-  private router:Router,
-  private authService:AuthService
+  private router:Router
 ) { }
 
-  modifyModuleListWithPermission(moduleList:any){
-    let modifyModuleList:any = [];
-    if(moduleList && moduleList.length > 0){
-      moduleList.forEach((module:any) => {
-        if(module && module.menu_list && module.menu_list.length > 0){
-          let menuList = module.menu_list;
-          module.menu_list = this.setDisplayInMenuWithPermission(menuList);
-          if(this.setDisplayInModuleWithPermission(module.menu_list)){
-            module['display'] = true;
-          }else{
-            module['display'] = false;
-          }
-          modifyModuleList.push(module);
-        }else{
-          modifyModuleList.push(module);
-        }
-      });
-    }
-    return modifyModuleList;
-  }
+  // modifyModuleListWithPermission(moduleList:any){
+  //   let modifyModuleList:any = [];
+  //   if(moduleList && moduleList.length > 0){
+  //     moduleList.forEach((module:any) => {
+  //       if(module && module.menu_list && module.menu_list.length > 0){
+  //         let menuList = module.menu_list;
+  //         module.menu_list = this.setDisplayInMenuWithPermission(menuList);
+  //         if(this.setDisplayInModuleWithPermission(module.menu_list)){
+  //           module['display'] = true;
+  //         }else{
+  //           module['display'] = false;
+  //         }
+  //         modifyModuleList.push(module);
+  //       }else{
+  //         modifyModuleList.push(module);
+  //       }
+  //     });
+  //   }
+  //   return modifyModuleList;
+  // }
   getDefaultMenuIndex(menuList:any){    
     let defaultmenuIndex = 0;
     let defaultSubmenuIndex = -1;
@@ -77,68 +73,68 @@ constructor(
     }
     return defaultmenuIndex;
   }
-  setDisplayInMenuWithPermission(menuList:any){
-    let modifyMenuList = [];
-    if(menuList && menuList.length > 0){
-        for (let index = 0; index < menuList.length; index++) {
-            const menu = menuList[index];
-            if(menu.submenu && menu.submenu != null){
-                let modifySubMenuList = [];
-                let check = 0;
-                for (let j = 0; j < menu.submenu.length; j++) {
-                    const submenu = menu.submenu[j];
-                    if(!this.checkPermission(submenu)){
-                        submenu['display'] = true;
-                        modifySubMenuList.push(submenu);
-                        check = 1;
-                    }else{
-                        submenu['display'] = false;
-                        modifySubMenuList.push(submenu);
-                    }
-                }
-                if(check == 1){
-                    menu['display'] = true;                        
-                }else{
-                    menu['display'] = false;
-                }
-                menu.submenu = modifySubMenuList;
-                modifyMenuList.push(menu);
-            }else{
-                if(!this.checkPermission(menu)){
-                    menu['display'] = true;
-                    modifyMenuList.push(menu);
-                }else{
-                    menu['display'] = false;
-                    modifyMenuList.push(menu); 
-                }
-            }                
-        }
-    }
-    return modifyMenuList;
-  }
-  setDisplayInModuleWithPermission(menuList:any){
-    let check = false;
-    if(menuList && menuList.length > 0){
-      for (let index = 0; index < menuList.length; index++) {
-        const menu = menuList[index];
-        if(menu.submenu && menu.submenu != null){
-          for (let j = 0; j < menu.submenu.length; j++) {
-            const submenu = menu.submenu[j];
-            if(submenu.display){
-              check = true;
-              break;
-            }            
-          }
-        }else{
-          if(menu.display){
-            check = true;
-            break;
-          }
-        }        
-      }
-    }
-    return check;
-  }
+  // setDisplayInMenuWithPermission(menuList:any){
+  //   let modifyMenuList = [];
+  //   if(menuList && menuList.length > 0){
+  //       for (let index = 0; index < menuList.length; index++) {
+  //           const menu = menuList[index];
+  //           if(menu.submenu && menu.submenu != null){
+  //               let modifySubMenuList = [];
+  //               let check = 0;
+  //               for (let j = 0; j < menu.submenu.length; j++) {
+  //                   const submenu = menu.submenu[j];
+  //                   if(!this.checkPermission(submenu)){
+  //                       submenu['display'] = true;
+  //                       modifySubMenuList.push(submenu);
+  //                       check = 1;
+  //                   }else{
+  //                       submenu['display'] = false;
+  //                       modifySubMenuList.push(submenu);
+  //                   }
+  //               }
+  //               if(check == 1){
+  //                   menu['display'] = true;                        
+  //               }else{
+  //                   menu['display'] = false;
+  //               }
+  //               menu.submenu = modifySubMenuList;
+  //               modifyMenuList.push(menu);
+  //           }else{
+  //               if(!this.checkPermission(menu)){
+  //                   menu['display'] = true;
+  //                   modifyMenuList.push(menu);
+  //               }else{
+  //                   menu['display'] = false;
+  //                   modifyMenuList.push(menu); 
+  //               }
+  //           }                
+  //       }
+  //   }
+  //   return modifyMenuList;
+  // }
+  // setDisplayInModuleWithPermission(menuList:any){
+  //   let check = false;
+  //   if(menuList && menuList.length > 0){
+  //     for (let index = 0; index < menuList.length; index++) {
+  //       const menu = menuList[index];
+  //       if(menu.submenu && menu.submenu != null){
+  //         for (let j = 0; j < menu.submenu.length; j++) {
+  //           const submenu = menu.submenu[j];
+  //           if(submenu.display){
+  //             check = true;
+  //             break;
+  //           }            
+  //         }
+  //       }else{
+  //         if(menu.display){
+  //           check = true;
+  //           break;
+  //         }
+  //       }        
+  //     }
+  //   }
+  //   return check;
+  // }
   getDefaultMenu(menuList:any){
       let menu:any = {};
       let defaultMenu:any = {};
@@ -149,37 +145,37 @@ constructor(
       }else{
           defaultMenu = menuList[defaultMenuIndexs.defaultmenuIndex];
       }
-
-      if(defaultMenu.display){
-        menu['menu'] = defaultMenu; 
-      }else{
-          menu['menu'] = this.findMenuWithPermission(menuList);
-      }
+      menu['menu'] = defaultMenu;
+      // if(defaultMenu.display){
+         
+      // }else{
+      //     menu['menu'] = this.findMenuWithPermission(menuList);
+      // }
       return menu;
   }
-  findMenuWithPermission(menuList:any){
-      let modifyMenu = {};
-      if(menuList && menuList.length > 0){
-          for (let index = 0; index < menuList.length; index++) {
-              const menu = menuList[index];
-              if(menu.display && menu.submenu && menu.submenu != null){
-                  for (let j = 0; j < menu.submenu.length; j++) {
-                      const submenu = menu.submenu[j];
-                      if(submenu.display){
-                          modifyMenu = submenu;
-                          break;
-                      }
-                  }
-              }else{
-                  if(menu.display){
-                      modifyMenu = menu;
-                      break;
-                  }
-              }                
-          }
-      }
-      return modifyMenu;
-  }
+  // findMenuWithPermission(menuList:any){
+  //     let modifyMenu = {};
+  //     if(menuList && menuList.length > 0){
+  //         for (let index = 0; index < menuList.length; index++) {
+  //             const menu = menuList[index];
+  //             if(menu.display && menu.submenu && menu.submenu != null){
+  //                 for (let j = 0; j < menu.submenu.length; j++) {
+  //                     const submenu = menu.submenu[j];
+  //                     if(submenu.display){
+  //                         modifyMenu = submenu;
+  //                         break;
+  //                     }
+  //                 }
+  //             }else{
+  //                 if(menu.display){
+  //                     modifyMenu = menu;
+  //                     break;
+  //                 }
+  //             }                
+  //         }
+  //     }
+  //     return modifyMenu;
+  // }
   setModuleName(moduleName:string){
     this.storageService.setModule(moduleName);
   }
@@ -239,9 +235,9 @@ constructor(
     }
     return menuName;
   }
-  checkPermission(menu:any){
-      return !this.permissionService.checkPermission(menu.name, 'view')
-  }
+  // checkPermission(menu:any){
+  //     return !this.permissionService.checkPermission(menu.name, 'view')
+  // }
   getTemplateData(module:any,submenu:any) {
     if(submenu && submenu.name && this.permissionService.checkPermission(submenu.name,'view')){
         this.storageService.SetActiveMenu(submenu);
@@ -269,20 +265,10 @@ constructor(
           }           
         }
     }else{
-      this.checkTokenStatusForPermission();       
+      this.permissionService.checkTokenStatusForPermission();       
     }
   }
-  checkTokenStatusForPermission(){
-    let getTokenStatus = this.authService.checkIdTokenStatus()
-    if(getTokenStatus.status){
-      this.notificationService.notify("bg-danger", "Permission denied !!!");
-    }else{
-      if(getTokenStatus.msg != ""){
-        this.notificationService.notify("bg-info", getTokenStatus.msg);
-      }
-      this.authService.gotToSigninPage();
-    }
-  }
+  
   GoToSelectedModule(item:any){        
     if(item && item.name){           
         this.setModuleName(item.name);
@@ -301,5 +287,6 @@ constructor(
         this.router.navigate(['/dashboard']);
     }
   }
+  
 
 }

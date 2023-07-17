@@ -26,6 +26,8 @@ export * from './lib/services/notify/notification.service';
 export * from './lib/services/permission/permission.service';
 export * from './lib/services/storage/storage.service';
 export * from './lib/services/lims-calculations/lims-calculations.service';
+export * from './lib/services/tree-component/tree-component.service';
+export * from './lib/services/voice-recognition/voice-recognition.service';
 export * from './lib/shared/enums/common.enum';
 export * from './lib/shared/enums/end-point.enum';
 export * from './lib/shared/enums/storage-token-status.enum';
