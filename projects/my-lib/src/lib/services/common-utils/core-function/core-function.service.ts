@@ -54,7 +54,7 @@ export class CoreFunctionService {
                 this.setTabOrPermission(menu,permissionList);                
               }
               if(submenuList && submenuList.length > 0){
-                menuobj['submenu'] = submenuList;
+                menuobj['submenu'] = this.sortMenu(submenuList);
               }else{
                 menuobj['submenu'] = null;
               }
@@ -63,7 +63,7 @@ export class CoreFunctionService {
           }          
         }
         if(menuList && menuList.length > 0){
-          moduleObj['menu_list'] = menuList;
+          moduleObj['menu_list'] = this.sortMenu(menuList);
         }else{
           moduleObj['menu_list'] = null;
         }
@@ -87,5 +87,15 @@ export class CoreFunctionService {
         });
       }
     }
+  }
+  sortMenu(menuList:any){
+    let list:any=[];
+    let mlist = menuList.sort((a:any,b:any) =>  a.index - b.index);
+    if(mlist && mlist.length > 0){
+      mlist.forEach((m:any) => {
+        list.push(m);
+      });
+    }
+    return list;
   }
 }
