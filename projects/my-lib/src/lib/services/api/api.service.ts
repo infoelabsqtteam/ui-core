@@ -672,5 +672,17 @@ getSelectedRowFromDB(payload:any){
   )
 }
 
+getGridRunningData(payload:any){
+  let api = this.envService.getApi('GET_GRID_DATA');
+  this.http.post(api + '/' + payload.path, payload.data).subscribe(
+    (respData) => {
+        this.dataShareService.shareGridRunningData(respData)
+      },
+    (error) => {
+        console.log(error);
+      }
+  ) 
+}
+
 
 }

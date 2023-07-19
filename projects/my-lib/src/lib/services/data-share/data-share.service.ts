@@ -75,6 +75,7 @@ export class DataShareService {
   S3Url:Subject<string> = new Subject<string>();
   printData:Subject<any> = new Subject<any>();
   setSelectedRowData:Subject<any> = new Subject<any>();
+  gridRunningData: Subject<any> = new BehaviorSubject<any>(null);
 
   constructor() { }
 
@@ -317,7 +318,9 @@ export class DataShareService {
   setSelectedRow(data:any){
     this.setSelectedRowData.next(data);
   }
-
+  shareGridRunningData(gridRunningData:any){
+    this.gridRunningData.next(gridRunningData);
+  }
 
 
 
