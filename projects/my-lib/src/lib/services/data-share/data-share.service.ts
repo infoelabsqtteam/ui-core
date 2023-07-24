@@ -76,6 +76,7 @@ export class DataShareService {
   printData:Subject<any> = new Subject<any>();
   setSelectedRowData:Subject<any> = new Subject<any>();  
   setClientName:Subject<any> = new Subject<any>();
+  gridRunningData: Subject<any> = new Subject<any>();
 
   constructor() { }
 
@@ -324,12 +325,9 @@ export class DataShareService {
   resetClientName(responce:any){
     this.setClientName.next(responce);
   }
-
-
-
-
-
-
+  shareGridRunningData(responce:any){
+    this.gridRunningData.next(responce);
+  }
 
 
 }
