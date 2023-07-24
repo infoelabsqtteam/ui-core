@@ -77,6 +77,9 @@ export class DataShareService {
   setSelectedRowData:Subject<any> = new Subject<any>();  
   setClientName:Subject<any> = new Subject<any>();
   gridRunningData: Subject<any> = new Subject<any>();
+  collectiondata:Subject<any> = new Subject<any>();
+  childGrid:Subject<any> = new Subject<any>();
+  childgridfields:any;
 
   constructor() { }
 
@@ -319,15 +322,27 @@ export class DataShareService {
   setSelectedRow(data:any){
     this.setSelectedRowData.next(data);
   }
+  shareGridRunningData(responce:any){
+    this.gridRunningData.next(responce);
+  }
+   //For App
   subscribeClientName(responce:string){
     this.setClientName.next(responce);
   }
   resetClientName(responce:any){
     this.setClientName.next(responce);
   }
-  shareGridRunningData(responce:any){
-    this.gridRunningData.next(responce);
+  collectionData(responce:any){
+    this.collectiondata.next(responce);
   }
+  setChildGrid(responce:any){
+    this.childGrid.next(responce);
+    this.childgridfields = responce;
+  }
+  getChildGrid(){
+    return this.childgridfields;
+  }
+  //End For App
 
 
 }

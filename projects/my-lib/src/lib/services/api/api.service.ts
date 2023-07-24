@@ -683,6 +683,30 @@ getGridRunningData(payload:any){
       }
   ) 
 }
+  // For app
+  getDatabyCollectionName(payload:any){
+    let api = this.envService.getApi('GET_GRID_DATA');
+    this.http.post(api + '/' + payload.path, payload.data).subscribe(
+      (respData) => {
+          this.dataShareService.collectionData(respData);
+        },
+      (error) => {
+          console.log(error);
+        }
+    ) 
+  }
+  GetChildGrid(payload:any){
+    let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
+    this.http.post(api, payload).subscribe(
+      (respData:any) => {        
+          this.dataShareService.setChildGrid(respData[0]);
+        },
+      (error) => {
+          console.log(error);
+        }
+    )
+  }
+  //End For app functions
 
 
 }
