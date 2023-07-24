@@ -7,6 +7,7 @@ import { StorageTokenStatus } from '../../shared/enums/storage-token-status.enum
 import { serverHostList } from './serverHostList';
 import { StorageService } from '../../services/storage/storage.service';
 import { CoreFunctionService } from '../../services/common-utils/core-function/core-function.service';
+import { PLATFORM_NAME } from '../../shared/platform';
 
 
 @Injectable({
@@ -26,6 +27,9 @@ export class EnvService {
     return this.env;
   }
 
+  getPlatform(){
+    return this.env.isPlatform;
+  }
 
   getBaseUrl(){
     let baseUrl:any;
@@ -111,14 +115,23 @@ export class EnvService {
   }
   
   getHostKeyValue(keyName:string){
-    let hostname:string = this.getHostName('hostname');
+    let hostname:any ="";
+    let key_Name:string = '';
+    let platFormName = this.getPlatform();
+    if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+      hostname = this.storageService.getClientName();
+      key_Name = 'clientCode';
+    }else{
+      hostname = this.getHostName('hostname');
+      key_Name = 'clientEndpoint';
+    }
     let value:any = '';   
     if(hostname == 'localhost'){
       value = this.env.serverhost;
     }else if(serverHostList && serverHostList.length > 0){
       for (let index = 0; index < serverHostList.length; index++) {
         const element:any = serverHostList[index];
-        if(hostname == element.clientEndpoint){
+        if(hostname == element.key_Name){
           if(keyName == "object"){
             value = element;
             break;

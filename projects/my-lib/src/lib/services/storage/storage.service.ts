@@ -39,6 +39,7 @@ export class StorageService {
   CHILD_WINDOW_URL:string = "CHILD_WINDOW_URL";
   MODIFY_MODULES:any = 'MODIFY_MODULES';
   appName:any;
+  CLIENT_NAME:any = 'CLIENT_NAME';
 
   constructor(private http: HttpClient) { }
   setAppName(appname:string){
@@ -536,6 +537,13 @@ export class StorageService {
       value = applicationSetting[key];
     }    
     return value;
+  }
+  
+  setClientNAme(name:string){
+    localStorage.setItem(this.CLIENT_NAME,name);
+  }
+  getClientName(){
+    return localStorage.getItem(this.CLIENT_NAME);
   }
 
 }

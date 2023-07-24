@@ -9,6 +9,7 @@ import { ApiService } from '../api/api.service';
 import { ModelService } from '../model/model.service';
 import { EnvService } from '../env/env.service';
 import { Common } from '../../shared/enums/common.enum';
+import { PLATFORM_NAME } from '../../shared/platform';
 
 
 @Injectable({
@@ -206,7 +207,9 @@ export class CommonFunctionService {
         "fValue": fvalue,
         "operator": criteria[1]
       }
-      crList.push(list);
+      if(this.coreFunctionService.isNotBlank(fvalue)){
+        crList.push(list);
+      }
     });
     return crList;
   }
@@ -352,7 +355,7 @@ export class CommonFunctionService {
   is_check_role(id: any) {
     const userInfo = this.storageService.GetUserInfo();
     let check = 0;
-    if (userInfo.roles && userInfo.roles != null && userInfo.roles != "" && Array.isArray(userInfo.roles) && userInfo.roles.length > 0) {
+    if (userInfo.roles && userInfo.roles != null && userInfo.roles != "" && this.isArray(userInfo.roles) && userInfo.roles.length > 0) {
       for (let index = 0; index < userInfo.roles.length; index++) {
         const element = userInfo.roles[index];
         if (element._id == id) {
@@ -468,7 +471,7 @@ export class CommonFunctionService {
 
   checkAddUpdateIf(tableField:any,fieldName:any){
     let fieldValue = tableField[fieldName];
-    if (fieldValue != undefined && fieldValue.has_role != null && fieldValue.has_role != undefined && Array.isArray(fieldValue.has_role) && fieldValue.has_role.length > 0) {
+    if (fieldValue != undefined && fieldValue.has_role != null && fieldValue.has_role != undefined && this.isArray(fieldValue.has_role) && fieldValue.has_role.length > 0) {
       let check = 0;
       for (let index = 0; index < fieldValue.has_role.length; index++) {
         const element = fieldValue.has_role[index];
@@ -505,11 +508,12 @@ export class CommonFunctionService {
       headElements.forEach((element: any) => {  
         if(element != null && element.type != null){      
         switch (element.type.toLowerCase()) {
+          case "button":
           case "text":
           case "tree_view_selection":
           case "dropdown":
             if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){              
-              if(Array.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0 && element.type != 'dropdown'){
+              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0 && element.type != 'dropdown'){
                 element.api_params_criteria.forEach((cri: any) => {
                   criteria.push(cri)
                 });
@@ -546,7 +550,7 @@ export class CommonFunctionService {
             break;
           case "number":
               if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){              
-                if(Array.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
                   element.api_params_criteria.forEach((cri: any) => {
                     criteria.push(cri)
                   });
@@ -563,7 +567,7 @@ export class CommonFunctionService {
               break;
           case "typeahead":
             if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){ 
-              if(Array.isArray(element.dataFilterCriteria) && element.dataFilterCriteria.length > 0){
+              if(this.isArray(element.dataFilterCriteria) && element.dataFilterCriteria.length > 0){
                 element.dataFilterCriteria.forEach((cri: any) => {
                   criteria.push(cri)
                 });
@@ -580,7 +584,7 @@ export class CommonFunctionService {
             break;
           case "info":
             if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){              
-              if(Array.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
                 element.api_params_criteria.forEach((cri: any) => {
                   criteria.push(cri)
                 });
@@ -598,7 +602,7 @@ export class CommonFunctionService {
             case "reference_names":
             case "chips":
             if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){              
-              if(Array.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
                 element.api_params_criteria.forEach((cri: any) => {
                   criteria.push(cri)
                 });
@@ -616,7 +620,7 @@ export class CommonFunctionService {
           case "date":
           case "datetime":
             if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
-              if(Array.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
                 element.api_params_criteria.forEach((cri: any) => {
                   criteria.push(cri)
                 });
@@ -633,7 +637,7 @@ export class CommonFunctionService {
             break;
           case "daterange":
             if(formValue && formValue[element.field_name] && formValue[element.field_name].start != '' && formValue[element.field_name].end != null){              
-              if(Array.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
                 element.api_params_criteria.forEach((cri: any) => {
                   criteria.push(cri)
                 });
@@ -648,7 +652,7 @@ export class CommonFunctionService {
               }          
             }
             if(formValue && formValue[element.field_name] && formValue[element.field_name].end != '' && formValue[element.field_name].end != null){
-              if(Array.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
                 element.api_params_criteria.forEach((cri: any) => {
                   criteria.push(cri)
                 });
@@ -680,8 +684,7 @@ export class CommonFunctionService {
     return filterList;
   }
   dateFormat(value:any) {
-    return this.datePipe.transform(value, 'dd/MM/yyyy')
-
+    return this.datePipe.transform(value, 'dd/MM/yyyy');
   }
 
   commanApiPayload(headElement:any,tableField:any,actionButton:any,object?:any){
@@ -897,6 +900,7 @@ export class CommonFunctionService {
       value= this.getObjectValue(fieldName, object)
     }
     if (!field.type) field.type = "Text";
+    let platFormName = this.envService.getPlatform();
     switch (field.type.toLowerCase()) {
       case 'datetime': return this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
       case 'date': return this.datePipe.transform(value, 'dd/MM/yyyy');
@@ -907,7 +911,11 @@ export class CommonFunctionService {
       case "typeahead": return value && value.name ? value.name : value;
       case "info":
         if (value && value != '') {
-          return '<i class="fa fa-eye cursor-pointer"></i>';
+          if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+            return '<span class="material-symbols-outlined cursor-pointer">visibility</span>';
+          }else{
+            return '<i class="fa fa-eye cursor-pointer"></i>';
+          }
         } else {
           return '-';
         }
@@ -920,23 +928,39 @@ export class CommonFunctionService {
         }        
       case "file":
         if (value && value != '') {
-          return '<span class="material-icons cursor-pointer">text_snippet</span>';
+          if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+            return '<span class="material-symbols-outlined cursor-pointer">text_snippet</span>';
+          }else{
+            return '<span class="material-icons cursor-pointer">text_snippet</span>';
+          }
         } else {
           return '-';
         }
       case "template":
         if (value && value != '') {
-          return '<i class="fa fa-file cursor-pointer" aria-hidden="true"></i>';
+          if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+            return '<span class="material-symbols-outlined">description</span>';
+          }else{
+            return '<i class="fa fa-file cursor-pointer" aria-hidden="true"></i>';
+          }
         } else {
           return '-';
         }
       case "image":
         return '<img src="data:image/jpg;base64,' + value + '" />';
       case "icon":
-        return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';
+        if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+          return '<span class="material-symbols-outlined cursor-pointer">' + field.field_class + '</span>';
+        }else{
+          return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';
+        }
       case "download_file":
         if (value && value != '') {
-          return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';
+          if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+            return '<span class="material-symbols-outlined cursor-pointer">' + field.field_class + '</span>';
+          }else{
+            return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';
+          }
         }else{
           return '-';
         }
@@ -965,7 +989,7 @@ export class CommonFunctionService {
         }
       break;
       case "chips":
-        if(this.coreFunctionService.isNotBlank(value) && Array.isArray(value)){
+        if(this.coreFunctionService.isNotBlank(value) && this.isArray(value)){
           let name = "";
           for(let i=0 ;i<value.length; i++){
             if(this.coreFunctionService.isNotBlank(value[i]['name'])){
@@ -978,7 +1002,7 @@ export class CommonFunctionService {
         }
         return "-";
       case "reference_names":
-        if(this.coreFunctionService.isNotBlank(value) && Array.isArray(value)){
+        if(this.coreFunctionService.isNotBlank(value) && this.isArray(value)){
           let name = '';
           for(let i=0 ;i<value.length; i++){
             if(this.coreFunctionService.isNotBlank(value[i]['name'])){
@@ -992,9 +1016,6 @@ export class CommonFunctionService {
         }else{
           return "-";
         }
-          
-
-
       default: return value;
     }
   }
@@ -1047,12 +1068,12 @@ export class CommonFunctionService {
           case "chips":
           case "chips_with_mask":
             if(validatField){            
-              if(formValue[element.field_name] != "" && formValue[element.field_name] != null &&  !Array.isArray(formValue[element.field_name])){
+              if(formValue[element.field_name] != "" && formValue[element.field_name] != null &&  !this.isArray(formValue[element.field_name])){
                 return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
-              }else if(this.applicableForValidation(element) && !Array.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length <= 0){
+              }else if(this.applicableForValidation(element) && !this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length <= 0){
                 return {'msg':'Please Enter '+ element.label + '. !!!'}
               }
-            }else if (formValue[element.field_name] == "" && !Array.isArray(formValue[element.field_name])) {     
+            }else if (formValue[element.field_name] == "" && !this.isArray(formValue[element.field_name])) {     
               formValue[element.field_name] = null;
             }
             break;
@@ -1084,10 +1105,10 @@ export class CommonFunctionService {
           if(validatField){
             if(formValue[element.field_name] != "" && formValue[element.field_name] != null){
               return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
-            }else if(this.applicableForValidation(element) && !Array.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length > 0){
+            }else if(this.applicableForValidation(element) && !this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length > 0){
               return {'msg':'Please Enter '+ element.label + '. !!!'}
             }
-          }else if (formValue[element.field_name] == "" && !Array.isArray(formValue[element.field_name])) {
+          }else if (formValue[element.field_name] == "" && !this.isArray(formValue[element.field_name])) {
             formValue[element.field_name] = null;
           }
           break;
@@ -1100,7 +1121,7 @@ export class CommonFunctionService {
           if(validatField){
             if(this.applicableForValidation(element)){
               if(element.datatype != 'key_value'){
-                if(formValueWithCust[element.field_name] == null || !Array.isArray(formValueWithCust[element.field_name]) || formValueWithCust[element.field_name].length <= 0){
+                if(formValueWithCust[element.field_name] == null || !this.isArray(formValueWithCust[element.field_name]) || formValueWithCust[element.field_name].length <= 0){
                   return {'msg': element.label + ' is required.'}
                 }
               }else if(element.datatype == 'key_value'){
@@ -1110,7 +1131,7 @@ export class CommonFunctionService {
               }             
             }
           }else{
-            if (!Array.isArray(formValue[element.field_name]) || formValue[element.field_name].length <= 0) {
+            if (!this.isArray(formValue[element.field_name]) || formValue[element.field_name].length <= 0) {
               if (formValue[element.field_name] != null) {
                 if (element.datatype == 'key_value' && typeof formValue[element.field_name] == 'object') {
                   const object = formValue[element.field_name]
@@ -1137,7 +1158,7 @@ export class CommonFunctionService {
                     case "chips_with_mask":
                       if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
                         formValue[element.field_name].forEach((fiedlList: any) => {
-                          if (fiedlList[data.field_name] == "" && !Array.isArray(fiedlList[data.field_name])) {
+                          if (fiedlList[data.field_name] == "" && !this.isArray(fiedlList[data.field_name])) {
                             fiedlList[data.field_name] = null;
                           }
                         });
@@ -1169,7 +1190,7 @@ export class CommonFunctionService {
                     case "list_of_string":
                       if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
                         formValue[element.field_name].forEach((fiedlList: any) => {
-                          if (fiedlList[data.field_name] == "" && !Array.isArray(fiedlList[data.field_name])) {
+                          if (fiedlList[data.field_name] == "" && !this.isArray(fiedlList[data.field_name])) {
                             fiedlList[data.field_name] = null;
                           }
                         });
@@ -1194,10 +1215,10 @@ export class CommonFunctionService {
                 if(validatField){
                   if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
                     return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
-                  }else if(this.applicableForValidation(data) && !Array.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
+                  }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
                     return {'msg':'Please Enter '+ data.label + '. !!!'}
                   }
-                }else if (formValue[element.field_name][data.field_name] == "" && !Array.isArray(formValue[element.field_name][data.field_name])) {
+                }else if (formValue[element.field_name][data.field_name] == "" && !this.isArray(formValue[element.field_name][data.field_name])) {
                     formValue[element.field_name][data.field_name] = null;
                   }                
                 break;
@@ -1225,10 +1246,10 @@ export class CommonFunctionService {
                 if(validatField){
                   if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
                     return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
-                  }else if(this.applicableForValidation(data) && !Array.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
+                  }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
                     return {'msg':'Please Enter '+ data.label + '. !!!'}
                   }
-                }else if (formValue[element.field_name][data.field_name] == "" && !Array.isArray(formValue[element.field_name][data.field_name])) {
+                }else if (formValue[element.field_name][data.field_name] == "" && !this.isArray(formValue[element.field_name][data.field_name])) {
                   formValue[element.field_name][data.field_name] = null;
                 }
                 break;
@@ -1251,10 +1272,10 @@ export class CommonFunctionService {
                     if(validatField){
                       if(formValue[data.field_name] != "" && formValue[data.field_name] != null){
                         return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
-                      }else if(this.applicableForValidation(data) && !Array.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
+                      }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
                         return {'msg':'Please Enter '+ data.label + '. !!!'}
                       }
-                    }else if (formValue[data.field_name] == "" && !Array.isArray(formValue[data.field_name])) {
+                    }else if (formValue[data.field_name] == "" && !this.isArray(formValue[data.field_name])) {
                       formValue[data.field_name] = null;
                     }
                     break;
@@ -1282,10 +1303,10 @@ export class CommonFunctionService {
                     if(validatField){
                       if(formValue[data.field_name] != "" && formValue[data.field_name] != null){
                         return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
-                      }else if(this.applicableForValidation(data) && !Array.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
+                      }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
                         return {'msg':'Please Enter '+ data.label + '. !!!'}
                       }
-                    }else if (formValue[data.field_name] == "" && !Array.isArray(formValue[data.field_name])) {
+                    }else if (formValue[data.field_name] == "" && !this.isArray(formValue[data.field_name])) {
                       formValue[data.field_name] = null;
                     }
                     break;
@@ -2954,14 +2975,18 @@ export class CommonFunctionService {
 
   checkCustmizedValuValidation(fields:any, value:any) {
     let validate:any = [];
+    let response:any = {
+      status : false,
+      msg : ""
+    }
     fields.forEach((element:any) => {
       switch (element.type) {
         case "grid_selection":
         case "list_of_string":
           if (element.is_mandatory) {
-            if (value[element.field_name] === undefined || value[element.field_name] === '' || value[element.field_name] === null || !Array.isArray(value[element.field_name])) {
+            if (value[element.field_name] === undefined || value[element.field_name] === '' || value[element.field_name] === null || !this.isArray(value[element.field_name])) {
               validate.push(element);
-            } else if (Array.isArray(value[element.field_name])) {
+            } else if (this.isArray(value[element.field_name])) {
               if (value[element.field_name].length <= 0) {
                 validate.push(element);
               }
@@ -2982,13 +3007,13 @@ export class CommonFunctionService {
         }
 
       });
-      this.notificationService.notify('bg-danger', fieldName + ' Required.')
-      return false;
+      response.msg = fieldName + ' Required.';
+      response.status = false;      
+      // this.notificationService.notify('bg-danger', fieldName + ' Required.')
     } else {
-      return true;
+      response.status = true; 
     }
-
-
+    return response;
 }
 
 formSize(evt:any,fieldLangth:number){
@@ -3098,7 +3123,7 @@ getIndexInArrayById(array:any,id:any,key?:any){
     for (let i = 0; i < array.length; i++) {
       const element = array[i];
       if(key != undefined && key != null){
-        if(Array.isArray(key) && key.length > 0 && Object.keys(id).length > 0){          
+        if(this.isArray(key) && key.length > 0 && Object.keys(id).length > 0){          
           if (this.getMatchingInList(key,id,element)) {
             index = i;
           }
@@ -3599,6 +3624,78 @@ openModal(id:any, data:any){
     popupWin!.document.close();
     popupWin!.print()
   }
+  isArray(obj : any ) {
+    return Array.isArray(obj)
+  }
 
+  donotResetField(tableFields:any,FormValue:any){
+    let donotResetFieldLists:any={};
+    tableFields.forEach((tablefield:any) => {
+      if(tablefield.do_not_refresh_on_add && tablefield.type != "list_of_fields" && tablefield.type != "group_of_fields" && tablefield.type != "stepper"){
+        donotResetFieldLists[tablefield.field_name] = FormValue[tablefield.field_name];
+      }else if(tablefield.type == "group_of_fields"){
+        if(tablefield.list_of_fields && tablefield.list_of_fields.length > 0){
+          tablefield.list_of_fields.forEach((field:any) => {
+            if(field.do_not_refresh_on_add){
+              donotResetFieldLists[tablefield.field_name][field.field_name] = FormValue[tablefield.field_name][field.field_name];
+            }
+          });
+        }
+      }else if(tablefield.type == "stepper"){
+        if(tablefield.list_of_fields && tablefield.list_of_fields.length > 0){
+          tablefield.list_of_fields.forEach((step:any) => {
+            if(step.list_of_fields && step.list_of_fields.length > 0){
+              step.list_of_fields.forEach((field:any) => {
+                if(field.do_not_refresh_on_add){
+                  donotResetFieldLists[step.field_name][field.field_name] = FormValue[step.field_name][field.field_name];
+                }
+              });
+            }
+          });
+        }
+      }
+    });
+    return donotResetFieldLists;
+  }
+
+  modifyFileSetValue(files:any){
+    let fileName = '';
+    let fileLength = files.length;
+    let file = files[0];
+    if(fileLength == 1 && (file.fileName || file.rollName)){
+      fileName = file.fileName || file.rollName;
+    }else if(fileLength > 1){
+      fileName = fileLength + " Files";
+    }
+    return fileName;
+  }
+  modifyUploadFiles(files:any){
+    const fileList:any = [];
+    if(files && files.length > 0){
+      files.forEach((element:any) => {
+        if(element._id){
+          fileList.push(element)
+        }else{
+          if(!element.uploadData){
+            fileList.push({uploadData:[element]});
+          }else{
+            fileList.push(element);
+          }
+        }
+      });
+    }                  
+    return fileList;
+  }
+  getFirstCharOfString(char:any){
+    if(this.coreFunctionService.isNotBlank(char)){
+      return char.charAt(0)
+    }else{
+      return '';
+    }
+  }
+  removeItem(data:any,column:any,i:number){
+    data[column.field_name].splice(i,1);
+    return data[column.field_name];
+  }
   
 }

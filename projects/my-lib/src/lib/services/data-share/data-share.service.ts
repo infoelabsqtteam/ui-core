@@ -74,7 +74,8 @@ export class DataShareService {
   pdfFileName:Subject<string> = new Subject<string>();
   S3Url:Subject<string> = new Subject<string>();
   printData:Subject<any> = new Subject<any>();
-  setSelectedRowData:Subject<any> = new Subject<any>();
+  setSelectedRowData:Subject<any> = new Subject<any>();  
+  setClientName:Subject<any> = new Subject<any>();
 
   constructor() { }
 
@@ -316,6 +317,12 @@ export class DataShareService {
   }
   setSelectedRow(data:any){
     this.setSelectedRowData.next(data);
+  }
+  subscribeClientName(responce:string){
+    this.setClientName.next(responce);
+  }
+  resetClientName(responce:any){
+    this.setClientName.next(responce);
   }
 
 

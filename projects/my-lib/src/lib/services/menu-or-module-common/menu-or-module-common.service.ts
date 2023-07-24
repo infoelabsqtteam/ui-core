@@ -7,6 +7,7 @@ import { DataShareService } from '../data-share/data-share.service';
 import { NotificationService } from '../notify/notification.service';
 import { PermissionService } from '../permission/permission.service';
 import { StorageService } from '../storage/storage.service';
+import { CommonDataShareService } from '../data-share/common-data-share/common-data-share.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,8 @@ constructor(
   private notificationService:NotificationService,
   private apiService:ApiService,
   private router:Router,
-  private authService:AuthService
+  private authService:AuthService,
+  private commonDataShareService: CommonDataShareService
 ) { }
 
   modifyModuleListWithPermission(moduleList:any){
@@ -301,5 +303,53 @@ constructor(
         this.router.navigate(['/dashboard']);
     }
   }
+
+  // for App
+  getModuleBySelectedIndex(){
+    const moduleList = this.commonDataShareService.getModuleList();
+    const clickedModuleIndex = this.commonDataShareService.getModuleIndex();
+    let module:any  = {};
+    if(clickedModuleIndex >= 0){
+      module = moduleList[clickedModuleIndex];
+    }
+    return module;
+  }
+  
+  getCard(index:any){
+    const moduleList = this.commonDataShareService.getModuleList();
+    const clickedModuleIndex = this.commonDataShareService.getModuleIndex();    
+    let card:any  = {};
+    let tabs:any =[];
+    let selectedTabIndex:number = -1;
+    let popoverTabbing = false;
+    if(clickedModuleIndex >= 0){
+      card = moduleList[clickedModuleIndex];
+    }
+    if(card && card.tab_menu && card.tab_menu.length > 0 && card.popoverTabbing){
+      popoverTabbing = true;
+    }
+    if(card && card.tab_menu && card.tab_menu.length > 0){
+    const clickedtabIndex= this.commonDataShareService.getSelectdTabIndex();
+      tabs = card.tab_menu;
+      let tab:any = {};
+      if(index == -1){
+        tab = tabs[0];
+        selectedTabIndex = 0;
+      }else{
+        tab = tabs[clickedtabIndex];
+        selectedTabIndex = clickedtabIndex;
+      }
+      const tabIndex = this.commonFunctionService.getIndexInArrayById(moduleList,tab._id,"_id");
+      card = moduleList[tabIndex];      
+    }
+    let object = {
+      'tabs' : tabs,
+      "card" : card,
+      "selectedTabIndex" : selectedTabIndex,
+      "popoverTabbing" : popoverTabbing
+    }
+    return object;
+  }
+  // End For APP
 
 }
