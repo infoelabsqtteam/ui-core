@@ -3064,6 +3064,18 @@ setPageNoAndSize(payload:any,page:number){
   payload['pageSize'] = this.itemNumOfGrid; 
   return payload;
 }
+getRealTimeGridData(currentMenu:any, object:any) {
+  let grid_api_params_criteria = [];
+  let page = 1;
+  let criteria = "_id;eq;" + object._id + ";STATIC";
+  grid_api_params_criteria.push(criteria);
+  const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page); 
+  const getFilterData = {
+    data: data,
+    path: null
+  }
+  this.apiService.getGridRunningData(getFilterData);
+}
 setPageNumverAndSize(payload:any,page:number,){
   payload['pageNo'] = page - 1;
   payload['pageSize'] = this.itemNumOfGrid; 
