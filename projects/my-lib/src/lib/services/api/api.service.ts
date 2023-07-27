@@ -659,19 +659,6 @@ getDownloadManual(payload:object){
       }
   ) 
 }
-
-getSelectedRowFromDB(payload:any){
-  let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
-  this.http.post(api, payload).subscribe(
-    (respData) => {        
-        this.dataShareService.setSelectedRow(respData);
-      },
-    (error) => {
-        console.log(error);
-      }
-  )
-}
-
 getGridRunningData(payload:any){
   let api = this.envService.getApi('GET_GRID_DATA');
   this.http.post(api + '/' + payload.path, payload.data).subscribe(
