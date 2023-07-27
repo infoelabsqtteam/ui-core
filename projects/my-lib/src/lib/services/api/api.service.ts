@@ -659,7 +659,6 @@ getDownloadManual(payload:object){
       }
   ) 
 }
-
 getGridRunningData(payload:any){
   let api = this.envService.getApi('GET_GRID_DATA');
   this.http.post(api + '/' + payload.path, payload.data).subscribe(
