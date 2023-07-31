@@ -20,14 +20,14 @@ constructor(
   private modalService: ModelService,
   private stroageService: StorageService
  ) { }
-  
-getStatiData(payloads:any){ 
+
+getStatiData(payloads:any){
   this.dataShareService.setReqResponce(true);
   let reqLength = payloads.length;
   let responceCount = 0;
   from(payloads)
   .pipe(
-    mergeMap((payload)=>         
+    mergeMap((payload)=>
       this.staticDataCall([payload]))
     )
     .subscribe(
@@ -49,8 +49,8 @@ staticDataCall(payload:object){
 }
 setStaticData(data:any){
   const staticData:any = this.dataShareService.getStatiData();
-  const currentData:any = {};    
-  if(data.length > 0){                
+  const currentData:any = {};
+  if(data.length > 0){
     data.forEach((element:any) => {
       if(element.adkeys){
           if(element.adkeys.totalRows && element.adkeys.totalRows != ''){
@@ -58,7 +58,7 @@ setStaticData(data:any){
               currentData[element.field] = [];
               for (let index = 0; index < element.adkeys.totalRows; index++) {
                   staticData[element.field].push(element.data);
-                  currentData[element.field].push(element.data);                              
+                  currentData[element.field].push(element.data);
               }
           }
           if(element.adkeys.index && element.adkeys.index != ''){
@@ -71,13 +71,13 @@ setStaticData(data:any){
       }else{
           staticData[element.field] = element.data;
           currentData[element.field] = element.data;
-      }                    
-    }); 
+      }
+    });
   }
   if(data['staticDataMessgae'] != null && data['staticDataMessgae'] != ''){
     staticData['staticDataMessgae'] = data['staticDataMessgae'];
     currentData['staticDataMessgae'] = data['staticDataMessgae'];
-  } 
+  }
   this.dataShareService.shareStaticData(staticData,currentData);
 }
 
@@ -91,10 +91,10 @@ resetStaticAllData(){
   this.dataShareService.shareStaticData({},{})
 }
 
-getGridCountData(payloads:string){ 
+getGridCountData(payloads:string){
   from(payloads)
   .pipe(
-    mergeMap((payload)=>         
+    mergeMap((payload)=>
       this.gridCountDataCall([payload]))
     )
     .subscribe(
@@ -113,12 +113,12 @@ gridCountDataCall(payload:object){
 }
 
 setGridCountData(data:any){
-  const gridCountData:any = this.dataShareService.getGridCountData();    
-  if(data.length > 0){                
+  const gridCountData:any = this.dataShareService.getGridCountData();
+  if(data.length > 0){
     data.forEach((element:any) => {
-      gridCountData[element.field] = element.data_size            
-    }); 
-  } 
+      gridCountData[element.field] = element.data_size
+    });
+  }
   this.dataShareService.shareGridCountData(gridCountData);
 }
 resetGridCountAllData(){
@@ -133,7 +133,7 @@ getGridData(payload:any){
     (error) => {
         console.log(error);
       }
-  ) 
+  )
 }
 
 resetGridData(){
@@ -148,7 +148,7 @@ getDashletMster(payload:any){
     (error) => {
         console.log(error);
       }
-  ) 
+  )
 }
 getMongoDashletMster(payload:any){
   let api = this.envService.getApi('GET_GRID_DATA');
@@ -159,7 +159,18 @@ getMongoDashletMster(payload:any){
     (error) => {
         console.log(error);
       }
-  ) 
+  )
+}
+getMongoDashbord(payload:any){
+  let api = this.envService.getApi('GET_GRID_DATA');
+  this.http.post(api + '/' + payload.path, payload.data).subscribe(
+    (respData) => {
+        this.dataShareService.shareMongoDashbord(respData)
+      },
+    (error) => {
+        console.log(error);
+      }
+  )
 }
 
 GetTempMenu(payload:any){
@@ -185,7 +196,7 @@ GetTempData(payload:any){
     (error) => {
         console.log(error);
       }
-  ) 
+  )
 }
 resetTempData(){
   this.dataShareService.shareTempData([])
@@ -218,9 +229,9 @@ DynamicApiCall(payload:any){
     default:
       this.saveCall(api+payload.path,payload)
   }
-  
+
 }
-saveCall(api:string,payload:any){    
+saveCall(api:string,payload:any){
   this.http.post(api, payload.data).subscribe(
     (respData) => {
         this.dataShareService.setSaveResponce(respData)
@@ -242,14 +253,14 @@ GetFilterGridData(payload:any){
     (error) => {
         console.log(error);
       }
-  ) 
+  )
 }
 GetTypeaheadData(payload:any){
   let api = this.envService.getApi('GET_STATIC_DATA');
   this.http.post(api, payload).subscribe(
     (respData:any) => {
       let currentstaticData:any=[];
-      let result =[];        
+      let result =[];
       currentstaticData=respData['success'];
       if(currentstaticData.length > 0){
           result = currentstaticData[0].data
@@ -259,7 +270,7 @@ GetTypeaheadData(payload:any){
     (error) => {
         console.log(error);
       }
-  ) 
+  )
 }
 clearTypeaheadData(){
   this.dataShareService.setTypeAheadData([])
@@ -281,7 +292,7 @@ GetForm(payload:any){
       if(respData && respData['success'] != null){
           const object = JSON.parse(JSON.stringify(respData['success']));
           object['view_mode'] = "inlineFormView";
-          dinamicForm = {                     
+          dinamicForm = {
               DINAMIC_FORM : object
           }
       }
@@ -290,13 +301,13 @@ GetForm(payload:any){
     (error) => {
         console.log(error);
       }
-  ) 
+  )
 }
 
 GetNestedForm(payload:any){
   let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
   this.http.post(api, payload).subscribe(
-    (respData:any) => {        
+    (respData:any) => {
         this.dataShareService.setNestedForm(respData[0]);
       },
     (error) => {
@@ -320,7 +331,7 @@ GetDashletData(payloads:any){
   //this.dataShareService.setDashletData({});
   from(payloads)
   .pipe(
-    mergeMap((payload)=>         
+    mergeMap((payload)=>
       this.dashletDataCall(payload))
     )
     .subscribe(
@@ -341,15 +352,15 @@ SetDashletData(respData:any){
   let getDashletData = this.dataShareService.getDashletData();
   const dashletData = JSON.parse(JSON.stringify(getDashletData));
   currentStaticData.push(respData);
-  if(currentStaticData.length > 0){                
+  if(currentStaticData.length > 0){
       currentStaticData.forEach(element => {
           if(element && element.field != undefined && element.field != null){
-              dashletData[element.field] = element.data   
-          }                                   
-      });                 
+              dashletData[element.field] = element.data
+          }
+      });
 
-  } 
-  this.dataShareService.setDashletData(dashletData);        
+  }
+  this.dataShareService.setDashletData(dashletData);
 }
 
 GetExportExclLink(payload:any){
@@ -359,7 +370,7 @@ GetExportExclLink(payload:any){
         this.dataShareService.setExportExcelLink(respData)
       },
     (error) => {
-      this.modalService.close('download-progress-modal'); 
+      this.modalService.close('download-progress-modal');
         console.log(error);
       }
   )
@@ -478,7 +489,7 @@ ResetFileData(){
 DownloadFile(payload:any){
   let api = this.envService.getApi('DOWNLOAD_PDF');
   this.http.post(api + '/' + payload.path, payload.data).subscribe(
-    (respData:any) => {          
+    (respData:any) => {
         this.dataShareService.setFileDownloadUrl(respData['success']);
       },
     (error) => {
@@ -492,7 +503,7 @@ ResetDownloadUrl(){
 FileUpload(payload:any){
   let api = this.envService.getApi('GET_PDF');
   this.http.post(api + '/' + payload._id, payload.data, payload.responce).subscribe(
-    (respData) => {          
+    (respData) => {
         console.log(respData);
       },
     (error) => {
@@ -503,7 +514,7 @@ FileUpload(payload:any){
 GetChartData(payload:object){
   let api = this.envService.getApi('GET_CHART_DATA');
   this.http.post(api, payload).subscribe(
-    (respData) => {          
+    (respData) => {
         this.dataShareService.setChartData(respData);
       },
     (error) => {
@@ -514,7 +525,7 @@ GetChartData(payload:object){
 GetQr(payload:any){
   let api = this.envService.getApi('GET_QR_CODE');
   this.http.post(api + payload['number'], payload,{responseType: 'blob'} ).subscribe(
-    (respData) => {          
+    (respData) => {
       this.dataShareService.setFileData({ data: respData, filename: "qr-"+payload['from']+"-"+(payload['to']-1) });
       },
     (error) => {
@@ -526,7 +537,7 @@ GetQr(payload:any){
 getAuditHistory(payload:any){
   let api = this.envService.getApi('AUDIT_HISTORY');
   this.http.post(api +"/"+ payload['_id'], payload).subscribe(
-    (respData) => {          
+    (respData) => {
       this.dataShareService.setAuditHistoryData(respData);
       },
     (error) => {
@@ -539,7 +550,7 @@ getAplicationsThemeSetting(payload:object) {
   let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
   this.http.post(api, payload).subscribe(
     (respData) => {
-      if(JSON.stringify(respData) != "{}"){ 
+      if(JSON.stringify(respData) != "{}"){
         this.dataShareService.setThemeSetting(respData)
       }
       },
@@ -552,7 +563,7 @@ getAplicationsSetting(payload:object) {
   let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
   this.http.post(api, payload).subscribe(
     (respData) => {
-      if(JSON.stringify(respData) != "{}"){ 
+      if(JSON.stringify(respData) != "{}"){
         this.dataShareService.setApplicationSetting(respData)
       }
       },
@@ -564,7 +575,7 @@ getAplicationsSetting(payload:object) {
 fieldDinamicApi(api:any,payload:object){
   const host = this.envService.getBaseUrl();
   this.http.post(host+api, payload).subscribe(
-    (respData) => {         
+    (respData) => {
       this.dataShareService.setFieldDinamicApiResponce(respData)
     },
     (error) => {
@@ -577,7 +588,7 @@ getNextFormData(payload:any) {
   let api = this.envService.getApi('GET_GRID_DATA');
   this.http.post(api + '/' + payload.path, payload.data).subscribe(
     (respData) => {
-      if(JSON.stringify(respData) != "{}"){ 
+      if(JSON.stringify(respData) != "{}"){
         this.dataShareService.setNextFormData(respData)
       }
       },
@@ -610,7 +621,7 @@ getReportLoadGridData(payload:any){
     (error) => {
         console.log(error);
       }
-  ) 
+  )
 }
 
 
@@ -622,14 +633,14 @@ getFavouriteData(payload:any){
           const userPreference = respData['data'][0];
           this.stroageService.setUserPreference(userPreference);
           this.dataShareService.setUserPreference(userPreference);
-        }else{            
+        }else{
           this.dataShareService.setUserPreference(respData['data']);
-        }          
+        }
       },
     (error) => {
         console.log(error);
       }
-  ) 
+  )
 }
 
 getUserNotification(payload:any){
@@ -641,7 +652,7 @@ getUserNotification(payload:any){
     (error) => {
         console.log(error);
       }
-  ) 
+  )
 }
 resetUserNotification(){
   this.dataShareService.shareUserNotification([])
@@ -657,7 +668,7 @@ getDownloadManual(payload:object){
     (error) => {
         console.log(error);
       }
-  ) 
+  )
 }
 getGridRunningData(payload:any){
   let api = this.envService.getApi('GET_GRID_DATA');
@@ -668,7 +679,7 @@ getGridRunningData(payload:any){
     (error) => {
         console.log(error);
       }
-  ) 
+  )
 }
 
 
