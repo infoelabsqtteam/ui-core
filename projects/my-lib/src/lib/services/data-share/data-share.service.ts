@@ -16,7 +16,7 @@ export class DataShareService {
   gridData: Subject<any> = new BehaviorSubject<any>(null);
   menu:Subject<any> = new BehaviorSubject<any>(null);
   tempData:Subject<any> = new BehaviorSubject<any>(null);
-  tempStoreData:any; 
+  tempStoreData:any;
   saveFromDataRsponce:string='';
   deleteGridRowDataRsponce:string='';
   saveResponceData:Subject<any>= new BehaviorSubject<any>(null);
@@ -29,7 +29,7 @@ export class DataShareService {
   nestedForm:Subject<any>= new BehaviorSubject<any>(null);
   settingData:Subject<any> = new Subject<any>();
   hostData:Subject<any> = new Subject<any>();
-  dashletData:Subject<any> = new Subject<any>(); 
+  dashletData:Subject<any> = new Subject<any>();
   DashLetData:any={};
   appName:Subject<any> = new Subject<any>();
   authenticated:Subject<boolean> = new BehaviorSubject<boolean>(false)
@@ -57,7 +57,7 @@ export class DataShareService {
   DashletMaster:any = [];
   gitVirsion:Subject<any> = new Subject<any>();
   forgot:Subject<any> = new Subject<any>();
-  nextFormData:Subject<any> = new Subject<any>();  
+  nextFormData:Subject<any> = new Subject<any>();
   getReportLoadData:Subject<any> = new Subject<any>();
   getIsGridSelectionOpen:Subject<any> = new Subject<any>();
   chartModelShowHide:Subject<any> = new Subject<any>();
@@ -71,21 +71,22 @@ export class DataShareService {
   requestResponce:Subject<boolean> = new Subject<boolean>();
   mongoDbChartList:Subject<any> = new Subject<any>();
   MongoDbChartList:any = [];
+  mongoDashbordList:Subject<any> = new Subject<any>();
   pdfFileName:Subject<string> = new Subject<string>();
   S3Url:Subject<string> = new Subject<string>();
   printData:Subject<any> = new Subject<any>();
-  setSelectedRowData:Subject<any> = new Subject<any>();
+  gridRunningData: Subject<any> = new Subject<any>();
 
   constructor() { }
 
-  sendCurrentPage(responce:any) { 
+  sendCurrentPage(responce:any) {
     if(responce != undefined && responce != null){
       this.currentPage.next(responce);
       this.currentpage = responce;
     }else{
       this.currentPage.next('HOME');
       this.currentpage = 'HOME';
-    }      
+    }
   }
   getCurrentPage(){
     return this.currentpage;
@@ -123,6 +124,9 @@ export class DataShareService {
   }
   getMongoChart(){
     return this.MongoDbChartList;
+  }
+  shareMongoDashbord(responce:any){
+    this.mongoDashbordList.next(responce)
   }
   shareMenuData(menuData:any){
     this.menu.next(menuData);
@@ -314,15 +318,10 @@ export class DataShareService {
   sharePublicUrlFromS3(url:any){
     this.S3Url.next(url);
   }
-  setSelectedRow(data:any){
-    this.setSelectedRowData.next(data);
+
+  shareGridRunningData(responce:any){
+    this.gridRunningData.next(responce);
   }
-
-
-
-
-
-
 
 
 }
