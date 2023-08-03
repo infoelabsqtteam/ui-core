@@ -19,11 +19,11 @@ export class PermissionService {
 
   checkPermission(template:string,option:string){
     this.permission = this.storageService.GetPermission();
-    if(this.permission && this.permission != null && this.permission != undefined){
-      return this.checkList(template,option);
-    }else{
-      return this.checkList(template,option);
+    let check = false;
+    if(this.permission && typeof this.permission == 'object' && Object.keys(this.permission).length > 0){
+      check = this.checkList(template,option);
     }
+    return check;
   }
   checkList(template:string,option:string){
     if(this.permission[template]){
