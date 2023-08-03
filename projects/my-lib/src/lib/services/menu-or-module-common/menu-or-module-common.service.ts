@@ -12,7 +12,7 @@ import { StorageService } from '../storage/storage.service';
 export class MenuOrModuleCommonService {
 
 constructor(
-  private storageService: StorageService, 
+  private storageService: StorageService,
   private permissionService:PermissionService,
   private commonFunctionService:CommonFunctionService,
   private dataShareService:DataShareService,
@@ -40,15 +40,15 @@ constructor(
   //   }
   //   return modifyModuleList;
   // }
-  getDefaultMenuIndex(menuList:any){    
+  getDefaultMenuIndex(menuList:any){
     let defaultmenuIndex = 0;
     let defaultSubmenuIndex = -1;
     let defaultIndexs = {
       'defaultmenuIndex':defaultmenuIndex,
       'defaultSubmenuIndex' :defaultSubmenuIndex
     };
-    if(menuList && menuList.length > 0){ 
-      defaultmenuIndex = this.getDefaultIndex(menuList)         
+    if(menuList && menuList.length > 0){
+      defaultmenuIndex = this.getDefaultIndex(menuList)
       const defaultMenu =menuList[defaultmenuIndex];
       if(defaultMenu.submenu && defaultMenu.submenu.length > 0){
         defaultSubmenuIndex = this.getDefaultIndex(defaultMenu.submenu);
@@ -63,13 +63,13 @@ constructor(
   }
   getDefaultIndex(menuList:any){
     let defaultmenuIndex = 0;
-    if(menuList && menuList.length > 0){ 
+    if(menuList && menuList.length > 0){
       for (let index = 0; index <  menuList.length; index++) {
         if(menuList[index].defaultMenu){
           defaultmenuIndex = index;
           break;
-        }            
-      } 
+        }
+      }
     }
     return defaultmenuIndex;
   }
@@ -93,7 +93,7 @@ constructor(
   //                   }
   //               }
   //               if(check == 1){
-  //                   menu['display'] = true;                        
+  //                   menu['display'] = true;
   //               }else{
   //                   menu['display'] = false;
   //               }
@@ -105,9 +105,9 @@ constructor(
   //                   modifyMenuList.push(menu);
   //               }else{
   //                   menu['display'] = false;
-  //                   modifyMenuList.push(menu); 
+  //                   modifyMenuList.push(menu);
   //               }
-  //           }                
+  //           }
   //       }
   //   }
   //   return modifyMenuList;
@@ -123,14 +123,14 @@ constructor(
   //           if(submenu.display){
   //             check = true;
   //             break;
-  //           }            
+  //           }
   //         }
   //       }else{
   //         if(menu.display){
   //           check = true;
   //           break;
   //         }
-  //       }        
+  //       }
   //     }
   //   }
   //   return check;
@@ -147,7 +147,7 @@ constructor(
       }
       menu['menu'] = defaultMenu;
       // if(defaultMenu.display){
-         
+
       // }else{
       //     menu['menu'] = this.findMenuWithPermission(menuList);
       // }
@@ -171,7 +171,7 @@ constructor(
   //                     modifyMenu = menu;
   //                     break;
   //                 }
-  //             }                
+  //             }
   //         }
   //     }
   //     return modifyMenu;
@@ -181,7 +181,7 @@ constructor(
   }
   getModuleIndexById(moduleId:any){
     let moduleList = this.storageService.GetModules();
-    return this.commonFunctionService.getIndexInArrayById(moduleList,moduleId);    
+    return this.commonFunctionService.getIndexInArrayById(moduleList,moduleId);
   }
   shareMenuIndex(menuIndex:number,subMenuIndex:number,moduleIndex?:number){
     let indexs:any = {};
@@ -210,7 +210,7 @@ constructor(
             }
           }
         }
-      }      
+      }
     }
     return indexs;
   }
@@ -219,7 +219,7 @@ constructor(
     let menuList = module.menu_list;
     let menuIndex = this.commonFunctionService.getIndexInArrayById(menuList,menuId,key);
     menuName['menuIndex'] = menuIndex;
-    let menu = menuList[menuIndex];    
+    let menu = menuList[menuIndex];
     if(submenuId != ""){
       if(menu.submenu){
         let subMenuList = menu.submenu;
@@ -260,17 +260,17 @@ constructor(
             this.GoToSelectedModule(module);
             const route = 'browse/'+module.name+"/"+submenu.name;
             //console.log(route);
-            this.router.navigate([route]);  
-            //this.router.navigate(['template']);  
-          }           
+            this.router.navigate([route]);
+            //this.router.navigate(['template']);
+          }
         }
     }else{
-      this.permissionService.checkTokenStatusForPermission();       
+      this.permissionService.checkTokenStatusForPermission();
     }
   }
-  
-  GoToSelectedModule(item:any){        
-    if(item && item.name){           
+
+  GoToSelectedModule(item:any){
+    if(item && item.name){
         this.setModuleName(item.name);
     }
     this.dataShareService.sendCurrentPage('DASHBOARD');
@@ -279,7 +279,7 @@ constructor(
     this.dataShareService.sendCurrentPage('MODULE');
     this.dataShareService.resetHeaderMenu([]);
     this.dataShareService.setModuleIndex(-1);
-    this.dataShareService.setMenuIndexs({menuIndex:-1,submenuIndex:-1});       
+    this.dataShareService.setMenuIndexs({menuIndex:-1,submenuIndex:-1});
     const menuType = this.storageService.GetMenuType()
     if (menuType == 'Horizontal') {
         this.router.navigate(['/home']);
@@ -287,6 +287,60 @@ constructor(
         this.router.navigate(['/dashboard']);
     }
   }
-  
+
+  addPermissionInTabs(tabs:any){
+    tabs.forEach((tab:any) => {
+      let tab_name = tab.tab_name;
+      let check = this.permissionService.checkPermission(tab_name,'view');
+      tab['display'] = check;
+      tab['febMenu'] = this.checkFebMenuAddOrNot(tab,'');
+    });
+    return tabs;
+  }
+  checkFebMenuAddOrNot(tab:any,parent:any){
+    let tabId = tab._id;
+    if(parent != ''){
+      tabId = parent._id;
+    }
+    let userFebTab = this.commonFunctionService.getUserPreferenceByFieldName('favoriteTabs');
+    if(userFebTab && userFebTab != null && userFebTab.length > 0){
+      let match = -1;
+      for (let index = 0; index < userFebTab.length; index++) {
+        const element = userFebTab[index];
+        if(element._id == tabId ){
+          match = index;
+          break;
+        }
+      }
+      if(match > -1){
+        if(parent != ''){
+          const submenu = userFebTab[match]['tab'];
+          let subMatchIndex = -1;
+          if(submenu && submenu.length > 0){
+            for (let j = 0; j < submenu.length; j++) {
+              const subMenu = submenu[j];
+              if(subMenu._id == tab._id){
+                subMatchIndex = j;
+                break;
+              }
+
+            }
+          }
+          if(subMatchIndex > -1){
+            return true
+          }else{
+            return false;
+          }
+        }else{
+          return true;
+        }
+      }else{
+        return false;
+      }
+    }else{
+      return false;
+    }
+  }
+
 
 }
