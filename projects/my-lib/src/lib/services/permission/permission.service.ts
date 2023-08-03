@@ -17,11 +17,11 @@ export class PermissionService {
       this.permission = this.storageService.GetPermission();
      }
 
-  checkPermission(template:string,option:string){    
+  checkPermission(template:string,option:string){
+    this.permission = this.storageService.GetPermission();
     if(this.permission && this.permission != null && this.permission != undefined){
-      return this.checkList(template,option);      
+      return this.checkList(template,option);
     }else{
-      this.permission = this.storageService.GetPermission();
       return this.checkList(template,option);
     }
   }
@@ -31,7 +31,7 @@ export class PermissionService {
       return this.check(permissionList,option);
     }else{
       return false;
-    } 
+    }
   }
   check(list:any,actionName:string){
     let check = false;
@@ -41,14 +41,14 @@ export class PermissionService {
         action = 'AUDIT_HISTORY';
       }else{
         action = actionName.toUpperCase();
-      }   
+      }
       for (let i = 0; i < list.length; i++) {
         const permission = list[i];
         if(permission == action){
           check = true;
           break;
         }
-      } 
+      }
     }else{
       check = false;
     }
