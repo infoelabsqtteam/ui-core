@@ -288,7 +288,7 @@ constructor(
     }
   }
 
-  addPermissionInTabs(tabs:any){
+  viewPermissionInTabs(tabs:any){
     tabs.forEach((tab:any) => {
       let tab_name = tab.tab_name;
       let check = this.permissionService.checkPermission(tab_name,'view');
@@ -296,6 +296,15 @@ constructor(
       tab['febMenu'] = this.checkFebMenuAddOrNot(tab,'');
     });
     return tabs;
+  }
+
+  addPermissionInTab(tab:any){
+    if(tab && tab.tab_name){
+      let name = tab.tab_name;
+      let check = this.permissionService.checkPermission(name,'add');
+      tab['addForm'] = check;
+    }
+    return tab;
   }
   checkFebMenuAddOrNot(tab:any,parent:any){
     let tabId = tab._id;
