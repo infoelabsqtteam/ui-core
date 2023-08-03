@@ -14,7 +14,7 @@ export class PermissionService {
     private authService:AuthService,
     private notificationService:NotificationService
     ) {
-      this.permission = this.storageService.GetPermission();
+
      }
 
   checkPermission(template:string,option:string){
