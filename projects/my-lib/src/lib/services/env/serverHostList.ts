@@ -38,6 +38,7 @@ export const serverHostList = [
   {"clientCode": "CENT-CENT01", "clientEndpoint": "central.e-labs.ai", "serverEndpoint": "https://prodservercentral.e-labs.ai"},
   {"clientCode": "UPMA-UPMA01", "clientEndpoint": "upma-lims.e-labs.ai", "serverEndpoint": "https://prodserverupma.e-labs.ai"},
   {"clientCode": "IIRT-IIRT01", "clientEndpoint": "erp.iirt.co.in", "serverEndpoint": "https://prodiirtserver.e-labs.ai"},
-  {"clientCode": "COMP-COMPASS01", "clientEndpoint": "compassgroup.e-labs.ai", "serverEndpoint": "https://prodservercompassgroup.e-labs.ai"}
+  {"clientCode": "COMP-COMPASS01", "clientEndpoint": "compassgroup.e-labs.ai", "serverEndpoint": "https://prodservercompassgroup.e-labs.ai"},
+  {"clientCode": "TICS-TICS01", "clientEndpoint": "lims.theticslab.com", "serverEndpoint": "https://prodservertheticslab.e-labs.ai"}
 ]
 
