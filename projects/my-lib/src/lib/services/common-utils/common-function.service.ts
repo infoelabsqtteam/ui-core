@@ -900,7 +900,7 @@ export class CommonFunctionService {
       value= this.getObjectValue(fieldName, object)
     }
     if (!field.type) field.type = "Text";
-    let platFormName = this.envService.getPlatform();
+    let platFormName = this.storageService.getPlatform();
     switch (field.type.toLowerCase()) {
       case 'datetime': return this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
       case 'date': return this.datePipe.transform(value, 'dd/MM/yyyy');

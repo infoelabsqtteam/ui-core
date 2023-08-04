@@ -16,20 +16,11 @@ import { PLATFORM_NAME } from '../../shared/platform';
 export class EnvService {
   requestType: any = '';
   constructor(
-    @Inject('env') private env:any,
     @Inject(DOCUMENT) private document: Document,
     private storageService: StorageService,
     private coreFunctionService:CoreFunctionService,
   ) { }
   
-
-  load(): Observable<any>{
-    return this.env;
-  }
-
-  getPlatform(){
-    return this.env.isPlatform;
-  }
 
   getBaseUrl(){
     let baseUrl:any;
@@ -44,13 +35,13 @@ export class EnvService {
     return baseUrl;
   }
   getAppName(){
-    if(this.coreFunctionService.isNotBlank(this.env.appName)){
-      this.storageService.setAppName(this.env.appName);
-      return this.env.appName;
+    if(this.coreFunctionService.isNotBlank(this.storageService.getClientCodeEnviorment().appName)){
+      this.storageService.setAppName(this.storageService.getClientCodeEnviorment().appName);
+      return this.storageService.getClientCodeEnviorment().appName;
     }
   }
   getAppId(){
-    return this.env.appId;
+    return this.storageService.getClientCodeEnviorment().appId;
   }
   baseUrl(applicationAction: string) {    
     return this.getBaseUrl() +  (<any>EndPoint)[applicationAction];
@@ -117,7 +108,7 @@ export class EnvService {
   getHostKeyValue(keyName:string){
     let hostname:any ="";
     let key_Name:string = '';
-    let platFormName = this.getPlatform();
+    let platFormName = this.storageService.getPlatform();
     if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
       hostname = this.storageService.getClientName();
       key_Name = 'clientCode';
@@ -127,7 +118,7 @@ export class EnvService {
     }
     let value:any = '';   
     if(hostname == 'localhost'){
-      value = this.env.serverhost;
+      value = this.storageService.getClientCodeEnviorment().serverhost;
     }else if(serverHostList && serverHostList.length > 0){
       for (let index = 0; index < serverHostList.length; index++) {
         const element:any = serverHostList[index];
@@ -191,6 +182,23 @@ export class EnvService {
     return redirectURL;
   }
 
+  checkClientExistOrNot(data:any){
+    let value : boolean = false;
+    if(serverHostList && serverHostList.length > 0){
+      for (let index = 0; index < serverHostList.length; index++) {
+        const element:any = serverHostList[index];
+        if(element && element.clientCode){
+          if(data === element.clientCode){
+            value = true
+          }
+        }
+      }
+    }
+    return value;
+  }
+  getVerifyType(){
+    return this.storageService.getClientCodeEnviorment().verify_type;
+  }
   
 
   

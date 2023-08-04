@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, tap, switchMap } from 'rxjs/operators';
 import { StorageTokenStatus } from '../../shared/enums/storage-token-status.enum';
+import { PLATFORM_NAME } from '../../shared/platform';
 
 
 
@@ -37,11 +38,20 @@ export class StorageService {
   USER_PREFERENCE:any;
   REDIRECT_URL:string = "REDIRECT_URL";
   CHILD_WINDOW_URL:string = "CHILD_WINDOW_URL";
+  LOGIN_REDIRECT_URL:string = 'LOGIN_REDIRECT_URL';
   MODIFY_MODULES:any = 'MODIFY_MODULES';
   appName:any;
   CLIENT_NAME:any = 'CLIENT_NAME';
+  
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,    
+    @Inject('env') private env:any,
+    ) { }
+    
+  load(): Observable<any>{
+    return this.env;
+  }
   setAppName(appname:string){
     this.appName = appname;
     localStorage.setItem("AppName", JSON.stringify(appname));
@@ -249,9 +259,32 @@ export class StorageService {
   getUserAppId(){
     return this.userInfo.appId;
   }
-  removeDataFormStorage() {
+  removeDataFormStorage(all?:string) {
+    let doNotClearCache:any = [];
+    if(all != "all"){
+      let platFormName = this.getPlatform();
+      if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+        let clientCode = this.getClientName();
+        if(clientCode && clientCode != ''){
+          let object:any = {};
+          object['key'] = this.CLIENT_NAME;
+          object["value"] = clientCode;
+          object['type'] = 'localstorage'
+          doNotClearCache.push(object);
+        }
+      }
+    }
     localStorage.clear();
     sessionStorage.clear();
+    if(doNotClearCache && doNotClearCache.length > 0){
+      doNotClearCache.forEach((obj:any) => {
+        if(obj && obj.type == 'localstorage'){
+          let key = obj['key'];
+          let value = obj['value'];
+          localStorage.setItem(key,value);
+        }
+      })
+    }
   }
 
   setIdTokenExpiry(){
@@ -544,6 +577,21 @@ export class StorageService {
   }
   getClientName(){
     return localStorage.getItem(this.CLIENT_NAME);
+  }
+  removeKeyFromStorage(key:string){
+    localStorage.removeItem(key);
+  } 
+  getPlatform(){
+    return this.env.plateformName;
+  }
+  getClientCodeEnviorment(){
+    return this.env;
+  }
+  setLoginRedirectUrl(url:string){
+    localStorage.setItem(this.LOGIN_REDIRECT_URL, url);
+  }
+  getLoginRedirectUrl(){
+    localStorage.getItem(this.LOGIN_REDIRECT_URL);
   }
 
 }

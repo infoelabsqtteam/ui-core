@@ -125,6 +125,7 @@ export class AuthService implements OnInit{
     const menuType = this.storageService.GetMenuType();
     const redirectUrl = this.storageService.getRedirectUrl();
     const childWindowUrl = this.storageService.getChildWindowUrl();
+    const loginRedirectUrl:any = this.storageService.getLoginRedirectUrl();
     let route = '/dashboard';
     if(menuType == 'Horizontal'){
       route = '/home'; 
@@ -133,7 +134,9 @@ export class AuthService implements OnInit{
       route = redirectUrl;
     }else if(childWindowUrl && childWindowUrl != '' && childWindowUrl != '/'){
       route = childWindowUrl;
-    } 
+    }else if(loginRedirectUrl && loginRedirectUrl != '' && loginRedirectUrl != '/'){
+      route = loginRedirectUrl;
+    }
     this.router.navigate([route]);
   }
   redirectToSignPage(){
