@@ -587,11 +587,5 @@ export class StorageService {
   getClientCodeEnviorment(){
     return this.env;
   }
-  setLoginRedirectUrl(url:string){
-    localStorage.setItem(this.LOGIN_REDIRECT_URL, url);
-  }
-  getLoginRedirectUrl(){
-    localStorage.getItem(this.LOGIN_REDIRECT_URL);
-  }
 
 }
