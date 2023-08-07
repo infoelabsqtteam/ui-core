@@ -26,7 +26,7 @@ export class CoreFunctionService {
         if(module && module.details){
           moduleObj = module.details;
         }
-        let menuList:any = []; 
+        let menuList:any = [];
         if(module && module.menuMap){
           let menuMap = module.menuMap;
           if(Object.keys(menuMap).length > 0){
@@ -46,12 +46,12 @@ export class CoreFunctionService {
                     if(submenu && submenu.details){
                       submenuObj = submenu.details;
                     }
-                    this.setTabOrPermission(submenu,permissionList);                    
-                    submenuList.push(submenuObj);                    
+                    this.setTabOrPermission(submenu,permissionList);
+                    submenuList.push(submenuObj);
                   });
                 }
               }else{
-                this.setTabOrPermission(menu,permissionList);                
+                this.setTabOrPermission(menu,permissionList);
               }
               if(submenuList && submenuList.length > 0){
                 menuobj['submenu'] = this.sortMenu(submenuList);
@@ -60,7 +60,7 @@ export class CoreFunctionService {
               }
               menuList.push(menuobj);
             })
-          }          
+          }
         }
         if(menuList && menuList.length > 0){
           moduleObj['menu_list'] = this.sortMenu(menuList);
@@ -80,9 +80,24 @@ export class CoreFunctionService {
       let tabsMap = menu.templateTabMap;
       if(Object.keys(tabsMap).length > 0){
         Object.keys(tabsMap).forEach((tkey,l) => {
-          let tab = tabsMap[tkey];          
-          if(tab && tab.access){
-            permissionList[tkey] = tab.access;
+          let tab = tabsMap[tkey];
+          if(tkey in permissionList){
+            if(tab && tab.access){
+              let oldPermissoin:Array<string> = permissionList[tkey];
+              let newPermission = tab.access;
+              if(newPermission && newPermission.length > 0){
+                newPermission.forEach((permission:string) => {
+                  if(!oldPermissoin.includes(permission)){
+                    oldPermissoin.push(permission);
+                  }
+                });
+              }
+              permissionList[tkey] = oldPermissoin;
+            }
+          }else{
+            if(tab && tab.access){
+              permissionList[tkey] = tab.access;
+            }
           }
         });
       }
