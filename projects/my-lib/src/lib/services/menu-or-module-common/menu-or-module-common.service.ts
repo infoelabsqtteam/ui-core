@@ -7,7 +7,7 @@ import { DataShareService } from '../data-share/data-share.service';
 import { NotificationService } from '../notify/notification.service';
 import { PermissionService } from '../permission/permission.service';
 import { StorageService } from '../storage/storage.service';
-import { CommonDataShareService } from '../data-share/common-data-share/common-data-share.service';
+import { CommonAppDataShareService } from '../data-share/common-app-data-share/common-app-data-share.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +23,7 @@ constructor(
   private apiService:ApiService,
   private router:Router,
   private authService:AuthService,
-  private commonDataShareService: CommonDataShareService
+  private commonAppDataShareService: CommonAppDataShareService
 ) { }
 
   modifyModuleListWithPermission(moduleList:any){
@@ -306,8 +306,8 @@ constructor(
 
   // for App
   getModuleBySelectedIndex(){
-    const moduleList = this.commonDataShareService.getModuleList();
-    const clickedModuleIndex = this.commonDataShareService.getModuleIndex();
+    const moduleList = this.commonAppDataShareService.getModuleList();
+    const clickedModuleIndex = this.commonAppDataShareService.getModuleIndex();
     let module:any  = {};
     if(clickedModuleIndex >= 0){
       module = moduleList[clickedModuleIndex];
@@ -316,8 +316,8 @@ constructor(
   }
   
   getCard(index:any){
-    const moduleList = this.commonDataShareService.getModuleList();
-    const clickedModuleIndex = this.commonDataShareService.getModuleIndex();    
+    const moduleList = this.commonAppDataShareService.getModuleList();
+    const clickedModuleIndex = this.commonAppDataShareService.getModuleIndex();    
     let card:any  = {};
     let tabs:any =[];
     let selectedTabIndex:number = -1;
@@ -329,7 +329,7 @@ constructor(
       popoverTabbing = true;
     }
     if(card && card.tab_menu && card.tab_menu.length > 0){
-    const clickedtabIndex= this.commonDataShareService.getSelectdTabIndex();
+    const clickedtabIndex= this.commonAppDataShareService.getSelectdTabIndex();
       tabs = card.tab_menu;
       let tab:any = {};
       if(index == -1){

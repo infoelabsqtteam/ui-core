@@ -3,7 +3,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class CommonDataShareService {
+export class CommonAppDataShareService {
 
   moduleList : any = [];
   moduleIndex:any = -1;

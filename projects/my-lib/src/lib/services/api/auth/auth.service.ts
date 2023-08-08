@@ -38,7 +38,7 @@ export class AuthService implements OnInit{
   Logout(payload:any){
     this.resetData();
     this.logOutRedirection();
-    this.notificationService.notify("bg-info","Log out Successful.");                
+    // this.notificationService.notify("bg-info","Log out Successful.");
     this.authDataShareService.restSettingModule('logged_out');
   }
   SessionExpired(payload?:any){
@@ -166,23 +166,65 @@ export class AuthService implements OnInit{
     )
   }
   Signup(payload:any){
+    let response = {
+      status: '',
+      class: '',
+      msg: '',
+      appPresentAlert: false,
+      autoLogin:false,
+      payload: {}
+    };
+    let newPayload :any = '';
+    let platFormName = this.storageService.getPlatform();
+    let isHybridPlatform = false;
+    if(platFormName && platFormName != 'web'){
+      isHybridPlatform = true;
+      newPayload = payload.data;
+    }else{
+      newPayload = payload;
+    }
     let api = this.envService.getAuthApi('AU_SIGNUP');
-    this.http.post(api, this.encryptionService.encryptRequest(payload)).subscribe(
+    this.http.post(api, this.encryptionService.encryptRequest(newPayload)).subscribe(
       (respData:any) =>{
         if(respData && respData['message'] == 'User registered successfully'){
-          if(this.storageService.getVerifyType() == 'mobile'){
-            this.router.navigate(['otp_varify'+'/'+payload.userId]);
+          if(payload.autologin && isHybridPlatform){
+            response.msg = 'Successfully Registered.';
+            response.autoLogin = payload.autologin;
+            response.payload = { userId: newPayload.userId, password: newPayload.password };
+            // this.Signin(appPayload);
           }else{
-            this.notificationService.notify("bg-success", "A verification link has been sent to your email account. please click on the link to verify your email and continue the registration process. ");
-            this.redirectToSignPage();
+            if(this.envService.getVerifyType() == 'mobile'){
+                response.msg = 'OTP has been sent to your registered Mobile no.';
+                response.payload = { userId: newPayload.userId, password: newPayload.password };
+                if(isHybridPlatform){
+                  response.appPresentAlert = true;
+                  // this.router.navigate([payload.redirection +'/'+payload.data.userId]);
+                }else{
+                  // this.router.navigate(['otp_varify'+'/'+payload.userId]);
+                }
+            }else{
+                response.msg = 'A verification link has been sent to your email account. please click on the link to verify your email and continue the registration process.';
+                response.appPresentAlert = true;
+            }
           }
-
         } else if(respData && respData['message']){
-          this.notificationService.notify("bg-success", respData['message']);
+          response.msg = respData['message'];
         }
+        response.status = 'success';
+        response.class = 'bg-success';
+        this.authDataShareService.setSignUpResponse(response);
       },
       (error)=>{
-        this.notificationService.notify("bg-danger", error.message);
+        if(error && error.error && error.error.message){
+          console.log("Sign In Secong error handling." + JSON.stringify(error));
+          response.msg = error.error.message;
+        }else{
+          console.log("Sign In Third error handling." + JSON.stringify(error));
+          response.msg = error.message;
+        }
+        response.status = 'error';
+        response.class = 'bg-danger';
+        this.authDataShareService.setSignUpResponse(response);
       }
     )
   }
@@ -261,19 +303,48 @@ export class AuthService implements OnInit{
       }
     ) 
   }
-  userVarify(payload:object){
+  userVarify(payload:any){
+    let response = {
+      status: '',
+      class: '',
+      msg: '',
+      autoLogin:false,
+    };
+    let newPayload :any = '';
+    let platFormName = this.storageService.getPlatform();
+    let isHybridPlatform = false;
+    if(platFormName && platFormName != 'web'){
+      isHybridPlatform = true;
+      newPayload = payload.data;
+    }else{
+      newPayload = payload;
+    }
     let api = this.envService.getAuthApi('USER_VARIFY');
-    this.http.post(api, this.encryptionService.encryptRequest(payload)).subscribe(
+    this.http.post(api, this.encryptionService.encryptRequest(newPayload)).subscribe(
       (respData:any) =>{
         if(respData && respData['message'] == "User has been verified successfully"){
-          this.notificationService.notify("bg-success", respData['message']);
-          if(this.storageService.getVerifyType() == 'mobile'){
-            this.router.navigate(['signin']);
+          response.msg = respData['message'];
+          if(payload.autologin){
+            response.autoLogin = payload.autologin;
           }
+          // if(this.storageService.getVerifyType() == 'mobile'){
+          // }
+        }else if(respData && respData['message']){
+          response.msg = respData['message'];
         }
+        response.status = 'success';
+        response.class = 'bg-success';
+        this.authDataShareService.setOtpResponse(response);
       },
       (error)=>{
-        this.notificationService.notify("bg-danger", error.message);
+        if(error && error.error && error.error.message){
+          response.msg = error.error.message;
+        }else{
+          response.msg = error.message;
+        }
+        response.status = 'error';
+        response.class = 'bg-danger';
+        this.authDataShareService.setOtpResponse(response);
       }
     )
   }
