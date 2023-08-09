@@ -313,8 +313,7 @@ constructor(
       module = moduleList[clickedModuleIndex];
     }
     return module;
-  }
-  
+  }  
   getCard(index:any){
     const moduleList = this.commonAppDataShareService.getModuleList();
     const clickedModuleIndex = this.commonAppDataShareService.getModuleIndex();    
@@ -349,6 +348,32 @@ constructor(
       "popoverTabbing" : popoverTabbing
     }
     return object;
+  }
+  getUserAutherisedCards(cardMasterList:any){
+    const userAuthModules:any = this.storageService.GetModules();
+    const cardList:any = [];
+    if(userAuthModules && userAuthModules != null){
+      userAuthModules.forEach((module:any, i:number) => {
+        if(module && module['_id']){
+          cardMasterList.forEach((card:any, j:number) => {
+            if(card && card.userAutherisedModule && card['userAutherisedModule']['_id']){
+              if(module['_id'] == card['userAutherisedModule']['_id']){
+                cardList.push(card);
+              }
+            }
+          })
+        }
+      });
+      return cardList;
+    }
+    return null;
+  }
+  getNestedCard(cardGrid:any, cardGridName:any) {
+    if (cardGrid[cardGridName] && cardGrid[cardGridName] != undefined && cardGrid[cardGridName] != null && cardGrid[cardGridName] != '') {
+      return JSON.parse(JSON.stringify(cardGrid[cardGridName]));
+    } else {
+      return {};
+    }
   }
   // End For APP
 

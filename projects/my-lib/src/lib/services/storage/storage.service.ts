@@ -571,7 +571,7 @@ export class StorageService {
     }    
     return value;
   }
-  
+  // for App
   setClientNAme(name:string){
     localStorage.setItem(this.CLIENT_NAME,name);
   }
