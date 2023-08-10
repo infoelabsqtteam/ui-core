@@ -311,12 +311,6 @@ export class DataShareService {
     this.gridRunningData.next(responce);
   }
    //For App
-  subscribeClientName(responce:string){
-    this.setClientName.next(responce);
-  }
-  resetClientName(responce:any){
-    this.setClientName.next(responce);
-  }
   collectionData(responce:any){
     this.collectiondata.next(responce);
   }

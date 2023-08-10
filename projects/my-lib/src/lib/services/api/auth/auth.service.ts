@@ -67,6 +67,11 @@ export class AuthService implements OnInit{
     this.redirectToSignPage();
   }
   GetUserInfoFromToken(payload:any, loginRedirect?:string){
+    let response = {
+      status: '',
+      class: '',
+      msg: ''
+    };
     let api = this.envService.getAuthApi('GET_USER_PERMISSION');
     const reqBody = { key: payload };
     this.http.post(api, reqBody).subscribe(
@@ -91,7 +96,16 @@ export class AuthService implements OnInit{
           this.envService.setRequestType('PUBLIC');
           this.redirectToSignPage(); 
         }else{
-            this.notificationService.notify("bg-danger", error.message);
+          if(error && error.status == 403){
+            response.msg = 'Username password does not match.';
+          }else if(error && error.error && error.error.message){
+            response.msg = error.error.message;
+          }else{
+            response.msg = error.message;
+          }
+          response.status = 'error';
+          response.class = 'bg-danger';          
+          this.authDataShareService.setSigninResponse(response);
         } 
       }
     )
@@ -229,34 +243,58 @@ export class AuthService implements OnInit{
     )
   }
   TryForgotPassword(payload:any){
+    let response = {
+      status: '',
+      class: '',
+      msg: ''
+    };
     let api = this.envService.getAuthApi('AUTH_FORGET_PASSWORD');
     this.http.post(api, this.encryptionService.encryptRequest(payload)).subscribe(
       (respData:any) =>{        
         if(respData && respData['message']){
-          this.notificationService.notify("bg-success", respData['message']);
-          this.authDataShareService.setForgot('reset');
+          response.status = 'success';
+          response.class = 'bg-success';
+          response.msg = respData['message'];
         }
+        this.authDataShareService.setForgot(response);
       },
       (error)=>{
         if(error && error.error && error.error.message){
-          this.notificationService.notify("bg-danger", error.error.message);
+          response.msg = error.error.message;
         }else{
-          this.notificationService.notify("bg-danger", error.message);
-        }        
+          response.msg = error.message;
+        }
+        response.status = 'error';
+        response.class = 'bg-danger';
+        this.authDataShareService.setForgot(response);
       }
     )
   }
   SaveNewPassword(payload:any){
+    let response = {
+      status: '',
+      class: '',
+      msg: ''
+    };
     let api = this.envService.getAuthApi('AUTH_RESET_PASSWORD');
     this.http.post(api, this.encryptionService.encryptRequest(payload)).subscribe(
       (respData:any) =>{
         if(respData && respData['message']){
-          this.notificationService.notify("bg-success", respData['message']);          
+          response.status = 'success';
+          response.class = 'bg-success';
+          response.msg = respData['message'];         
         }
-        this.redirectToSignPage();
+        this.authDataShareService.setForgot(response);
       },
       (error)=>{
-        this.notificationService.notify("bg-danger", error.message);
+        if(error && error.error && error.error.message){
+          response.msg = error.error.message;
+        }else{
+          response.msg = error.message;
+        }
+        response.status = 'error';
+        response.class = 'bg-danger';
+        this.authDataShareService.setForgot(response);
       }
     )
   }
@@ -283,23 +321,33 @@ export class AuthService implements OnInit{
   TryVerify(payload:object){
     console.log(payload);
   }
-  changePassword(payload:object){
+  changePassword(payload:any){
+    let response = {
+      status: '',
+      class: '',
+      msg: ''
+    };
     let api = this.envService.getAuthApi('AUTH_CHANGE_PASSWORD')
     this.http.post(api, this.encryptionService.encryptRequest(payload)).subscribe(
       (respData:any) => {
         if(respData && respData['message']){
-          this.notificationService.notify("bg-success", respData['message']);
-          this.Logout("");
+          response.status = 'success';
+          response.class = 'bg-success';
+          response.msg = respData['message'];
         }
+        this.authDataShareService.setChangePwd(response);
       },
       (error) => {
         if(error && error.status == 403){
-          this.notificationService.notify("bg-danger", "Invalid current password.");
+          response.msg = "Invalid current password.";
         }else if(error && error.error && error.error.message){
-          this.notificationService.notify("bg-danger", error.error.message);
+          response.msg =  error.error.message;
         }else{
-          this.notificationService.notify("bg-danger", error.message);
+          response.msg = error.message;
         }
+        response.status = 'error';
+        response.class = 'bg-danger';
+        this.authDataShareService.setChangePwd(response);
       }
     ) 
   }
