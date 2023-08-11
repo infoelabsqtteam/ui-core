@@ -14,6 +14,7 @@ export class AuthDataShareService {
   otpResponse:Subject<any> = new Subject();
   OtpAutoLoginData:any = {}
   createPwd:Subject<any> = new Subject();
+  userInfo:Subject<any> = new Subject();
   
 
   constructor() { }
@@ -47,6 +48,9 @@ export class AuthDataShareService {
   }
   setChangePwd(responce:any){
     this.createPwd.next(responce);
+  }
+  setUserInfo(responce:any){
+    this.userInfo.next(responce);
   }
 
 

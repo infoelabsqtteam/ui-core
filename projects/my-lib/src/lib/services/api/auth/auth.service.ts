@@ -105,7 +105,7 @@ export class AuthService implements OnInit{
           }
           response.status = 'error';
           response.class = 'bg-danger';          
-          this.authDataShareService.setSigninResponse(response);
+          this.authDataShareService.setUserInfo(response);
         } 
       }
     )
