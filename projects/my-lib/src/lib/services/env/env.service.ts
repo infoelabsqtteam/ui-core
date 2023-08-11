@@ -122,7 +122,7 @@ export class EnvService {
     }else if(serverHostList && serverHostList.length > 0){
       for (let index = 0; index < serverHostList.length; index++) {
         const element:any = serverHostList[index];
-        if(hostname == element.key_Name){
+        if(hostname == element[key_Name]){
           if(keyName == "object"){
             value = element;
             break;
