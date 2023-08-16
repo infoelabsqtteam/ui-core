@@ -9,7 +9,6 @@ import { ApiService } from '../api/api.service';
 import { ModelService } from '../model/model.service';
 import { EnvService } from '../env/env.service';
 import { Common } from '../../shared/enums/common.enum';
-import { PLATFORM_NAME } from '../../shared/platform';
 
 
 @Injectable({
@@ -900,7 +899,6 @@ export class CommonFunctionService {
       value= this.getObjectValue(fieldName, object)
     }
     if (!field.type) field.type = "Text";
-    let platFormName = this.storageService.getPlatform();
     switch (field.type.toLowerCase()) {
       case 'datetime': return this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
       case 'date': return this.datePipe.transform(value, 'dd/MM/yyyy');
@@ -911,7 +909,7 @@ export class CommonFunctionService {
       case "typeahead": return value && value.name ? value.name : value;
       case "info":
         if (value && value != '') {
-          if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+          if(this.storageService.checkPlatForm() == 'mobile'){
             return '<span class="material-symbols-outlined cursor-pointer">visibility</span>';
           }else{
             return '<i class="fa fa-eye cursor-pointer"></i>';
@@ -928,7 +926,7 @@ export class CommonFunctionService {
         }        
       case "file":
         if (value && value != '') {
-          if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+          if(this.storageService.checkPlatForm() == 'mobile'){
             return '<span class="material-symbols-outlined cursor-pointer">text_snippet</span>';
           }else{
             return '<span class="material-icons cursor-pointer">text_snippet</span>';
@@ -938,7 +936,7 @@ export class CommonFunctionService {
         }
       case "template":
         if (value && value != '') {
-          if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+          if(this.storageService.checkPlatForm() == 'mobile'){
             return '<span class="material-symbols-outlined">description</span>';
           }else{
             return '<i class="fa fa-file cursor-pointer" aria-hidden="true"></i>';
@@ -949,14 +947,14 @@ export class CommonFunctionService {
       case "image":
         return '<img src="data:image/jpg;base64,' + value + '" />';
       case "icon":
-        if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+        if(this.storageService.checkPlatForm() == 'mobile'){
           return '<span class="material-symbols-outlined cursor-pointer">' + field.field_class + '</span>';
         }else{
           return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';
         }
       case "download_file":
         if (value && value != '') {
-          if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+          if(this.storageService.checkPlatForm() == 'mobile'){
             return '<span class="material-symbols-outlined cursor-pointer">' + field.field_class + '</span>';
           }else{
             return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';

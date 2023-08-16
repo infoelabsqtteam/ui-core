@@ -262,8 +262,7 @@ export class StorageService {
   removeDataFormStorage(all?:string) {
     let doNotClearCache:any = [];
     if(all != "all"){
-      let platFormName = this.getPlatform();
-      if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+      if(this.checkPlatForm() == 'mobile'){
         let clientCode = this.getClientName();
         if(clientCode && clientCode != ''){
           let object:any = {};
@@ -586,6 +585,14 @@ export class StorageService {
   }
   getClientCodeEnviorment(){
     return this.env;
+  }  
+  checkPlatForm(){ 
+    let platForm = 'web';
+    let platFormName = this.getPlatform();
+    if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+      platForm = 'mobile';
+    }
+    return platForm;
   }
 
 }

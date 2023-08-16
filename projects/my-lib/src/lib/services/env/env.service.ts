@@ -108,8 +108,7 @@ export class EnvService {
   getHostKeyValue(keyName:string){
     let hostname:any ="";
     let key_Name:string = '';
-    let platFormName = this.storageService.getPlatform();
-    if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+    if(this.storageService.checkPlatForm() == 'mobile'){
       hostname = this.storageService.getClientName();
       key_Name = 'clientCode';
     }else{
@@ -199,8 +198,6 @@ export class EnvService {
   getVerifyType(){
     return this.storageService.getClientCodeEnviorment().verify_type;
   }
-  
-
   
   
 }

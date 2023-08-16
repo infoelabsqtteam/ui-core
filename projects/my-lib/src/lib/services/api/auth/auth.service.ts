@@ -3,12 +3,10 @@ import { EnvService } from '../../env/env.service';
 import { HttpClient } from '@angular/common/http';
 import { StorageService } from '../../storage/storage.service';
 import { StorageTokenStatus } from '../../../shared/enums/storage-token-status.enum';
-import { NotificationService } from '../../notify/notification.service';
 import { Router } from '@angular/router';
 import { EncryptionService } from '../../encryption/encryption.service';
 import { CommonFunctionService } from '../../common-utils/common-function.service';
 import { ApiService } from '../api.service';
-import { Common } from '../../../shared/enums/common.enum';
 import { AuthDataShareService } from '../../data-share/auth-data-share/auth-data-share.service';
 
 
@@ -21,7 +19,6 @@ export class AuthService implements OnInit{
   constructor(
     private http:HttpClient,
     private envService:EnvService,
-    private notificationService:NotificationService,
     private apiService:ApiService,
     private storageService:StorageService,
     private router:Router,
@@ -38,14 +35,23 @@ export class AuthService implements OnInit{
   Logout(payload:any){
     this.resetData();
     this.logOutRedirection();
-    // this.notificationService.notify("bg-info","Log out Successful.");
     this.authDataShareService.restSettingModule('logged_out');
   }
   SessionExpired(payload?:any){
+    let response = {
+      status: '',
+      class: '',
+      msg: ''
+    };
     this.resetData();
     this.logOutRedirection();
-    this.notificationService.notify("bg-info", "Session Expired, Kindly Login Again.");
-    this.authDataShareService.restSettingModule('logged_out');
+    response.class = "bg-info";
+    response.status = "success";
+    response.msg = "Session Expired, Kindly Login Again.";
+    this.authDataShareService.setSessionExpired(response);
+    if(this.storageService.checkPlatForm() != 'mobile'){
+      this.authDataShareService.restSettingModule('logged_out');
+    }
   }
   resetData(){
     this.storageService.removeDataFormStorage();                
@@ -142,6 +148,7 @@ export class AuthService implements OnInit{
         if(respData && respData['token']){
             const cognitoIdToken = respData['token'];
             const cognitoExpiresIn = 86400;
+            // const cognitoExpiresIn = 420;
             this.storageService.setExpiresIn(cognitoExpiresIn);
             this.storageService.SetIdToken(cognitoIdToken);
             response.status = 'success';
@@ -189,11 +196,9 @@ export class AuthService implements OnInit{
       payload: {}
     };
     let newPayload :any = '';
-    let platFormName = this.storageService.getPlatform();
     let isHybridPlatform = false;
-    if(platFormName && platFormName != 'web'){
+    if(this.storageService.checkPlatForm() == 'mobile'){
       isHybridPlatform = true;
-      newPayload = payload.data;
     }else{
       newPayload = payload;
     }
@@ -302,19 +307,19 @@ export class AuthService implements OnInit{
     let api = this.envService.getAuthApi('RESET_PASSWORD');
     this.http.post(api,this.encryptionService.encryptRequest(payload)).subscribe(
       (respData:any) =>{
-        if (respData && respData.hasOwnProperty('success')) {                        
-            this.notificationService.notify("bg-success", " New Password Set  Successfully.");
+        if (respData && respData.hasOwnProperty('success')) {
+            // this.notificationService.notify("bg-success", " New Password Set  Successfully.");
             this.router.navigate(['/admin']);
         } else if (respData.hasOwnProperty('error')) {
             if (respData["error"] == "not_confirmed") {
-                this.notificationService.notify("bg-danger", "User Not Confirmed ");
+                // this.notificationService.notify("bg-danger", "User Not Confirmed ");
             } else if (respData["error"] == "user_name_password_does_not_match") {
-                this.notificationService.notify("bg-danger", "Username password does not match ");
+                // this.notificationService.notify("bg-danger", "Username password does not match ");
             }
         }
       },
       (error)=>{
-        this.notificationService.notify("bg-danger", error.message);
+        // this.notificationService.notify("bg-danger", error.message);
       }
     )
   }
@@ -359,9 +364,8 @@ export class AuthService implements OnInit{
       autoLogin:false,
     };
     let newPayload :any = '';
-    let platFormName = this.storageService.getPlatform();
     let isHybridPlatform = false;
-    if(platFormName && platFormName != 'web'){
+    if(this.storageService.checkPlatForm() == 'mobile'){
       isHybridPlatform = true;
       newPayload = payload.data;
     }else{
@@ -405,8 +409,8 @@ export class AuthService implements OnInit{
       if(this.storageService.GetIdTokenStatus() == StorageTokenStatus.ID_TOKEN_ACTIVE){
         statusWithMsg.status = true;           
       }else{
-        statusWithMsg.status = false; 
-        this.SessionExpired();
+        statusWithMsg.status = false;
+          this.SessionExpired();
       }
     }else{
       statusWithMsg.status=false;

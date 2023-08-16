@@ -15,6 +15,7 @@ export class AuthDataShareService {
   OtpAutoLoginData:any = {}
   createPwd:Subject<any> = new Subject();
   userInfo:Subject<any> = new Subject();
+  sessionexpired:Subject<any> = new Subject();
   
 
   constructor() { }
@@ -51,6 +52,9 @@ export class AuthDataShareService {
   }
   setUserInfo(responce:any){
     this.userInfo.next(responce);
+  }
+  setSessionExpired(responce:any){
+    this.sessionexpired.next(responce);
   }
 
 
