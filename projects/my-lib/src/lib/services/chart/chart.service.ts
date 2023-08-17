@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -5,29 +6,36 @@ import { Injectable } from '@angular/core';
 })
 export class ChartService {
 
-  constructor() { }
+  constructor(
+    private datePipe:DatePipe
+  ) { }
 
   getDownloadData(chart:any,object:any){
     let DataList:any = [];
     let fileName = object.name;
-    chart.getData().then((chartdata: any) => {      
+    chart.getData().then((chartdata: any) => {
       let data = chartdata.documents;
       let fields = chartdata.fields;
       if(data && data.length > 0){
-        data.forEach((obj:any) => {          
+        data.forEach((obj:any) => {
           let modifyObj:any = {};
           Object.keys(fields).forEach((key) => {
             const value = fields[key];
-            modifyObj[value] = obj[key];
+            const val = obj[key]
+            if(val && val.constructor && val.constructor.name == "Date"){
+              modifyObj[value] = this.datePipe.transform(val,'dd/MM/yyyy');
+            }else{
+              modifyObj[value] = obj[key];
+            }
           });
           DataList.push(modifyObj);
         });
-      }      
-      if(DataList && DataList.length > 0){      
+      }
+      if(DataList && DataList.length > 0){
         this.downloadFile(DataList,fileName);
       }
     });
-    
+
   }
   downloadFile(data: any,fileName:any) {
     const replacer = (key:any, value:any) => (value === null ? '' : value); // specify how you want to handle null values here
