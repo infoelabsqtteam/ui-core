@@ -10,10 +10,11 @@ export class ChartService {
     private datePipe:DatePipe
   ) { }
 
-  getDownloadData(chart:any,object:any){
+  async getDownloadData(chart:any,object:any){
     let DataList:any = [];
     let fileName = object.name;
-    chart.getData().then((chartdata: any) => {
+    let blobUrl :any = '';
+    await chart.getData().then((chartdata: any) => {
       let data = chartdata.documents;
       let fields = chartdata.fields;
       if(data && data.length > 0){
@@ -32,12 +33,16 @@ export class ChartService {
         });
       }
       if(DataList && DataList.length > 0){
-        this.downloadFile(DataList,fileName);
+        blobUrl = this.downloadFile(DataList);
       }
     });
+    return {
+      url: blobUrl,
+      name: fileName
+    }
 
   }
-  downloadFile(data: any,fileName:any) {
+  downloadFile(data: any) {
     const replacer = (key:any, value:any) => (value === null ? '' : value); // specify how you want to handle null values here
     const header = Object.keys(data[0]);
     const csv = data.map((row:any) =>
@@ -47,16 +52,17 @@ export class ChartService {
     );
     csv.unshift(header.join(','));
     const csvArray = csv.join('\r\n');
-
-    const a = document.createElement('a');
     const blob = new Blob([csvArray], { type: 'text/csv' });
+    return  blob;
+  }
+  downlodBlobData(blob:any,fileName:string){
+    const a = document.createElement('a');
     const url = window.URL.createObjectURL(blob);
-
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    a.remove();
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
   }
 
 }
