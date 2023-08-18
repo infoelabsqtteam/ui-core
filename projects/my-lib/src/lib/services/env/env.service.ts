@@ -7,6 +7,7 @@ import { StorageTokenStatus } from '../../shared/enums/storage-token-status.enum
 import { serverHostList } from './serverHostList';
 import { StorageService } from '../../services/storage/storage.service';
 import { CoreFunctionService } from '../../services/common-utils/core-function/core-function.service';
+import { PLATFORM_NAME } from '../../shared/platform';
 
 
 @Injectable({
@@ -15,17 +16,11 @@ import { CoreFunctionService } from '../../services/common-utils/core-function/c
 export class EnvService {
   requestType: any = '';
   constructor(
-    @Inject('env') private env:any,
     @Inject(DOCUMENT) private document: Document,
     private storageService: StorageService,
     private coreFunctionService:CoreFunctionService,
   ) { }
   
-
-  load(): Observable<any>{
-    return this.env;
-  }
-
 
   getBaseUrl(){
     let baseUrl:any;
@@ -40,13 +35,13 @@ export class EnvService {
     return baseUrl;
   }
   getAppName(){
-    if(this.coreFunctionService.isNotBlank(this.env.appName)){
-      this.storageService.setAppName(this.env.appName);
-      return this.env.appName;
+    if(this.coreFunctionService.isNotBlank(this.storageService.getClientCodeEnviorment().appName)){
+      this.storageService.setAppName(this.storageService.getClientCodeEnviorment().appName);
+      return this.storageService.getClientCodeEnviorment().appName;
     }
   }
   getAppId(){
-    return this.env.appId;
+    return this.storageService.getClientCodeEnviorment().appId;
   }
   baseUrl(applicationAction: string) {    
     return this.getBaseUrl() +  (<any>EndPoint)[applicationAction];
@@ -111,14 +106,22 @@ export class EnvService {
   }
   
   getHostKeyValue(keyName:string){
-    let hostname:string = this.getHostName('hostname');
+    let hostname:any ="";
+    let key_Name:string = '';
+    if(this.storageService.checkPlatForm() == 'mobile'){
+      hostname = this.storageService.getClientName();
+      key_Name = 'clientCode';
+    }else{
+      hostname = this.getHostName('hostname');
+      key_Name = 'clientEndpoint';
+    }
     let value:any = '';   
     if(hostname == 'localhost'){
-      value = this.env.serverhost;
+      value = this.storageService.getClientCodeEnviorment().serverhost;
     }else if(serverHostList && serverHostList.length > 0){
       for (let index = 0; index < serverHostList.length; index++) {
         const element:any = serverHostList[index];
-        if(hostname == element.clientEndpoint){
+        if(hostname == element[key_Name]){
           if(keyName == "object"){
             value = element;
             break;
@@ -178,8 +181,23 @@ export class EnvService {
     return redirectURL;
   }
 
-  
-
+  checkClientExistOrNot(data:any){
+    let value : boolean = false;
+    if(serverHostList && serverHostList.length > 0){
+      for (let index = 0; index < serverHostList.length; index++) {
+        const element:any = serverHostList[index];
+        if(element && element.clientCode){
+          if(data === element.clientCode){
+            value = true
+          }
+        }
+      }
+    }
+    return value;
+  }
+  getVerifyType(){
+    return this.storageService.getClientCodeEnviorment().verify_type;
+  }
   
   
 }

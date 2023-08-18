@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, tap, switchMap } from 'rxjs/operators';
 import { StorageTokenStatus } from '../../shared/enums/storage-token-status.enum';
+import { PLATFORM_NAME } from '../../shared/platform';
 
 
 
@@ -22,7 +23,7 @@ export class StorageService {
   REFRESH_TOKEN_EXPIRY_TIME:string='REFRESH_TOKEN_EXPIRY_TIME';
   userInfo: any;
   log: any;
-  age:any=3540000; //59 minuts 
+  age:any=3540000; //59 minuts
   refreshTokenAge:any=2505600000 //refresh token age 29 days
   packDetails: any = {};
 
@@ -39,12 +40,21 @@ export class StorageService {
   CHILD_WINDOW_URL:string = "CHILD_WINDOW_URL";
   MODIFY_MODULES:any = 'MODIFY_MODULES';
   appName:any;
+  CLIENT_NAME:any = 'CLIENT_NAME';
 
-  constructor(private http: HttpClient) { }
+
+  constructor(
+    private http: HttpClient,
+    @Inject('env') private env:any,
+    ) { }
+
+  load(): Observable<any>{
+    return this.env;
+  }
   setAppName(appname:string){
     this.appName = appname;
     localStorage.setItem("AppName", JSON.stringify(appname));
-}  
+}
   setModule(module:string){
     sessionStorage.setItem("MODULE",module);
   }
@@ -108,7 +118,7 @@ export class StorageService {
   SetIdToken(token: any) {
     localStorage.setItem(this.ID_TOKEN, JSON.stringify(token));
   }
-  GetIdToken() { 
+  GetIdToken() {
     let obj = JSON.parse(<any>localStorage.getItem(this.ID_TOKEN));
     if(obj && obj != null ){
       return obj;
@@ -131,13 +141,13 @@ export class StorageService {
     let obj = JSON.parse(<any>localStorage.getItem(this.ACCESS_TOKEN));
     if(obj && obj != null){
         return obj;
-    } 
+    }
   }
   SetRefreshToken(token: string) {
     localStorage.setItem(this.REFRESH_TOKEN, token);
     this.setRefreshTokenExpiry();
   }
-  GetRefreshToken() {    
+  GetRefreshToken() {
     return localStorage.getItem(this.REFRESH_TOKEN);
   }
 
@@ -146,33 +156,33 @@ export class StorageService {
     let expireTime = Number(localStorage.getItem(this.ID_TOKEN_EXPIRY_TIME));
     let currentTime = Date.now();
     let expiresIn24Hours = 0;
-    
+
 	if(expireTime > currentTime)
       expiresIn24Hours =  (((expireTime-currentTime)/1000)/3600) ;
-    
+
 	if(currentTime > expireTime){
-      if(expireTime > 0){        
+      if(expireTime > 0){
         return StorageTokenStatus.ID_TOKEN_EXPIRED;  // appConstant.TOKEN_STATUS.ID_TOKEN_EXPIRED; // notify, due to expired
       }
-      return  StorageTokenStatus.ID_TOKEN_NOT_CREATED; //appConstant.TOKEN_STATUS.ID_TOKEN_NOT_CREATED;  // first time loading so no notify   
+      return  StorageTokenStatus.ID_TOKEN_NOT_CREATED; //appConstant.TOKEN_STATUS.ID_TOKEN_NOT_CREATED;  // first time loading so no notify
     } else if(expiresIn24Hours > 24){
 		return StorageTokenStatus.ID_TOKEN_EXPIRED //appConstant.TOKEN_STATUS.ID_TOKEN_EXPIRED; // notify, due to expired
 	}
-	
+
     return StorageTokenStatus.ID_TOKEN_ACTIVE; //appConstant.TOKEN_STATUS.ID_TOKEN_ACTIVE; // not expired
   }
 
-  
-  
+
+
   GetRefreshTokenStatus(){
     let expired = 0;
     let expireTime = Number(localStorage.getItem(this.REFRESH_TOKEN_EXPIRY_TIME));
     let currentTime = Date.now();
-    if(currentTime > expireTime){     
-      if(expireTime > 0){        
+    if(currentTime > expireTime){
+      if(expireTime > 0){
         return StorageTokenStatus.REFRESH_TOKEN_EXPIRED; // appConstant.TOKEN_STATUS.REFRESH_TOKEN_EXPIRED; // notify, due to expired
-      } 
-      return StorageTokenStatus.REFRESH_TOKEN_NOT_CREATED; // appConstant.TOKEN_STATUS.REFRESH_TOKEN_NOT_CREATED;  // first time loading so no notify   
+      }
+      return StorageTokenStatus.REFRESH_TOKEN_NOT_CREATED; // appConstant.TOKEN_STATUS.REFRESH_TOKEN_NOT_CREATED;  // first time loading so no notify
     }
     return StorageTokenStatus.REFRESH_TOKEN_ACTIVE; // appConstant.TOKEN_STATUS.REFRESH_TOKEN_ACTIVE; // not expired
   }
@@ -181,7 +191,7 @@ export class StorageService {
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
   }
   GetUserInfo() {
-    const obj:any = JSON.parse(<any>localStorage.getItem(this.USER_KEY));    
+    const obj:any = JSON.parse(<any>localStorage.getItem(this.USER_KEY));
     if(obj && obj.user){
       return obj.user
     }else{
@@ -189,7 +199,7 @@ export class StorageService {
     }
   }
   GetPermission() {
-    const obj = JSON.parse(<any>localStorage.getItem(this.USER_KEY));    
+    const obj = JSON.parse(<any>localStorage.getItem(this.USER_KEY));
     if(obj && obj.permission){
       return obj.permission
     }
@@ -199,13 +209,13 @@ export class StorageService {
   }
 
   GetModules(){
-    const obj = JSON.parse(<any>localStorage.getItem(this.USER_KEY));    
+    const obj = JSON.parse(<any>localStorage.getItem(this.USER_KEY));
     if(obj && obj.modules){
       return obj.modules
     }
     else{
       return [];
-    } 
+    }
   }
   SetModifyModules(modules:any){
     localStorage.setItem(this.MODIFY_MODULES,JSON.stringify(modules));
@@ -223,14 +233,14 @@ export class StorageService {
     }
   }
   getUserLog() {
-    const user = JSON.parse(<any>localStorage.getItem(this.USER_KEY));     
+    const user = JSON.parse(<any>localStorage.getItem(this.USER_KEY));
     if(user && user != null && user != undefined && user.user){
       this.userInfo = user.user;
       this.log = { userId: this.userInfo.email, appId: this.getAppId(), refCode: this.userInfo.refCode };
       return this.log;
     }else{
       return null;
-    } 
+    }
   }
   SetActiveMenu(menu: any) {
     sessionStorage.setItem(this.ACTIVE_MENU, JSON.stringify(menu));
@@ -248,16 +258,38 @@ export class StorageService {
   getUserAppId(){
     return this.userInfo.appId;
   }
-  removeDataFormStorage() {
+  removeDataFormStorage(all?:string) {
+    let doNotClearCache:any = [];
+    if(all != "all"){
+      if(this.checkPlatForm() == 'mobile'){
+        let clientCode = this.getClientName();
+        if(clientCode && clientCode != ''){
+          let object:any = {};
+          object['key'] = this.CLIENT_NAME;
+          object["value"] = clientCode;
+          object['type'] = 'localstorage'
+          doNotClearCache.push(object);
+        }
+      }
+    }
     localStorage.clear();
     sessionStorage.clear();
+    if(doNotClearCache && doNotClearCache.length > 0){
+      doNotClearCache.forEach((obj:any) => {
+        if(obj && obj.type == 'localstorage'){
+          let key = obj['key'];
+          let value = obj['value'];
+          localStorage.setItem(key,value);
+        }
+      })
+    }
   }
 
   setIdTokenExpiry(){
     const startTime = Date.now();
     const expiry = Number(this.getExpiresIn());
     //const expiry = this.getExpiresIn();
-    localStorage.setItem(this.ID_TOKEN_EXPIRY_TIME, ""+(startTime + expiry));    
+    localStorage.setItem(this.ID_TOKEN_EXPIRY_TIME, ""+(startTime + expiry));
   }
 
   setRefreshTokenExpiry(){
@@ -517,7 +549,7 @@ export class StorageService {
     return this.getApplicationValueByKey('varify_mode');
   }
   getPageThmem(){
-    return this.getApplicationValueByKey('theme');    
+    return this.getApplicationValueByKey('theme');
   }
   getTemplateName(){
     return this.getApplicationValueByKey('temp_name');
@@ -526,7 +558,7 @@ export class StorageService {
     return this.getApplicationValueByKey('teamname');
   }
 
-  getBucketName(){    
+  getBucketName(){
     return this.getApplicationValueByKey('bucket');
   }
   getApplicationValueByKey(key:any){
@@ -534,8 +566,32 @@ export class StorageService {
     let applicationSetting = this.getApplicationSetting();
     if(applicationSetting && applicationSetting[key] != undefined && applicationSetting[key] != null && applicationSetting[key] != ""){
       value = applicationSetting[key];
-    }    
+    }
     return value;
+  }
+  // for App
+  setClientNAme(name:string){
+    localStorage.setItem(this.CLIENT_NAME,name);
+  }
+  getClientName(){
+    return localStorage.getItem(this.CLIENT_NAME);
+  }
+  removeKeyFromStorage(key:string){
+    localStorage.removeItem(key);
+  }
+  getPlatform(){
+    return this.env.plateformName;
+  }
+  getClientCodeEnviorment(){
+    return this.env;
+  }
+  checkPlatForm(){
+    let platForm = 'web';
+    let platFormName = this.getPlatform();
+    if(platFormName && platFormName != "" && PLATFORM_NAME.includes(platFormName)){
+      platForm = 'mobile';
+    }
+    return platForm;
   }
 
 }

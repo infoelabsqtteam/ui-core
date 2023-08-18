@@ -7,6 +7,7 @@ import { DataShareService } from '../data-share/data-share.service';
 import { NotificationService } from '../notify/notification.service';
 import { PermissionService } from '../permission/permission.service';
 import { StorageService } from '../storage/storage.service';
+import { CommonAppDataShareService } from '../data-share/common-app-data-share/common-app-data-share.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,8 @@ constructor(
   private notificationService:NotificationService,
   private apiService:ApiService,
   private router:Router,
-  private authService:AuthService
+  private authService:AuthService,
+  private commonAppDataShareService: CommonAppDataShareService
 ) { }
 
   modifyModuleListWithPermission(moduleList:any){
@@ -301,5 +303,78 @@ constructor(
         this.router.navigate(['/dashboard']);
     }
   }
+
+  // for App
+  getModuleBySelectedIndex(){
+    const moduleList = this.commonAppDataShareService.getModuleList();
+    const clickedModuleIndex = this.commonAppDataShareService.getModuleIndex();
+    let module:any  = {};
+    if(clickedModuleIndex >= 0){
+      module = moduleList[clickedModuleIndex];
+    }
+    return module;
+  }  
+  getCard(index:any){
+    const moduleList = this.commonAppDataShareService.getModuleList();
+    const clickedModuleIndex = this.commonAppDataShareService.getModuleIndex();    
+    let card:any  = {};
+    let tabs:any =[];
+    let selectedTabIndex:number = -1;
+    let popoverTabbing = false;
+    if(clickedModuleIndex >= 0){
+      card = moduleList[clickedModuleIndex];
+    }
+    if(card && card.tab_menu && card.tab_menu.length > 0 && card.popoverTabbing){
+      popoverTabbing = true;
+    }
+    if(card && card.tab_menu && card.tab_menu.length > 0){
+    const clickedtabIndex= this.commonAppDataShareService.getSelectdTabIndex();
+      tabs = card.tab_menu;
+      let tab:any = {};
+      if(index == -1){
+        tab = tabs[0];
+        selectedTabIndex = 0;
+      }else{
+        tab = tabs[clickedtabIndex];
+        selectedTabIndex = clickedtabIndex;
+      }
+      const tabIndex = this.commonFunctionService.getIndexInArrayById(moduleList,tab._id,"_id");
+      card = moduleList[tabIndex];      
+    }
+    let object = {
+      'tabs' : tabs,
+      "card" : card,
+      "selectedTabIndex" : selectedTabIndex,
+      "popoverTabbing" : popoverTabbing
+    }
+    return object;
+  }
+  getUserAutherisedCards(cardMasterList:any){
+    const userAuthModules:any = this.storageService.GetModules();
+    const cardList:any = [];
+    if(userAuthModules && userAuthModules != null){
+      userAuthModules.forEach((module:any, i:number) => {
+        if(module && module['_id']){
+          cardMasterList.forEach((card:any, j:number) => {
+            if(card && card.userAutherisedModule && card['userAutherisedModule']['_id']){
+              if(module['_id'] == card['userAutherisedModule']['_id']){
+                cardList.push(card);
+              }
+            }
+          })
+        }
+      });
+      return cardList;
+    }
+    return null;
+  }
+  getNestedCard(cardGrid:any, cardGridName:any) {
+    if (cardGrid[cardGridName] && cardGrid[cardGridName] != undefined && cardGrid[cardGridName] != null && cardGrid[cardGridName] != '') {
+      return JSON.parse(JSON.stringify(cardGrid[cardGridName]));
+    } else {
+      return {};
+    }
+  }
+  // End For APP
 
 }

@@ -27,12 +27,10 @@ export class DataShareService {
   dinamicForm={};
   docData:Subject<any>= new BehaviorSubject<any>(null);
   nestedForm:Subject<any>= new BehaviorSubject<any>(null);
-  settingData:Subject<any> = new Subject<any>();
   hostData:Subject<any> = new Subject<any>();
   dashletData:Subject<any> = new Subject<any>();
   DashLetData:any={};
   appName:Subject<any> = new Subject<any>();
-  authenticated:Subject<boolean> = new BehaviorSubject<boolean>(false)
   navigationData:Subject<any> = new Subject<any>();
   permissionData:Subject<any> = new Subject<any>();
   quoteData:Subject<any> = new Subject<any>();
@@ -56,7 +54,6 @@ export class DataShareService {
   dashletMaster:Subject<any> = new Subject<any>();
   DashletMaster:any = [];
   gitVirsion:Subject<any> = new Subject<any>();
-  forgot:Subject<any> = new Subject<any>();
   nextFormData:Subject<any> = new Subject<any>();
   getReportLoadData:Subject<any> = new Subject<any>();
   getIsGridSelectionOpen:Subject<any> = new Subject<any>();
@@ -75,7 +72,11 @@ export class DataShareService {
   pdfFileName:Subject<string> = new Subject<string>();
   S3Url:Subject<string> = new Subject<string>();
   printData:Subject<any> = new Subject<any>();
+  setClientName:Subject<any> = new Subject<any>();
   gridRunningData: Subject<any> = new Subject<any>();
+  collectiondata:Subject<any> = new Subject<any>();
+  childGrid:Subject<any> = new Subject<any>();
+  childgridfields:any;
 
   constructor() { }
 
@@ -169,11 +170,7 @@ export class DataShareService {
   }
   setNestedForm(form:any){
     this.nestedForm.next(form)
-  }
-
-  restSettingModule(value:any){
-    this.settingData.next(value)
-  }
+  }  
   setHostData(data:any){
     this.hostData.next(data);
   }
@@ -193,12 +190,6 @@ export class DataShareService {
   }
   setAppName(response:any){
     this.appName.next(response);
-  }
-  setAuthentication(responce:boolean){
-    this.authenticated.next(responce);
-  }
-  getAuthentication(){
-    return this.authenticated;
   }
   setNavigationData(responce:any){
     this.navigationData.next(responce);
@@ -272,9 +263,6 @@ export class DataShareService {
   setGitVersion(responce:any){
     this.gitVirsion.next(responce);
   }
-  setForgot(responce:any){
-    this.forgot.next(responce);
-  }
   setNextFormData(responce:any){
     this.nextFormData.next(responce);
   }
@@ -322,6 +310,18 @@ export class DataShareService {
   shareGridRunningData(responce:any){
     this.gridRunningData.next(responce);
   }
+   //For App
+  collectionData(responce:any){
+    this.collectiondata.next(responce);
+  }
+  setChildGrid(responce:any){
+    this.childGrid.next(responce);
+    this.childgridfields = responce;
+  }
+  getChildGrid(){
+    return this.childgridfields;
+  }
+  //End For App
 
 
 }
