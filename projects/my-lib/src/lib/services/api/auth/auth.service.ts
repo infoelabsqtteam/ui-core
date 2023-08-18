@@ -25,7 +25,7 @@ export class AuthService implements OnInit{
     private router:Router,
     private encryptionService:EncryptionService,
     private commonFunctionService:CommonFunctionService,
-    private coreFunctionService:CoreFunctionService
+    private coreFunctionService:CoreFunctionService,
     private authDataShareService: AuthDataShareService
     ) { }
 
