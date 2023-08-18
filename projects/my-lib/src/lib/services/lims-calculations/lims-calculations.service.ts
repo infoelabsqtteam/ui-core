@@ -64,23 +64,35 @@ export class LimsCalculationsService {
 
   calculateTotalFair(value:any) {
     let totalFair = 0;
-    let claimSheet = value.claimSheet;
-    let localTa = claimSheet.localTa;
-    let travelFair = claimSheet.travelFare;
-    let dailyAllowance = claimSheet.dailyAllowance;
-    let food = claimSheet.food;
-    let hotel = claimSheet.hotel;
-    let parking = claimSheet.parking;
-    let toolCharge = claimSheet.tollCharge;
-    let miscellaneous = claimSheet.miscellaneous;
+    let curValue:any = {};
+    let checkClaimSheet = false;
+    let calculateObject = {
+      totalForTheDay : 0
+    }
+    if(value && value.claimSheet){
+      curValue = value.claimSheet;
+      checkClaimSheet = true;
+    }else{
+      curValue = value;
+    }
+    let localTa = curValue.localTa;
+    let travelFair = curValue.travelFare;
+    let dailyAllowance = curValue.dailyAllowance;
+    let food = curValue.food;
+    let hotel = curValue.hotel;
+    let parking = curValue.parking;
+    let toolCharge = curValue.tollCharge;
+    let miscellaneous = curValue.miscellaneous;
     totalFair = (+travelFair) + (+localTa) + (+dailyAllowance) + (+food) + (+hotel) + (+parking) + (+toolCharge) + (+miscellaneous);
-    let obj1 = {
-      totalForTheDay: totalFair
+
+    calculateObject.totalForTheDay = totalFair;
+    if(checkClaimSheet){
+      return {
+        claimSheet: calculateObject
+      }
+    }else{
+      return calculateObject
     }
-    let obj = {
-      claimSheet: obj1
-    }
-    return obj;
   }
 
   buggetForcastCalc(templateForm: any) {
