@@ -1,0 +1,1 @@
+export const PLATFORM_NAME = ["ios" , "ipad" , "iphone" , "android" , "phablet" , "tablet" , "cordova" , "capacitor" , "electron" , "pwa" , "mobile" , "mobileweb" , "desktop" , "hybrid"]
