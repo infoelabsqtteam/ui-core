@@ -25,6 +25,21 @@ export class PermissionService {
     }
     return check;
   }
+  checkPermissionWithParent(template:any,option:string){
+    this.permission = this.storageService.GetPermission();
+    let check = false;
+    if(this.permission && typeof this.permission == 'object' && Object.keys(this.permission).length > 0){
+      let name:string = template.name;
+      check = this.checkList(name,option);
+      if(!check){
+        if(template && template.tab_name && template.tab_name != ''){
+          name = template.tab_name;
+          check = this.checkList(name,option);
+        }
+      }
+    }
+    return check;
+  }
   checkList(template:string,option:string){
     if(this.permission[template]){
       let permissionList = this.permission[template]
