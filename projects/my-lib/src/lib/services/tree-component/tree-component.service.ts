@@ -37,8 +37,8 @@ export class TreeComponentService {
         node.pIndex = ''+index;
       }else{
         node.pIndex = value.pIndex;
-      }     
-      
+      }
+
 
       if (value != null) {
         let nextKey = keys[level];
@@ -46,7 +46,7 @@ export class TreeComponentService {
         if(next == null){
           nextKey = keys[level + 1];
           next = value[nextKey];
-        }        
+        }
         if (next && typeof next === 'object') {
           Object.keys(next).forEach((childKey,i) => {
             next[childKey].pIndex = node.pIndex+'.'+(i+1);
@@ -68,7 +68,7 @@ export class TreeComponentService {
     let previousIndex:number = -1;
     let resultList:any = [];
     for (let i = 0; i < list.length; i++) {
-      const node = list[i];      
+      const node = list[i];
       const pIndex = node.pIndex;
       if(pIndex && pIndex != ''){
         const indexlist = pIndex.split('.');
@@ -80,36 +80,36 @@ export class TreeComponentService {
               }
               childList.push(node);
             }else{
-              if(parentGroup.length > 0 && childList.length > 0){            
+              if(parentGroup.length > 0 && childList.length > 0){
                 this.addChildParentList(parentGroup,childList,fields,resultList);
                 childList = [];
                 parentGroup.splice((parentGroup.length-1),1);
-                parentGroup.push(node);  
-                previousIndex = indexlist.length;          
+                parentGroup.push(node);
+                previousIndex = indexlist.length;
               }
             }
           }else{
             parentGroup.push(node);
             childList.push(node);
           }
-          previousIndex = indexlist.length;          
+          previousIndex = indexlist.length;
         }else if(indexlist && indexlist.length == 4){
           if(previousIndex == 3){
             childList = [];
             childList.push(node);
           }else{
             childList.push(node);
-          }          
+          }
           previousIndex = indexlist.length;
         }else if(indexlist && indexlist.length == 2){
-          if(parentGroup.length > 0 && childList.length > 0){            
+          if(parentGroup.length > 0 && childList.length > 0){
             this.addChildParentList(parentGroup,childList,fields,resultList);
             childList = [];
             const firstParent = [];
             firstParent.push(parentGroup[0]);
             parentGroup = [];
             parentGroup.push(firstParent[0]);
-            parentGroup.push(node);            
+            parentGroup.push(node);
           }else{
             parentGroup.push(node);
           }
@@ -130,11 +130,11 @@ export class TreeComponentService {
             parentGroup = [];
           }
         }
-      }     
-      
+      }
+
     }
     return resultList;
-  } 
+  }
   addChildParentList(parentList:any,ChildList:any,fields:any,result:any){
     ChildList.forEach((child:any) => {
       let obj:any = {};
@@ -146,15 +146,15 @@ export class TreeComponentService {
             obj[field.field_name] = child.reference;
           }else{
             obj[field.field_name] = parentList[i].reference;
-          }          
+          }
         });
       }else if(parentList.length == 3){
-        fields.forEach((field:any,i:number) => {          
+        fields.forEach((field:any,i:number) => {
           if(i == 3){
             obj[field.field_name] = child.reference;
           }else{
             obj[field.field_name] = parentList[i].reference;
-          }                
+          }
         });
       }
       result.push(obj);
@@ -166,7 +166,7 @@ export class TreeComponentService {
     // for (let i = 0; i < list.length; i++) {
     //   const element = list[i];
     //   let field = fields[i];
-    //   let fieldName = field.field_name;                           
+    //   let fieldName = field.field_name;
     //   if(i == 2){
     //     if(list && list.length == 3){
 
@@ -176,27 +176,29 @@ export class TreeComponentService {
     //   }
     //   if(list && list.length == (i+1)){
     //     result.push(object);
-    //   }      
+    //   }
     // }
   }
 
   //this function for get selected node tree
   getSelectedNodeWithParent(allNodes:any,selectedNodes:any,keys:any){
-    let selectedNodesWithParent:any = [];    
+    let selectedNodesWithParent:any = [];
     if(allNodes && allNodes.length > 0 && selectedNodes && selectedNodes.length > 0){
       selectedNodes.forEach((selectNode:any) => {
-        if((keys.includes(selectNode.type) || selectNode.level == 0)&& selectNode.expandable){
-          selectNode.allSelected = true;
-        }else{
-          selectNode.allSelected = false;
+        if(selectNode){
+          if((keys.includes(selectNode.type) || selectNode.level == 0)&& selectNode.expandable){
+            selectNode.allSelected = true;
+          }else{
+            selectNode.allSelected = false;
+          }
+          selectNode.select = true;
+          let groupList:any = [];
+          let check = this.commonfunctionService.checkDataAlreadyAddedInListOrNot('_id',selectNode._id,groupList);
+          if(!check){
+            groupList.push(selectNode);
+          }
+          this.findChildToParentNode(allNodes,selectNode,groupList,selectedNodesWithParent);
         }
-        selectNode.select = true;
-        let groupList:any = [];
-        let check = this.commonfunctionService.checkDataAlreadyAddedInListOrNot('_id',selectNode._id,groupList);
-        if(!check){
-          groupList.push(selectNode);
-        } 
-        this.findChildToParentNode(allNodes,selectNode,groupList,selectedNodesWithParent);        
       });
     }
     return selectedNodesWithParent;
@@ -210,14 +212,14 @@ export class TreeComponentService {
         let check = this.commonfunctionService.checkDataAlreadyAddedInListOrNot('_id',parentNode._id,groupList);
         if(!check){
           groupList.push(parentNode);
-        }        
+        }
         this.findChildToParentNode(allNodes,parentNode,groupList,selectedNodesWithParent);
-      }          
+      }
     }else{
       let check = this.commonfunctionService.checkDataAlreadyAddedInListOrNot('_id',selectNode._id,groupList);
       if(!check){
         groupList.push(selectNode);
-      } 
+      }
     }
     return this.modifyParentChild(selectedNodesWithParent,groupList);
   }
@@ -235,17 +237,17 @@ export class TreeComponentService {
         }
         if(!check){
           selectedNodesWithParent.push(data);
-        } 
+        }
       });
     }
     return selectedNodesWithParent;
   }
-  modifySelectedDataWithParentId(selectedData:any){   
+  modifySelectedDataWithParentId(selectedData:any){
     let modifyList=selectedData.sort((a:any,b:any) => a.pIndex.localeCompare(b.pIndex, undefined, { numeric:true }));
     //arr.sort( (a, b) => a.localeCompare(b, undefined, { numeric:true }) );
     return  modifyList;
   }
-  
+
   //this function for get selected node tree
 
   //This function for convet list to tree map
@@ -287,7 +289,7 @@ export class TreeComponentService {
       return node;
     });
   };
-  
+
   listToTree = (arr = []) => {
      let indexMap = new Map();
      arr.forEach((node:any, index:number) => {
@@ -300,9 +302,9 @@ export class TreeComponentService {
         return res;
      }, []);
   };
-  
+
   treeToObject = (tree:any = [], result:any = {}) => {
-    tree.forEach((child:any) => { 
+    tree.forEach((child:any) => {
         let modifyObj:any = {};
         modifyObj['reference'] = child.reference;
         if(child.allSelected){
@@ -313,16 +315,16 @@ export class TreeComponentService {
         }
         if(child.level == 0){
           result[child.item] = modifyObj;
-        }else if(child.expandable){     
+        }else if(child.expandable){
           if(!result[child.type]) result[child.type] = {}
           result[child.type][child.item] = modifyObj;
         }else{
           if(!result[child.type]) result[child.type] = {}
           result[child.type][child.item] = modifyObj;
-        } 
-        if(child.children && child.children.length > 0){      
+        }
+        if(child.children && child.children.length > 0){
           this.treeToObject(child.children, child.level == 0 ? result[child.item] : result[child.type][child.item]);
-        }      
+        }
     });
     return result;
   };
@@ -345,6 +347,6 @@ export class TreeComponentService {
   updateItem(node: TodoItemNode, name: string) {
     node.item = name;
     this.dataChange.next(this.data);
-  }  
+  }
 
 }
