@@ -17,10 +17,40 @@ export class CustomvalidationService {
       if (!control.value) {
         return null!;
       }
-      const regex = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
-      const valid = regex.test(control.value);
-      return valid ? null! : { invalidPassword: true };
+      const regex = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[~!@#$%^&*?.=()-+])(?=.*?[0-9]).{8,}$');
+      let valid = regex.test(control.value);
+      let msg = "Minimum 8 characters";
+      if(!valid){
+        //let checkNo = new RegExp('^(?=.*?[0-9])$').test(control.value);
+        if(!new RegExp('[0-9]').test(control.value)){
+          msg = "At least one number";
+        }else if(!new RegExp('[A-Z]').test(control.value)){
+          msg = "At least one uppercase letter";
+        }else if(!new RegExp('[~!@#$%^&*?.=()-+]').test(control.value)){
+          msg = "At least one special character";
+        }else if(!new RegExp('[a-z]').test(control.value)){
+          msg = "At least one lowercase letter";
+        }else{
+          msg = "Minimum 8 characters";
+        }
+      }else if(this.checkCommonPassword(control.value)){
+        valid = false
+        msg = "Common Passwords are not allowed";
+      }
+      return valid ? null! : { invalidPassword: msg };
     };
+  }
+  checkCommonPassword(value:string){
+    let check = false;
+    let commonPasswordList = ['Test@123','Test@12345'];
+    for (let index = 0; index < commonPasswordList.length; index++) {
+      const element = commonPasswordList[index];
+      if(element === value){
+        check = true;
+        break;
+      }
+    }
+    return check;
   }
   checkDates(endDate: string, startDate: string) {
     return (formGroup: FormGroup) => {
@@ -33,7 +63,7 @@ export class CustomvalidationService {
       }else{
         endDateControl.setErrors(null);
       }
-    }    
+    }
  }
 
   MatchPassword(password: any, confirmPassword: any) {
@@ -84,7 +114,7 @@ export class CustomvalidationService {
   isValidGSTNumber(control: AbstractControl): Promise<ValidationErrors | null> {
     return new Promise((resolve) => {
       setTimeout(() => {
-          let gstin = control.value;         
+          let gstin = control.value;
           if (gstin == "" || gstin == null || gstin == undefined || (gstin.length == 2 && gstin.toUpperCase() == "NA")) {
             resolve( null );
           }
@@ -107,7 +137,7 @@ export class CustomvalidationService {
                 "name" : "invalid"
               }
               this.dataShareService.setValidationCondition(object);
-            }            
+            }
           }
           resolve({ invalidGSTNumber: true });
           const object = {
@@ -124,7 +154,7 @@ export class CustomvalidationService {
     var checkCodePoint = 0;
     var mod = GSTN_CODEPOINT_CHARS.length;
     var i;
-  
+
     for (i = gstin.length - 2; i >= 0; i--) {
       var codePoint = -1;
       for (var j = 0; j < GSTN_CODEPOINT_CHARS.length; j++) {
@@ -140,7 +170,7 @@ export class CustomvalidationService {
     checkCodePoint = (mod - (sum % mod)) % mod;
     return GSTN_CODEPOINT_CHARS[checkCodePoint];
   }
-  
+
   // GSTIN Regex validation result
   validatePattern(gstin:any) {
     // eslint-disable-next-line max-len
@@ -153,16 +183,16 @@ export class CustomvalidationService {
   isValidData(control: AbstractControl): Promise<ValidationErrors | null> {
     return new Promise(resolve => {
       setTimeout(() => {
-          let data = control.value;   
+          let data = control.value;
           if (data == "" || data == null || data == undefined) {
             resolve( null );
           }else if(typeof data == 'object'){
             resolve(null);
           }else{
             resolve({ invaliData: true });
-          }          
+          }
         }, 1000);
       });
   }
-  
+
 }
