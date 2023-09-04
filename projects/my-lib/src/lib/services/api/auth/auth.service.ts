@@ -144,7 +144,8 @@ export class AuthService implements OnInit{
     let response = {
       status: '',
       class: '',
-      msg: ''
+      msg: '',
+      message:''
     };
     let api = this.envService.getAuthApi('AU_SIGNIN');
     this.http.post(api, this.encryptionService.encryptRequest(payload)).subscribe(
@@ -158,6 +159,9 @@ export class AuthService implements OnInit{
             response.status = 'success';
             response.class = 'bg-success';
             response.msg = 'Login  Successful.';
+            if(respData['message']){
+              response.message = respData['message'];
+            }
             this.authDataShareService.setAuthentication(true);
         } else if (respData.hasOwnProperty('error')) {
             if (respData["error"] == "not_confirmed") {
