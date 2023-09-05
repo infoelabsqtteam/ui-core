@@ -34,6 +34,6 @@ export * from './lib/shared/enums/storage-token-status.enum';
 export * from './lib/shared/enums/keycodes.enum';
 export * from './lib/services/data-share/auth-data-share/auth-data-share.service';
 export * from './lib/services/data-share/common-app-data-share/common-app-data-share.service';
-
+export * from './lib/services/fileHandler/file-handler.service';
 
 
