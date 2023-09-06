@@ -165,19 +165,16 @@ constructor(
     if(listOfGridFieldName.length > 0){  
       gridSelectedData.forEach((data:any,i:number) => {
         listOfGridFieldName.forEach((column:any) => {
-          if(column.editable || column.type == 'number'){
-            switch (column.type) {
-              case 'number':
-                gridSelectedData[i][column.field_name] = modifiedSelectedData[i][column.field_name];
-                break;
-            case 'file' :
+          switch (column.type) {
+            case 'number':
+              gridSelectedData[i][column.field_name] = modifiedSelectedData[i][column.field_name];
+              break;
+            case 'file':
               gridSelectedData[i][column.field_name] = this.fileHandlerService.modifyUploadFiles(modifiedSelectedData[i][column.field_name]);
-            break
-              default:
-                break;
-            }
-            
-          } 
+              break
+            default:
+              break;
+          }
 
         });
       });
