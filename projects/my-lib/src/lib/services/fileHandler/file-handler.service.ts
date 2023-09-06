@@ -15,10 +15,17 @@ export class FileHandlerService {
         if(element._id){
           fileList.push(element)
         }else{
-          fileList.push({uploadData:[element]})
+          if(element && element.uploadData){
+            let file = element.uploadData[0];
+            fileList.push(file);
+          }else {
+            fileList.push({uploadData:[element]})
+          }
         }
       });
     }                  
     return fileList;
   }
+
+
 }
