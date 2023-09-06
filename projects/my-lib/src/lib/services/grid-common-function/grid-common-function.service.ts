@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
 import { CommonFunctionService } from '../common-utils/common-function.service';
-
+import { FileHandlerService } from '../fileHandler/file-handler.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -9,7 +9,8 @@ export class GridCommonFunctionService {
 
 constructor(
   private CommonFunctionService:CommonFunctionService,
-  private coreFunctionService:CoreFunctionService
+  private coreFunctionService:CoreFunctionService,
+  private fileHandlerService: FileHandlerService
 ) { }
   modifyGridData(gridData:any,gridColumns:any,field:any,editableGridColumns:any,typegrapyCriteriaList:any){
     let modifiedData = [];
@@ -32,7 +33,14 @@ constructor(
       }          
       modifyRow[column.field_name+"_tooltip"] = this.CommonFunctionService.getValueForGridTooltip(column,row);          
       if(column.editable){
-        modifyRow[column.field_name+"_disabled"] = this.isDisable(column,row);            
+        modifyRow[column.field_name+"_disabled"] = this.isDisable(column,row); 
+        if(column.type == 'file') {
+          if(row && row[column.field_name] && this.CommonFunctionService.isArray(row[column.field_name]) && row[column.field_name].length > 0) {
+            modifyRow[column.field_name] = this.fileHandlerService.modifyUploadFiles(row[column.field_name]);
+          } else {
+            modifyRow[column.field_name] = row[column.field_name];
+          }
+        }           
       }
     }
     if(editableGridColumns && (editableGridColumns.length == 1 || (field && !field.grid_row_selection) || row.selected)){
@@ -158,8 +166,19 @@ constructor(
       gridSelectedData.forEach((data:any,i:number) => {
         listOfGridFieldName.forEach((column:any) => {
           if(column.editable || column.type == 'number'){
-            gridSelectedData[i][column.field_name] = modifiedSelectedData[i][column.field_name];
-          }         
+            switch (column.type) {
+              case 'number':
+                gridSelectedData[i][column.field_name] = modifiedSelectedData[i][column.field_name];
+                break;
+            case 'file' :
+              gridSelectedData[i][column.field_name] = this.fileHandlerService.modifyUploadFiles(modifiedSelectedData[i][column.field_name]);
+            break
+              default:
+                break;
+            }
+            
+          } 
+
         });
       });
     }  
