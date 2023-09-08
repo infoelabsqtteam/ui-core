@@ -297,7 +297,7 @@ export class AuthService implements OnInit{
           response.class = 'bg-success';
           response.msg = respData['message'];
         }
-        this.authDataShareService.setForgot(response);
+        this.authDataShareService.resetPassword(response);
       },
       (error)=>{
         if(error && error.error && error.error.message){
@@ -307,7 +307,7 @@ export class AuthService implements OnInit{
         }
         response.status = 'error';
         response.class = 'bg-danger';
-        this.authDataShareService.setForgot(response);
+        this.authDataShareService.resetPassword(response);
       }
     )
   }
