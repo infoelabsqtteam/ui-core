@@ -2759,10 +2759,22 @@ export class CommonFunctionService {
       "fieldName": fieldName.field_name,
       "ddnFieldName": fieldName.ddn_field,
       "files" : fileData,
-      "tableFields":fieldName.tableFields,
-      "defaultBucket":fieldName.defaultBucket ,
-      "defaultS3Key": fieldName.defaultS3Key
+      "tableFields":null,
+      "defaultBucket":null ,
+      "defaultS3Key": null
     }
+    if (fieldName.tableFields) {
+      alertData['tableFields'] = fieldName.tableFields;
+    }
+    
+    if (fieldName.defaultBucket) {
+      alertData['defaultBucket'] = fieldName.defaultBucket;
+    }
+    
+    if (fieldName.defaultS3Key) {
+      alertData['defaultS3Key'] = fieldName.defaultS3Key;
+    }
+
     this.modalService.open(modalName, alertData);
   }
   openAlertModal(id:string, type:any, headerMessage:any, bodyMessage:any) {
