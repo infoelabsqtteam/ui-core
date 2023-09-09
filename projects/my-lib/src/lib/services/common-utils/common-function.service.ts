@@ -2758,7 +2758,10 @@ export class CommonFunctionService {
       "event": true,
       "fieldName": fieldName.field_name,
       "ddnFieldName": fieldName.ddn_field,
-      "files" : fileData
+      "files" : fileData,
+      "tableFields":fieldName.tableFields,
+      "defaultBucket":fieldName.defaultBucket ,
+      "defaultS3Key": fieldName.defaultS3Key
     }
     this.modalService.open(modalName, alertData);
   }
