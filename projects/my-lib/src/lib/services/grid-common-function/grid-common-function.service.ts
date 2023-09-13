@@ -14,10 +14,10 @@ constructor(
 ) { }
   modifyGridData(gridData:any,gridColumns:any,field:any,editableGridColumns:any,typegrapyCriteriaList:any){
     let modifiedData = [];
-    if(gridColumns.length > 0){      
+    if(gridColumns.length > 0){
       for (let i = 0; i < gridData.length; i++) {
         const row = gridData[i];
-        let modifyRow = this.rowModify(row,field,gridColumns,editableGridColumns,typegrapyCriteriaList);     
+        let modifyRow = this.rowModify(row,field,gridColumns,editableGridColumns,typegrapyCriteriaList);
         modifiedData.push(modifyRow);
       }
     }
@@ -27,30 +27,30 @@ constructor(
     let modifyRow = JSON.parse(JSON.stringify(row));
     modifyRow["disabled"] = this.checkRowIf(row,field);
     for (let j = 0; j < gridColumns.length; j++) {
-      const column = gridColumns[j];  
-      if(!column.editable || editableGridColumns.length == 0){        
+      const column = gridColumns[j];
+      if(!column.editable || editableGridColumns.length == 0){
         modifyRow[column.field_name] = this.CommonFunctionService.getValueForGrid(column,row);
-      }          
-      modifyRow[column.field_name+"_tooltip"] = this.CommonFunctionService.getValueForGridTooltip(column,row);          
+      }
+      modifyRow[column.field_name+"_tooltip"] = this.CommonFunctionService.getValueForGridTooltip(column,row);
       if(column.editable){
-        modifyRow[column.field_name+"_disabled"] = this.isDisable(column,row); 
+        modifyRow[column.field_name+"_disabled"] = this.isDisable(column,row);
         if(column.type == 'file') {
           if(row && row[column.field_name] && this.CommonFunctionService.isArray(row[column.field_name]) && row[column.field_name].length > 0) {
             modifyRow[column.field_name] = this.fileHandlerService.modifyUploadFiles(row[column.field_name]);
           } else {
             modifyRow[column.field_name] = row[column.field_name];
           }
-        }           
+        }
       }
     }
     if(editableGridColumns && (editableGridColumns.length == 1 || (field && !field.grid_row_selection) || row.selected)){
       modifyRow["column_edit"] = true;
     }else{
       modifyRow["column_edit"] = false;
-    }  
+    }
     if(editableGridColumns && editableGridColumns.length == 0 && field && Object.keys(field).length > 0){
       modifyRow['actionBtnDisplay'] = this.checkRowDisabledIf(field,row);
-    } 
+    }
     if(typegrapyCriteriaList && typegrapyCriteriaList.length > 0){
       modifyRow['background-color'] = this.checkTypgraphCondition(typegrapyCriteriaList,row,'background-color');
     }
@@ -83,20 +83,20 @@ constructor(
     const updateMode = false;
     if (field.is_disabled) {
       return true;
-    } 
+    }
     if(data.disabled){
       return data.disabled;
     }
     if (field.etc_fields && field.etc_fields.disable_if && field.etc_fields.disable_if != '') {
       return this.CommonFunctionService.isDisable(field.etc_fields, updateMode, data);
-    }   
+    }
     return false;
   }
   isDisableRuntime(column:any, data:any,i:number,gridData:any,field:any,filterData:any) {
     const updateMode = false;
     if (column.is_disabled) {
       return true;
-    } 
+    }
     if(data.disabled){
       return data.disabled;
     }
@@ -104,7 +104,7 @@ constructor(
       let indx:any = this.getCorrectIndex(data,i,field,gridData,filterData);
       data = gridData[indx];
       return this.CommonFunctionService.isDisable(field.etc_fields, updateMode, data);
-    }   
+    }
     return false;
   }
   getListByKeyValueToList(list:any,key:string,value:any){
@@ -151,38 +151,34 @@ constructor(
       }
     }
   }
-  updateGridDataToModifiedData(grid_row_selection:any,gridData:any,modifiedGridData:any,listOfGridFieldName:any){  
-    let gridSelectedData:any = []; 
+  updateGridDataToModifiedData(grid_row_selection:any,gridData:any,modifiedGridData:any,listOfGridFieldName:any){
+    let gridSelectedData:any = [];
     let modifiedSelectedData:any = [];
     if (grid_row_selection == false) {
       gridSelectedData = [...gridData];
       modifiedSelectedData = [...modifiedGridData];
     }
     else {
-      gridSelectedData = this.getListByKeyValueToList(gridData,"selected",true); 
+      gridSelectedData = this.getListByKeyValueToList(gridData,"selected",true);
       modifiedSelectedData = this.getListByKeyValueToList(modifiedGridData,"selected",true);
-    } 
-    if(listOfGridFieldName.length > 0){  
+    }
+    if(listOfGridFieldName.length > 0){
       gridSelectedData.forEach((data:any,i:number) => {
         listOfGridFieldName.forEach((column:any) => {
-          if(column.editable){
+          if(column.editable || column.type == 'number'){
             switch (column.type) {
-              case 'number':
-                gridSelectedData[i][column.field_name] = modifiedSelectedData[i][column.field_name];
-                break;
               case 'file':
                 gridSelectedData[i][column.field_name] = this.fileHandlerService.modifyUploadFiles(modifiedSelectedData[i][column.field_name]);
                 break
               default:
+                gridSelectedData[i][column.field_name] = modifiedSelectedData[i][column.field_name];
                 break;
             }
-            
-          } 
-
+          }
         });
       });
-    }  
-    return gridSelectedData;  
+    }
+    return gridSelectedData;
   }
   getCorrectIndex(data:any, indx:number,field:any,gridData:any,filterValue:any){
     let index;
@@ -205,7 +201,7 @@ constructor(
       index = this.CommonFunctionService.getIndexInArrayById(gridData, data._id);
     } else {
       index = indx;
-    } 
+    }
     if(index && index != indx && filterValue == ''){
       index = indx;
     }
@@ -246,7 +242,7 @@ constructor(
             alreadyExist =  "true";
           }
         }
-      
+
       });
     }else{
       alreadyExist =  "false";
@@ -265,7 +261,7 @@ constructor(
   //   }
   // }
   modifyTableFields(tablefields:any){
-    
+
   }
   gridDataModify(modifyData:any,data:any,fields:any,field_name:any,key:any,object:any){
     let modifyObject = {
@@ -278,21 +274,21 @@ constructor(
         const element = fields[i];
         const type = element.type;
         const fieldName = element.field_name;
-        if(type && type.startsWith(key) && field_name == fieldName){                    
+        if(type && type.startsWith(key) && field_name == fieldName){
           if(element && fieldName && data && data[fieldName]){
             const cData = data[fieldName];
-            if(Array.isArray(cData) && cData.length > 0){              
+            if(Array.isArray(cData) && cData.length > 0){
               const gridColumns = element.gridColumns;
               const modifyList = this.modifyGridData(cData,gridColumns,element,[],[]);
               modifyData[fieldName] = modifyList;
               element.gridColumns = this.modifyGridColumns(gridColumns,object);
               modifyObject.field_index = i;
             }
-          } 
+          }
         }else if(type && type.startsWith('list_of_fields') && element.datatype == "list_of_object_with_popup" && field_name == fieldName){
           if(element && fieldName && data && data[fieldName]){
             const cData = data[fieldName];
-            if(Array.isArray(cData) && cData.length > 0){              
+            if(Array.isArray(cData) && cData.length > 0){
               const gridColumns = element.list_of_fields;
               const modifyList = this.modifyListofFieldsData({},cData,gridColumns)['data'];
               modifyData[fieldName] = modifyList;
@@ -313,10 +309,10 @@ constructor(
     if(fields && fields.length > 0 && data && data.length > 0){
       for (let index = 0; index < data.length; index++) {
         const object = data[index];
-        const mObject = this.getModifyListOfFieldsObject(parentField,object,fields);        
+        const mObject = this.getModifyListOfFieldsObject(parentField,object,fields);
         modifyData.push(mObject);
-      }   
-      modifyListoffieldObject['data'] = modifyData;   
+      }
+      modifyListoffieldObject['data'] = modifyData;
     }
     return modifyListoffieldObject;
   }
@@ -326,7 +322,7 @@ constructor(
       for (let index = 0; index < fields.length; index++) {
         const element = fields[index];
         let fieldName = element.field_name;
-        mObject[fieldName] = this.showListFieldValue(object,element);        
+        mObject[fieldName] = this.showListFieldValue(object,element);
       }
       mObject['actionBtnDisplay'] = this.checkRowDisabledIf(parentField,object);
     }
@@ -364,7 +360,7 @@ constructor(
           return '<i class="fa fa-eye cursor-pointer"></i>';
         } else {
           return '-';
-        } 
+        }
       case "checkbox":
         let value:any = false;
         if (item.display_name && item.display_name != "") {
@@ -372,28 +368,28 @@ constructor(
         } else {
           value = this.CommonFunctionService.getValueForGrid(item,listOfField);
         }
-        return value ? "Yes" : "No";     
+        return value ? "Yes" : "No";
       default:
         if (item.display_name && item.display_name != "") {
           return this.CommonFunctionService.getObjectValue(item.display_name, listOfField);
         } else {
           return this.CommonFunctionService.getValueForGrid(item,listOfField);
         }
-    }   
+    }
 
   }
-  checkRowDisabledIf(field:any,data:any){  
-    if(field && field.disableRowIf && field.disableRowIf != ''){  
+  checkRowDisabledIf(field:any,data:any){
+    if(field && field.disableRowIf && field.disableRowIf != ''){
       const condition = field.disableRowIf;
       if(condition){
         if(field.disableRowIfOnlySelection){
           return true;
         }else{
           return !this.CommonFunctionService.checkDisableRowIf(condition,data);
-        }      
+        }
       }
     }
-    return true;    
+    return true;
   }
   checkTypgraphCondition(typegrapyCriteriaList:any,object:any,name:any){
     let background = '';
@@ -412,7 +408,7 @@ constructor(
             break;
           }else{
             childConditionsMatched = true;
-          }          
+          }
         }
         if(childConditionsMatched){
           matchedelement = typegrapyCriteriaList[index]
@@ -422,18 +418,18 @@ constructor(
           criteriaMatched = false;
         }
       }
-      if(criteriaMatched){ 
-        let typograpy = matchedelement['typoGraphy']; 
+      if(criteriaMatched){
+        let typograpy = matchedelement['typoGraphy'];
         let value = '';
         switch (name) {
           case 'background-color':
             value = typograpy['background_color'];
-            break;        
+            break;
           default:
             break;
         }
         background = value;
-      }      
+      }
     }
     return background;
   }
