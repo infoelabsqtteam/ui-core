@@ -33,8 +33,8 @@ constructor(
       }
       modifyRow[column.field_name+"_tooltip"] = this.CommonFunctionService.getValueForGridTooltip(column,row);
       if(column.editable){
-        modifyRow[column.field_name+"_disabled"] = this.isDisable(column,row);
-        if(column.type == 'file') {
+        modifyRow[column.field_name+"_disabled"] = this.isDisable(column,row); 
+        if(column.type == 'file' && editableGridColumns.length > 0) {
           if(row && row[column.field_name] && this.CommonFunctionService.isArray(row[column.field_name]) && row[column.field_name].length > 0) {
             modifyRow[column.field_name] = this.fileHandlerService.modifyUploadFiles(row[column.field_name]);
           } else {
