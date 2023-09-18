@@ -872,7 +872,7 @@ export class LimsCalculationsService {
     let taxable_amount = 0;
     let net_amount = 0;
     let parentObjectValue = templateValue[calculate_on_field.parent];
-    if (this.coreFunctionService.isNotBlank(templateValue[calculate_on_field.parent])) {
+    if (this.coreFunctionService.isNotBlank(parentObjectValue)) {
       if (this.coreFunctionService.isNotBlank(parentObjectValue[calculate_on_field.field_name])){
           taxable_amount = parentObjectValue[calculate_on_field.field_name];
       }   
