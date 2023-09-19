@@ -899,9 +899,26 @@ export class CommonFunctionService {
       value= this.getObjectValue(fieldName, object)
     }
     if (!field.type) field.type = "Text";
+    let returnValue:any = '';
     switch (field.type.toLowerCase()) {
-      case 'datetime': return this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
-      case 'date': return this.datePipe.transform(value, 'dd/MM/yyyy');
+      case 'datetime':
+        if(value && value != ''){
+          if(this.storageService.checkPlatForm() == 'mobile'){
+            returnValue =  this.datePipe.transform(value, 'medium');
+          }else{
+            returnValue = this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
+          }
+        }
+        return returnValue
+      case 'date': 
+        if(value && value != ''){
+          if(this.storageService.checkPlatForm() == 'mobile'){
+            returnValue =  this.datePipe.transform(value, 'mediumDate');
+          }else{
+            returnValue = this.datePipe.transform(value, 'dd/MM/yyyy');
+          }
+        }
+        return returnValue;
       case 'time': return this.datePipe.transform(value, 'h:mm a');
       case "boolean": return value ? "Yes" : "No";
       case "currency": return this.CurrencyPipe.transform(value, 'INR');
