@@ -5,7 +5,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthDataShareService {
-  
+
   signinResponse:Subject<any> = new Subject();
   authenticated:Subject<boolean> = new BehaviorSubject<boolean>(false);
   forgot:Subject<any> = new Subject<any>();
@@ -16,13 +16,14 @@ export class AuthDataShareService {
   createPwd:Subject<any> = new Subject();
   userInfo:Subject<any> = new Subject();
   sessionexpired:Subject<any> = new Subject();
-  
+  resetPass:Subject<any> = new Subject();
+
 
   constructor() { }
 
   setSigninResponse(responce:any){
     this.signinResponse.next(responce);
-  } 
+  }
   setAuthentication(responce:boolean){
     this.authenticated.next(responce);
   }
@@ -55,6 +56,9 @@ export class AuthDataShareService {
   }
   setSessionExpired(responce:any){
     this.sessionexpired.next(responce);
+  }
+  resetPassword(responce:any){
+    this.resetPass.next(responce);
   }
 
 

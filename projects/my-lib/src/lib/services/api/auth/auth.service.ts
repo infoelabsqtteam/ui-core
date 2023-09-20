@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { EncryptionService } from '../../encryption/encryption.service';
 import { CommonFunctionService } from '../../common-utils/common-function.service';
 import { ApiService } from '../api.service';
+import { CoreFunctionService } from '../../common-utils/core-function/core-function.service';
 import { AuthDataShareService } from '../../data-share/auth-data-share/auth-data-share.service';
 
 
@@ -14,7 +15,7 @@ import { AuthDataShareService } from '../../data-share/auth-data-share/auth-data
   providedIn: 'root'
 })
 export class AuthService implements OnInit{
-  
+
 
   constructor(
     private http:HttpClient,
@@ -24,13 +25,14 @@ export class AuthService implements OnInit{
     private router:Router,
     private encryptionService:EncryptionService,
     private commonFunctionService:CommonFunctionService,
+    private coreFunctionService:CoreFunctionService,
     private authDataShareService: AuthDataShareService
     ) { }
 
 
   ngOnInit(){
 
-  } 
+  }
 
   Logout(payload:any){
     this.resetData();
@@ -54,17 +56,17 @@ export class AuthService implements OnInit{
     }
   }
   resetData(){
-    this.storageService.removeDataFormStorage();                
+    this.storageService.removeDataFormStorage();
     this.apiService.resetMenuData();
     this.apiService.resetTempData();
     this.apiService.resetGridData();
     this.envService.setRequestType('PUBLIC');
-    this.commonFunctionService.getApplicationAllSettings();    
+    this.commonFunctionService.getApplicationAllSettings();
   }
   logOutRedirection(){
     if (this.envService.checkRedirectionUrl()) {
       window.location.href = this.envService.checkRedirectionUrl();
-    }else{      
+    }else{
       this.redirectToSignPage();
     }
   }
@@ -83,15 +85,16 @@ export class AuthService implements OnInit{
     this.http.post(api, reqBody).subscribe(
       (respData:any) =>{
         if (respData && respData.user) {
-          this.storageService.SetUserInfo(respData);
+          let modifyData = this.coreFunctionService.getModulesFormMapObject(respData);
+          this.storageService.SetUserInfo(modifyData);
           this.storageService.GetUserInfo();
-          this.envService.setRequestType('PRIVATE');  
-          this.commonFunctionService.getApplicationAllSettings();        
+          this.envService.setRequestType('PRIVATE');
+          this.commonFunctionService.getApplicationAllSettings();
           this.authDataShareService.restSettingModule('logged_in');
           this.apiService.gitVersion('');
           this.commonFunctionService.getUserPrefrerence(respData.user);
           this.commonFunctionService.getUserNotification(1);
-          this.redirectionWithMenuType(loginRedirect);                                  
+          this.redirectionWithMenuType(loginRedirect);
         } else {
             this.envService.setRequestType('PUBLIC');
             this.redirectToSignPage();
@@ -100,7 +103,7 @@ export class AuthService implements OnInit{
       (error)=>{
         if(error.status == 403){
           this.envService.setRequestType('PUBLIC');
-          this.redirectToSignPage(); 
+          this.redirectToSignPage();
         }else{
           if(error && error.status == 403){
             response.msg = 'Username password does not match.';
@@ -110,19 +113,19 @@ export class AuthService implements OnInit{
             response.msg = error.message;
           }
           response.status = 'error';
-          response.class = 'bg-danger';          
+          response.class = 'bg-danger';
           this.authDataShareService.setUserInfo(response);
-        } 
+        }
       }
     )
-  }  
+  }
   redirectionWithMenuType(loginRedirectUrl?:string){
     const menuType = this.storageService.GetMenuType();
     const redirectUrl = this.storageService.getRedirectUrl();
     const childWindowUrl = this.storageService.getChildWindowUrl();
     let route = '/dashboard';
     if(menuType == 'Horizontal'){
-      route = '/home'; 
+      route = '/home';
     }
     if(redirectUrl && redirectUrl != '' && redirectUrl != '/'){
       route = redirectUrl;
@@ -140,7 +143,8 @@ export class AuthService implements OnInit{
     let response = {
       status: '',
       class: '',
-      msg: ''
+      msg: '',
+      message:''
     };
     let api = this.envService.getAuthApi('AU_SIGNIN');
     this.http.post(api, this.encryptionService.encryptRequest(payload)).subscribe(
@@ -154,6 +158,9 @@ export class AuthService implements OnInit{
             response.status = 'success';
             response.class = 'bg-success';
             response.msg = 'Login  Successful.';
+            if(respData['message']){
+              response.message = respData['message'];
+            }
             this.authDataShareService.setAuthentication(true);
         } else if (respData.hasOwnProperty('error')) {
             if (respData["error"] == "not_confirmed") {
@@ -165,7 +172,7 @@ export class AuthService implements OnInit{
             }
             response.status = 'error';
             response.class = 'bg-danger';
-        }        
+        }
         this.authDataShareService.setSigninResponse(response);
       },
       (error)=>{
@@ -181,7 +188,7 @@ export class AuthService implements OnInit{
         }
         response.status = 'error';
         response.class = 'bg-danger';
-        
+
         this.authDataShareService.setSigninResponse(response);
       }
     )
@@ -255,7 +262,7 @@ export class AuthService implements OnInit{
     };
     let api = this.envService.getAuthApi('AUTH_FORGET_PASSWORD');
     this.http.post(api, this.encryptionService.encryptRequest(payload)).subscribe(
-      (respData:any) =>{        
+      (respData:any) =>{
         if(respData && respData['message']){
           response.status = 'success';
           response.class = 'bg-success';
@@ -287,9 +294,9 @@ export class AuthService implements OnInit{
         if(respData && respData['message']){
           response.status = 'success';
           response.class = 'bg-success';
-          response.msg = respData['message'];         
+          response.msg = respData['message'];
         }
-        this.authDataShareService.setForgot(response);
+        this.authDataShareService.resetPassword(response);
       },
       (error)=>{
         if(error && error.error && error.error.message){
@@ -299,7 +306,7 @@ export class AuthService implements OnInit{
         }
         response.status = 'error';
         response.class = 'bg-danger';
-        this.authDataShareService.setForgot(response);
+        this.authDataShareService.resetPassword(response);
       }
     )
   }
@@ -354,7 +361,7 @@ export class AuthService implements OnInit{
         response.class = 'bg-danger';
         this.authDataShareService.setChangePwd(response);
       }
-    ) 
+    )
   }
   userVarify(payload:any){
     let response = {
@@ -405,9 +412,9 @@ export class AuthService implements OnInit{
       "status":false,
       "msg" : ""
     };
-    if (this.storageService != null && this.storageService.GetIdToken() != null) {      
+    if (this.storageService != null && this.storageService.GetIdToken() != null) {
       if(this.storageService.GetIdTokenStatus() == StorageTokenStatus.ID_TOKEN_ACTIVE){
-        statusWithMsg.status = true;           
+        statusWithMsg.status = true;
       }else{
         statusWithMsg.status = false;
           this.SessionExpired();
@@ -427,6 +434,6 @@ export class AuthService implements OnInit{
       exists = false;
     }
     return exists;
-  } 
+  }
 
 }

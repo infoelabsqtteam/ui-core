@@ -1,6 +1,6 @@
 export enum EndPoint {
 
-    GET_USER_PERMISSION = "user/utvn",
+    GET_USER_PERMISSION = "user/utvn/v2",
     SAVE_CUSTOM_TEMPLATE = "ins/save/templates",
     SAVE_FORM_DATA = "ins/save",
     DELETE_GRID_ROW = "del/delete",
@@ -19,10 +19,10 @@ export enum EndPoint {
     AU_SIGNIN = "login/signIn",
     AU_SIGNUP = "login/signUp",
     USER_VARIFY = "login/verify",
-    AUTH_SIGNOUT = "login/signOut/",
-    AUTH_FORGET_PASSWORD = "login/fp/",
-    AUTH_RESET_PASSWORD = "login/rp/",
-    AUTH_CHANGE_PASSWORD = "login/cp/",
+    AUTH_SIGNOUT = "login/signOut",
+    AUTH_FORGET_PASSWORD = "login/fp",
+    AUTH_RESET_PASSWORD = "login/rp",
+    AUTH_CHANGE_PASSWORD = "login/cp",
     GET_AUTH_APP = "user/auth/app/",
     SAVE_CONTACT_US = "ins/save/contact_us_query",
     SAVE_CAREER_WITH_US = "ins/save/career_with_us",
