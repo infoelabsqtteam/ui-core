@@ -2708,9 +2708,6 @@ export class CommonFunctionService {
 
   }
 
-  
-
-
   // getDecimalAmount(value:any): any | undefined {
   //   if (typeof(value) == 'number' && value != undefined && value != null) {
   //     return Number(value.toFixed(2));
@@ -2738,9 +2735,7 @@ export class CommonFunctionService {
   //     }
   //   });
   //   return templateForm;
-  // }
-
-  
+  // }  
 
   claimAmountCalculation(field1:any, field2:any, field3:any) {
     let total = 0;
@@ -2765,9 +2760,7 @@ export class CommonFunctionService {
     }
     arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
     return arr; // for testing
-  };
-
-  
+  };  
 
   openFileUpload(fieldName:any, modalName:any, formValue:any, fileData:any) {
     const alertData = {
@@ -2782,16 +2775,13 @@ export class CommonFunctionService {
     }
     if (fieldName.tableFields) {
       alertData['tableFields'] = fieldName.tableFields;
-    }
-    
+    }    
     if (fieldName.defaultBucket) {
       alertData['defaultBucket'] = fieldName.defaultBucket;
-    }
-    
+    }    
     if (fieldName.defaultS3Key) {
       alertData['defaultS3Key'] = fieldName.defaultS3Key;
     }
-
     this.modalService.open(modalName, alertData);
   }
   openAlertModal(id:string, type:any, headerMessage:any, bodyMessage:any) {
@@ -2885,50 +2875,50 @@ export class CommonFunctionService {
     return downloadPdfCheck;
   }
 
-    getPdf(data:any,currentMenu:any) {
-      let payloadData = {};
-      if(currentMenu != ''){
-        payloadData = this.getPaylodWithCriteria(currentMenu, '', [], '')
-      }
-      const getFileData:any = {
-        _id: data._id,
-        data: payloadData,
-        responce: { responseType: "arraybuffer" }
-      }
-      let fileName = currentMenu;
-      fileName = fileName.charAt(0).toUpperCase() + fileName.slice(1)
-      const downloadPdfCheck = fileName + '-' + new Date().toLocaleDateString();
-      if(getFileData._id && getFileData._id != undefined && getFileData._id != null && getFileData._id != ''){
-        getFileData.data['data']=data;
-        this.apiService.GetFileData(getFileData);
-      }
-      return  downloadPdfCheck;
+  getPdf(data:any,currentMenu:any) {
+    let payloadData = {};
+    if(currentMenu != ''){
+      payloadData = this.getPaylodWithCriteria(currentMenu, '', [], '')
     }
+    const getFileData:any = {
+      _id: data._id,
+      data: payloadData,
+      responce: { responseType: "arraybuffer" }
+    }
+    let fileName = currentMenu;
+    fileName = fileName.charAt(0).toUpperCase() + fileName.slice(1)
+    const downloadPdfCheck = fileName + '-' + new Date().toLocaleDateString();
+    if(getFileData._id && getFileData._id != undefined && getFileData._id != null && getFileData._id != ''){
+      getFileData.data['data']=data;
+      this.apiService.GetFileData(getFileData);
+    }
+    return  downloadPdfCheck;
+  }
 
-    download_file(payload:object){
-      this.apiService.GetFileData(payload);
-    }
+  download_file(payload:object){
+    this.apiService.GetFileData(payload);
+  }
 
-    getQRCode(data:object){
-      this.apiService.GetQr(data);
-    }
+  getQRCode(data:object){
+    this.apiService.GetQr(data);
+  }
 
-    getAuditHistory(data:object){
-      this.apiService.getAuditHistory(data);
-    }
+  getAuditHistory(data:object){
+    this.apiService.getAuditHistory(data);
+  }
 
-    getFormForTds(data:any,currentMenu:any, object:any){
-      let payloadData:any = {};
-      if(currentMenu != ''){
-        payloadData = this.getPaylodWithCriteria(currentMenu, '', [], '')
-        payloadData['data']=object
-      }
-      const getFormData = {
-        _id : data._id,
-        data: payloadData
-      }
-      return getFormData;
+  getFormForTds(data:any,currentMenu:any, object:any){
+    let payloadData:any = {};
+    if(currentMenu != ''){
+      payloadData = this.getPaylodWithCriteria(currentMenu, '', [], '')
+      payloadData['data']=object
     }
+    const getFormData = {
+      _id : data._id,
+      data: payloadData
+    }
+    return getFormData;
+  }
 
   downloadFile(file:string) {
     const payload = {
@@ -3044,160 +3034,160 @@ export class CommonFunctionService {
       response.status = true; 
     }
     return response;
-}
-
-formSize(evt:any,fieldLangth:number){
-  if(evt && evt.class && evt.class!= ''){
-    return evt.class;
-  }else if(fieldLangth <= 5){
-    return '';
-  }else if(fieldLangth <= 10){
-    return 'modal-lg';
   }
-  else{
-    return 'modal-dialog-full-width';
-  }
-}
 
-// create_professional_email(templateForm:any){
-//   let templateValue = templateForm.getRawValue();
-//   let name = templateValue.name;
-//   let prof_email = "";
-//   let strt = name.substring(0, 2);
-//   let last = name.slice(-2);
-//   prof_email = strt+last+"@gmail.com";
-//   const fieldWithValue = [
-//     { field: 'prof_email', value: prof_email },
-//   ]
-
-//   this.setValueInVields(templateForm, fieldWithValue);
-// }
-
-price_after_disc_health_test(templateForm:any){
-  let templateValue = templateForm.getRawValue();
-  let discount = 0;
-  discount = templateValue.discount;
-}
-
-// autopopulateFields(templateForm:any){
-//   let templateValue = templateForm.getRawValue();
-//   let product = templateValue.product.name;
-//   const fieldWithValue = [
-//     { field: 'sample_name', value: product },
-//   ]
-
-//   this.setValueInVields(templateForm, fieldWithValue);
-// }
-getDataForGrid(page:any,tab:any,currentMenu:any,headElements:any,filterForm:any,selectContact:any){
-  let grid_api_params_criteria = [];
-  if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
-    this.itemNumOfGrid = tab.grid.grid_page_size;
-  }
-  if(this.isGridFieldExist(tab,"api_params_criteria")){
-    grid_api_params_criteria = tab.grid.api_params_criteria;
-  }
-  const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);     
-  this.getfilterCrlist(headElements,filterForm).forEach((element: any) => {
-    data.crList.push(element);
-  });
-  if(selectContact != ''){
-    const tabFilterCrlist = {        
-      "fName": 'account._id',
-      "fValue": selectContact,
-      "operator": 'eq'
+  formSize(evt:any,fieldLangth:number){
+    if(evt && evt.class && evt.class!= ''){
+      return evt.class;
+    }else if(fieldLangth <= 5){
+      return '';
+    }else if(fieldLangth <= 10){
+      return 'modal-lg';
     }
-    data.crList.push(tabFilterCrlist);
-  }
-  const getFilterData = {
-    data: data,
-    path: null
-  }
-  return getFilterData;
-}
-setPageNoAndSize(payload:any,page:number){
-  payload['pageNo'] = page - 1;
-  payload['pageSize'] = this.itemNumOfGrid; 
-  return payload;
-}
-getRealTimeGridData(currentMenu:any, object:any) {
-  let grid_api_params_criteria = [];
-  let page = 1;
-  let criteria = "_id;eq;" + object._id + ";STATIC";
-  grid_api_params_criteria.push(criteria);
-  const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page); 
-  const getFilterData = {
-    data: data,
-    path: null
-  }
-  this.apiService.getGridRunningData(getFilterData);
-}
-setPageNumverAndSize(payload:any,page:number,){
-  payload['pageNo'] = page - 1;
-  payload['pageSize'] = this.itemNumOfGrid; 
-  return payload;
-}
-getPage(page: number,tab:any,currentMenu:string,headElements:object,filterForm:object,selectContact:any) {  
- return this.getDataForGrid(page,tab,currentMenu,headElements,filterForm,selectContact);
-}
-isGridFieldExist(tab:any,fieldName:any){
-  if(tab.grid && tab.grid[fieldName] && tab.grid[fieldName] != undefined && tab.grid[fieldName] != null && tab.grid[fieldName] != ''){
-   return true;
-  }
-  return false;
-}
-getMatchingInList(list:any,IncomingData:any,existData:any){
-  var validity = true;
-  list.forEach((matchcriteria: any) => {
-    if (this.getObjectValue(matchcriteria, IncomingData) == this.getObjectValue(matchcriteria, existData)) {
-      validity = validity && true;
+    else{
+      return 'modal-dialog-full-width';
     }
-    else {
-      validity = validity && false;
+  }
+
+  // create_professional_email(templateForm:any){
+  //   let templateValue = templateForm.getRawValue();
+  //   let name = templateValue.name;
+  //   let prof_email = "";
+  //   let strt = name.substring(0, 2);
+  //   let last = name.slice(-2);
+  //   prof_email = strt+last+"@gmail.com";
+  //   const fieldWithValue = [
+  //     { field: 'prof_email', value: prof_email },
+  //   ]
+
+  //   this.setValueInVields(templateForm, fieldWithValue);
+  // }
+
+  price_after_disc_health_test(templateForm:any){
+    let templateValue = templateForm.getRawValue();
+    let discount = 0;
+    discount = templateValue.discount;
+  }
+
+  // autopopulateFields(templateForm:any){
+  //   let templateValue = templateForm.getRawValue();
+  //   let product = templateValue.product.name;
+  //   const fieldWithValue = [
+  //     { field: 'sample_name', value: product },
+  //   ]
+
+  //   this.setValueInVields(templateForm, fieldWithValue);
+  // }
+  getDataForGrid(page:any,tab:any,currentMenu:any,headElements:any,filterForm:any,selectContact:any){
+    let grid_api_params_criteria = [];
+    if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
+      this.itemNumOfGrid = tab.grid.grid_page_size;
     }
-  });
-  return validity;
-}
-
-
-getIndexInArrayById(array:any,id:any,key?:any){
-  let index = -1;
-  if(array && array.length > 0){
-    for (let i = 0; i < array.length; i++) {
-      const element = array[i];
-      if(key != undefined && key != null){
-        if(this.isArray(key) && key.length > 0 && Object.keys(id).length > 0){          
-          if (this.getMatchingInList(key,id,element)) {
-            index = i;
-          }
-        }else{
-          const idValue = this.getObjectValue(key,element);
-          if(id && id == idValue){
-            index = i;
-            break;
-          }
-        }
-      }else if(element._id && element._id == id){
-        index = i;
-        break;
+    if(this.isGridFieldExist(tab,"api_params_criteria")){
+      grid_api_params_criteria = tab.grid.api_params_criteria;
+    }
+    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);     
+    this.getfilterCrlist(headElements,filterForm).forEach((element: any) => {
+      data.crList.push(element);
+    });
+    if(selectContact != ''){
+      const tabFilterCrlist = {        
+        "fName": 'account._id',
+        "fValue": selectContact,
+        "operator": 'eq'
       }
-    };
+      data.crList.push(tabFilterCrlist);
+    }
+    const getFilterData = {
+      data: data,
+      path: null
+    }
+    return getFilterData;
   }
-  return index;
-}
+  setPageNoAndSize(payload:any,page:number){
+    payload['pageNo'] = page - 1;
+    payload['pageSize'] = this.itemNumOfGrid; 
+    return payload;
+  }
+  getRealTimeGridData(currentMenu:any, object:any) {
+    let grid_api_params_criteria = [];
+    let page = 1;
+    let criteria = "_id;eq;" + object._id + ";STATIC";
+    grid_api_params_criteria.push(criteria);
+    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page); 
+    const getFilterData = {
+      data: data,
+      path: null
+    }
+    this.apiService.getGridRunningData(getFilterData);
+  }
+  setPageNumverAndSize(payload:any,page:number,){
+    payload['pageNo'] = page - 1;
+    payload['pageSize'] = this.itemNumOfGrid; 
+    return payload;
+  }
+  getPage(page: number,tab:any,currentMenu:string,headElements:object,filterForm:object,selectContact:any) {  
+  return this.getDataForGrid(page,tab,currentMenu,headElements,filterForm,selectContact);
+  }
+  isGridFieldExist(tab:any,fieldName:any){
+    if(tab.grid && tab.grid[fieldName] && tab.grid[fieldName] != undefined && tab.grid[fieldName] != null && tab.grid[fieldName] != ''){
+    return true;
+    }
+    return false;
+  }
+  getMatchingInList(list:any,IncomingData:any,existData:any){
+    var validity = true;
+    list.forEach((matchcriteria: any) => {
+      if (this.getObjectValue(matchcriteria, IncomingData) == this.getObjectValue(matchcriteria, existData)) {
+        validity = validity && true;
+      }
+      else {
+        validity = validity && false;
+      }
+    });
+    return validity;
+  }
 
-openModal(id:any, data:any){
- this.modalService.open(id, data);
-}
-// calculate_next_calibration_due_date(templateForm: FormGroup){
-//       const objectValue = templateForm.getRawValue();
-//       let calibration_date =objectValue['calibration_date']
-//       let calibration_frequency =objectValue['calibration_frequency']
-//       if(calibration_date!=null && calibration_date!==undefined && calibration_frequency!=null && calibration_frequency!==undefined && calibration_date!=="" && calibration_frequency!=="" ) {
-//         let date = new Date();
-//         date.setDate(calibration_date.getDate() + calibration_frequency );
-//         templateForm.controls['next_date'].setValue(date);
-//       }
-//   }
+
+  getIndexInArrayById(array:any,id:any,key?:any){
+    let index = -1;
+    if(array && array.length > 0){
+      for (let i = 0; i < array.length; i++) {
+        const element = array[i];
+        if(key != undefined && key != null){
+          if(this.isArray(key) && key.length > 0 && Object.keys(id).length > 0){          
+            if (this.getMatchingInList(key,id,element)) {
+              index = i;
+            }
+          }else{
+            const idValue = this.getObjectValue(key,element);
+            if(id && id == idValue){
+              index = i;
+              break;
+            }
+          }
+        }else if(element._id && element._id == id){
+          index = i;
+          break;
+        }
+      };
+    }
+    return index;
+  }
+
+  openModal(id:any, data:any){
+  this.modalService.open(id, data);
+  }
+  // calculate_next_calibration_due_date(templateForm: FormGroup){
+  //       const objectValue = templateForm.getRawValue();
+  //       let calibration_date =objectValue['calibration_date']
+  //       let calibration_frequency =objectValue['calibration_frequency']
+  //       if(calibration_date!=null && calibration_date!==undefined && calibration_frequency!=null && calibration_frequency!==undefined && calibration_date!=="" && calibration_frequency!=="" ) {
+  //         let date = new Date();
+  //         date.setDate(calibration_date.getDate() + calibration_frequency );
+  //         templateForm.controls['next_date'].setValue(date);
+  //       }
+  //   }
   // calculateAutoEffRate(data:any){
   //   data.forEach((element:any) => {
   //     element["per_sample_net_rate"] = element["no_of_samples"]*element["quotation_effective_rate"];
@@ -3242,7 +3232,6 @@ openModal(id:any, data:any){
     }
   }
 
-
   getOperatorSymbol(operator:any){
     switch (operator) {
       case 'eq':
@@ -3282,7 +3271,6 @@ openModal(id:any, data:any){
       }      
       return {newUrlWithQuery};
   }
-
 
   getFormDataInMultiformCollection(multiformCollection:any,formValue:any,index?:any){
     let data:any = {};
@@ -3571,8 +3559,6 @@ openModal(id:any, data:any){
     });
     return templateForm;
   }
-
-
 
   // calculateTotalFair(value:any){
   //   let totalFair = 0;
