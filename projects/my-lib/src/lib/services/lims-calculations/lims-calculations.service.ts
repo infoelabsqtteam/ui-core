@@ -864,7 +864,22 @@ export class LimsCalculationsService {
     return templateValue;
   }
 
-
+  credit_note_invoice_calculation(templateValue: any, lims_segment: any, calculate_on_field: any){
+    let surcharge = 0;
+    let gross_amount = 0;
+    let discount_percent = 0;
+    let discount_amount = 0;
+    let taxable_amount = 0;
+    let net_amount = 0;
+    let parentObjectValue = templateValue[calculate_on_field.parent];
+    if (this.coreFunctionService.isNotBlank(parentObjectValue)) {
+      if (this.coreFunctionService.isNotBlank(parentObjectValue[calculate_on_field.field_name])){
+          taxable_amount = parentObjectValue[calculate_on_field.field_name];
+      }   
+    }
+    templateValue = this.update_invoice_totatl(templateValue, gross_amount, discount_amount, discount_percent, net_amount, surcharge, taxable_amount);
+    return templateValue;
+  }
 
   calculate_lims_invoice(templateValue:any, lims_segment:any, calculate_on_field: any) {
     if (calculate_on_field == null || calculate_on_field == '') {
