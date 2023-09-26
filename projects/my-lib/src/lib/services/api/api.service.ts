@@ -389,7 +389,6 @@ GetExportCVSLink(payload:any){
   )
 }
 
-
 resetGetExportExclLink(){
   this.dataShareService.setExportExcelLink('');
 }
