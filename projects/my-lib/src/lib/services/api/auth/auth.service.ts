@@ -86,7 +86,6 @@ export class AuthService implements OnInit{
       (respData:any) =>{
         if (respData && respData.user) {
           let modifyData = this.coreFunctionService.getModulesFormMapObject(respData);
-          console.log(modifyData);
           this.storageService.SetUserInfo(modifyData);
           this.storageService.GetUserInfo();
           this.envService.setRequestType('PRIVATE');
@@ -163,7 +162,11 @@ export class AuthService implements OnInit{
               response.message = respData['message'];
             }
             this.authDataShareService.setAuthentication(true);
-        } else if (respData.hasOwnProperty('error')) {
+        } else if(respData && respData['message']){
+          response.status = 'error';
+          response.class = 'bg-danger';
+          response.msg = respData['message'];
+        }else if (respData.hasOwnProperty('error')) {
             if (respData["error"] == "not_confirmed") {
                 response.msg = 'User Not Confirmed ';
             } else if (respData["error"] == "user_name_password_does_not_match") {

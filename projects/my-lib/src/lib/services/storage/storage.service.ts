@@ -561,6 +561,17 @@ export class StorageService {
   getBucketName(){
     return this.getApplicationValueByKey('bucket');
   }
+  getAuthenticationSetting(){
+    return this.getApplicationValueByKey('authenticationSettings');
+  }
+  getAdminEmail(){
+    let authenticationSettings:any = this.getAuthenticationSetting();
+    let adminEmail = "";
+    if(authenticationSettings && authenticationSettings['adminEmailId'] && authenticationSettings['adminEmailId'] != ""){
+      adminEmail = authenticationSettings['adminEmailId'];
+    }
+    return adminEmail;
+  }
   getApplicationValueByKey(key:any){
     let value = "";
     let applicationSetting = this.getApplicationSetting();
