@@ -1,11 +1,12 @@
 import { DatePipe } from '@angular/common';
-import { Injectable } from '@angular/core';
+import { Injectable,EventEmitter } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChartService {
 
+  filterRest:EventEmitter<any> = new EventEmitter<any>(false);
   constructor(
     private datePipe:DatePipe
   ) { }
@@ -24,7 +25,8 @@ export class ChartService {
             const value = fields[key];
             const val = obj[key]
             if(val && val.constructor && val.constructor.name == "Date"){
-              modifyObj[value] = this.datePipe.transform(val,'dd/MM/yyyy');
+              const format = object.dateFormat ? object.dateFormat : 'dd/MM/yyyy';
+              modifyObj[value] = this.datePipe.transform(val,format);
             }else{
               modifyObj[value] = obj[key];
             }
@@ -64,5 +66,7 @@ export class ChartService {
       window.URL.revokeObjectURL(url);
       a.remove();
   }
-
+  resetChartFilter(){
+    this.filterRest.emit(true);
+  }
 }
