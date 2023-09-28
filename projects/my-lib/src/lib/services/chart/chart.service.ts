@@ -23,8 +23,9 @@ export class ChartService {
           Object.keys(fields).forEach((key) => {
             const value = fields[key];
             const val = obj[key]
+            const format = object.dateFormat ? object.dateFormat : 'dd/MM/yyyy';
             if(val && val.constructor && val.constructor.name == "Date"){
-              modifyObj[value] = this.datePipe.transform(val,'dd/MM/yyyy');
+              modifyObj[value] = this.datePipe.transform(val,format);
             }else{
               modifyObj[value] = obj[key];
             }
