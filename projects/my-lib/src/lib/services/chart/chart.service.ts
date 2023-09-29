@@ -69,4 +69,88 @@ export class ChartService {
   resetChartFilter(){
     this.filterRest.emit(true);
   }
+  getFilterData(dashbord:any,formValue:any){
+    let fields = dashbord.fields && dashbord.fields.length > 0 ? dashbord.fields : [];
+    let filterValue = this.getMongochartFilterValue(fields,formValue);
+    let filterData = this.getMongodbFilterObject(filterValue);
+    return filterData;
+  }
+  getMongochartFilterValue(fields:any,object:any){
+    let modifyObject:any = {};
+    let objectCopy = JSON.parse(JSON.stringify(object));
+    if(fields && fields.length > 0 && Object.keys(objectCopy).length > 0){
+      fields.forEach((field:any) => {
+        let key = field.field_name;
+        if(object && object[key] && object[key] != ''){
+          let newDateObjec:any = {};
+          let date = new Date();
+          switch (field.type) {
+            case 'typeahead':
+              if(objectCopy[key] && typeof objectCopy[key] == 'object'){
+                modifyObject[key+'._id'] = objectCopy[key]._id;
+              }else{
+                modifyObject[key] = objectCopy[key];
+              }
+              break;
+            case 'dropdown':
+              if(field.datatype == "object"){
+                if(field.multi_select){
+                  let idList:any = [];
+                  if(object[key] && object[key].length > 0){
+                    object[key].forEach((data:any) => {
+                      idList.push(data._id);
+                    });
+                  }
+                  if(idList && idList.length > 0){
+                    modifyObject[key+'._id'] = idList;
+                  }
+                }else{
+                  modifyObject[key+'._id'] = objectCopy[key]._id;
+                }
+              }else{
+                modifyObject[key] = objectCopy[key];
+              }
+              break;
+            case 'date':
+              let formateDate:any = this.datePipe.transform(objectCopy[key], 'yyyy-MM-dd');
+              let selectedDate = new Date(formateDate);
+              selectedDate.setTime(selectedDate.getTime()+(24*3600000));
+              newDateObjec = {};
+              date = new Date(formateDate);
+              newDateObjec['$gt'] = date;
+              newDateObjec['$lte'] = selectedDate;
+              modifyObject[key] =  newDateObjec;
+              break;
+            case 'daterange':
+              if(object[key].start && object[key].end && object[key].start != '' && object[key].end != ''){
+                let startDate:any = this.datePipe.transform(object[key].start,'yyyy-MM-dd');
+                let endDate:any = this.datePipe.transform(object[key].end,'yyyy-MM-dd');
+                let modifyEndDate = new Date(endDate);
+                modifyEndDate.setTime(modifyEndDate.getTime()+(24*3600000));
+                newDateObjec = {};
+                newDateObjec['$gt'] = new Date(startDate);
+                newDateObjec['$lte'] = new Date(modifyEndDate);
+                modifyObject[key] =  newDateObjec;
+              }
+              break;
+            default:
+              modifyObject[key] = objectCopy[key];
+              break;
+          }
+        }
+      });
+    }
+    return modifyObject;
+  }
+  getMongodbFilterObject(data:any){
+    let object:any = {};
+    if(Object.keys(data).length > 0){
+      Object.keys(data).forEach(key => {
+        if(data[key] && data[key] != ''){
+          object[key] = data[key];
+        }
+      });
+    }
+    return object;
+  }
 }
