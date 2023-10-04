@@ -210,6 +210,7 @@ export class AuthService implements OnInit{
     let isHybridPlatform = false;
     if(this.storageService.checkPlatForm() == 'mobile'){
       isHybridPlatform = true;
+      newPayload = payload.data;
     }else{
       newPayload = payload;
     }
@@ -233,8 +234,12 @@ export class AuthService implements OnInit{
                   // this.router.navigate(['otp_varify'+'/'+payload.userId]);
                 }
             }else{
+              if(newPayload.admin){
+                response.msg = 'A verification link has been sent to your email account. If not received, please connect to admin to verify your email.';
+              }else{
                 response.msg = 'A verification link has been sent to your email account. please click on the link to verify your email and continue the registration process.';
-                response.appPresentAlert = true;
+              }
+              response.appPresentAlert = true;
             }
           }
         } else if(respData && respData['message']){
