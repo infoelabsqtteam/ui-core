@@ -1168,6 +1168,71 @@ export class LimsCalculationsService {
 
   }
 
+  calculate_quotation_for_lims(templateValue:any, lims_segment:any, field: any) {
+    var total = 0;
+    let discount_percent = 0;
+    let net_amount = 0;
+    let sampling_amount = 0;
+    let final_amount = 0;
+    let discount_amount = 0;
+    let quotation_param_methods = [];
+    let unit_price:any = 0;
+    let paramArray:any = [];
+    let gross_amount = 0;
+    let field_name = field.field_name;
+    let qty = 0;
+    let product_wise_pricing = templateValue['product_wise_pricing'];
+    let current_disount = 0;
+    if (this.coreFunctionService.isNotBlank(templateValue['discount_percent'])) {
+      current_disount = templateValue['discount_percent'];
+    }
+
+    if (this.coreFunctionService.isNotBlank(templateValue.qty)) {
+      qty = templateValue.qty;
+    }
+
+    if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
+      templateValue['quotation_param_methods'].forEach((element:any) => {
+        let data = { ...element };
+        paramArray.push(data);
+      });
+    }
+
+    // if(gross_amount>0){
+    if (true) {
+      discount_amount = 0;
+      net_amount = 0;
+      if (paramArray.length > 0) {
+        paramArray.forEach((data:any) => {
+          data['qty'] = qty;
+          this.calculateParameterLimsSegmentWise(lims_segment, data, field_name);
+          gross_amount = gross_amount + data['total'];
+          net_amount = net_amount + data['net_amount'];
+          discount_amount = discount_amount + data['discount_amount'];
+        });
+      }
+      if (product_wise_pricing) {
+        unit_price = templateValue["unit_price"];
+        net_amount = unit_price * qty;
+        discount_amount = gross_amount - net_amount;
+        discount_percent = this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
+        if (paramArray.length > 0) {
+          paramArray.forEach((data:any) => {
+            data['discount_percent'] = discount_percent;
+            this.calculateParameterLimsSegmentWise(lims_segment, data, "unit_price");
+          });
+        }
+      }
+    }
+    templateValue['total'] = gross_amount;
+    templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
+    templateValue['net_amount'] = this.getDecimalAmount(net_amount);
+    templateValue['discount_percent'] = this.getDecimalAmount(discount_percent);
+    templateValue['unit_price'] = unit_price;
+    return templateValue;
+
+  }
+
 
   calculateParameterLimsSegmentWise(lims_segment: any, data: any, fieldName: string) {
     switch (lims_segment) {
