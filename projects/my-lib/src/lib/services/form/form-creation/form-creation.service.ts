@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
-import { CommonFunctionService } from '../common-utils/common-function.service';
-import { EnvService } from '../env/env.service';
+import { CommonFunctionService } from '../../common-utils/common-function.service';
+import { EnvService } from '../../env/env.service';
 import { FormGroup } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FormService {
+export class FormCreationService {
+
   minDate: Date;
   maxDate: Date;
 
@@ -94,8 +95,10 @@ constructor(
         break;
       }
       if(element.type == 'pdf_view'){
-        const object = elements[selectedRowIndex];
-        responce.staticModal.push(this.commonFunctionService.getPaylodWithCriteria(element.onchange_api_params,element.onchange_call_back_field,element.onchange_api_params_criteria,object));
+        if(selectedRowIndex && selectedRowIndex != -1 && elements && elements.length > 0){
+          const object = elements[selectedRowIndex];
+          responce.staticModal.push(this.commonFunctionService.getPaylodWithCriteria(element.onchange_api_params,element.onchange_call_back_field,element.onchange_api_params_criteria,object));
+        }
         responce.editorTypeFieldList.push(element);
       }
       if(element.type == 'info_html' || element.type == 'html_view') {
@@ -396,8 +399,7 @@ constructor(
   }
   checkFieldButtonCondition(tableFields:any){
     let responce:any={
-      tempVal:{},
-      pageLoading:false
+      tempVal:{}
     }
     tableFields.forEach((element:any) => {
       switch (element.type) {
