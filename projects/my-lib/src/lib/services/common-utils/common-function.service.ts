@@ -21,11 +21,11 @@ export class CommonFunctionService {
   itemNumOfGrid: any = Common.ITEM_NUM_OF_GRID;
 
   constructor(
-    private formBuilder: FormBuilder, 
-    private storageService: StorageService, 
-    private modalService: ModelService, 
-    private datePipe: DatePipe, 
-    private CurrencyPipe: CurrencyPipe, 
+    private formBuilder: FormBuilder,
+    private storageService: StorageService,
+    private modalService: ModelService,
+    private datePipe: DatePipe,
+    private CurrencyPipe: CurrencyPipe,
     private customvalidationService:CustomvalidationService,
     private notificationService:NotificationService,
     private apiService:ApiService,
@@ -69,7 +69,7 @@ export class CommonFunctionService {
             switch (field.api_call_name) {
               case "gst_number":
                 forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
-                break;            
+                break;
               default:
                 forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
                 break;
@@ -80,12 +80,12 @@ export class CommonFunctionService {
             switch (field.datatype) {
               case 'object':
                 forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidData.bind(this.customvalidationService))
-                break;            
+                break;
               default:
                 forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
                 break;
             }
-            break;       
+            break;
           default:
             forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
             break;
@@ -127,15 +127,15 @@ export class CommonFunctionService {
           validator.push(Validators.email);
           break;
         default:
-          break; 
+          break;
       }
-    }    
+    }
     if (field.min_length != undefined && field.min_length != null && field.min_length != '' && Number(field.min_length) && field.min_length > 0) {
       validator.push(Validators.minLength(field.min_length))
     }
     if(field.max_length != undefined && field.max_length != null && field.max_length != '' && Number(field.max_length) && field.max_length > 0){
       validator.push(Validators.maxLength(field.max_length))
-    }       
+    }
     return validator;
   }
 
@@ -169,13 +169,26 @@ export class CommonFunctionService {
         crList.forEach((element: any) => {
           staticModal.crList.push(element);
         });
-      }      
-    }    
+      }
+    }
     return staticModal;
+  }
+  checkQtmpApi(params:any,field:any,payload:any,multipleFormCollection:any,object:any,objectWithCustom:any){
+    if(params.indexOf("FORM_GROUP") >= 0 || params.indexOf("QTMP") >= 0){
+      let multiCollection = JSON.parse(JSON.stringify(multipleFormCollection));
+      if(field && field.formValueAsObjectForQtmp){
+        let formValue = this.getFormDataInMultiformCollection(multiCollection,object);
+        payload["data"]=formValue;
+      }else{
+        let formValue = this.getFormDataInMultiformCollection(multiCollection,objectWithCustom);
+        payload["data"]=formValue;
+      }
+    }
+    return payload;
   }
   getTabsCountPyload(tabs:any){
     let payloads:any = [];
-    if(tabs && tabs.length >= 1 ){      
+    if(tabs && tabs.length >= 1 ){
       tabs.forEach((element: any) => {
         let grid_api_params_criteria = [];
         if(this.isGridFieldExist(element,"api_params_criteria")){
@@ -184,14 +197,14 @@ export class CommonFunctionService {
         const payload = this.getPaylodWithCriteria(element.tab_name,element.tab_name+"_"+element.name,grid_api_params_criteria,{});
         payload['countOnly'] = true;
         payloads.push(payload);
-      }); 
+      });
     }
     if(payloads && payloads.length > 0){
       this.apiService.getGridCountData(payloads);
-    } 
+    }
   }
   getCriteriaList(criteria:any,object:any){
-    const crList:any = [];    
+    const crList:any = [];
     criteria.forEach((element: string) => {
       const criteria = element.split(";");
       const fValue = criteria[2]
@@ -241,6 +254,20 @@ export class CommonFunctionService {
     }
   }
 
+  checkShowIf(field:any,selectedRow:any,formValue:any){
+    const  objectc = selectedRow?selectedRow:{}
+    const object = JSON.parse(JSON.stringify(objectc));
+    if(formValue && typeof formValue == 'object' && Object.keys(formValue).length > 0){
+      Object.keys(formValue).forEach(key => {
+        object[key] = formValue[key];
+      })
+    }
+    const display = this.showIf(field,object);
+    const modifiedField = JSON.parse(JSON.stringify(field));
+    modifiedField['display'] = display;
+    field = modifiedField;
+    return display;
+  }
   showIf(field:any, formValue:any) {
     if (field.show_if && field.show_if != null && field.show_if != '') {
       const showIf = field.show_if.split(';')
@@ -265,7 +292,7 @@ export class CommonFunctionService {
     condition = data.split('#');
     if (condition.length == 4 && condition[3] != 'dynamic' && condition[3] != 'STATIC') {
       let check = "";
-      let checkList = [];      
+      let checkList = [];
       let setValue = formValue ? this.getObjectValue(condition[0], formValue) : "";
       if(setValue && setValue.length > 0){
         for (let index = 0; index < setValue.length; index++) {
@@ -279,14 +306,14 @@ export class CommonFunctionService {
                 check = check + conditons + '#';
               }else if(index == 2){
                 check = check + conditons + '#STATIC';
-              }        
+              }
             }
             checkList.push(check);
             check = "";
           }else{
             return false;
           }
-        }        
+        }
       }else{
         return false;
       }
@@ -307,25 +334,6 @@ export class CommonFunctionService {
     }
 
   }
-  //   calculateAdditionalCost(obj:any){
-    
-  //   let list = obj['additional_cost'];
-  //   let sum = 0;
-  //   let net_amt = obj['net_amount'];
-  //   if(list != null && list.length > 0){
-  //     list.forEach((element:any) => {
-  //       sum += +(element.amount);
-  //     });
-  //   }
-    
-
-  //   let final_amt = sum+net_amt;
-  //   obj['sampling_charge'] = sum;
-  //   obj['final_amount'] = final_amt;
-    
-  //  return obj;
-
-  // }
 
 
   isDisable(tableField:any, updateMode:any, formValue:any) {
@@ -335,7 +343,7 @@ export class CommonFunctionService {
       if (tableField.disable_if && tableField.disable_if != '') {
         return this.checkIfCondition(tableField.disable_if, formValue)
       }
-     
+
       if (updateMode) {
         if (tableField.disable_on_update != undefined && tableField.disable_on_update) {
           return this.checkAddUpdateIf(tableField,'can_update_if');
@@ -397,7 +405,7 @@ export class CommonFunctionService {
         setValue = condition[0];
       }else{
         setValue = formValue ? this.getObjectValue(condition[0], formValue) : "";
-      }      
+      }
       if (setValue === undefined || setValue === "") {
         setValue = "";
       } else {
@@ -408,7 +416,7 @@ export class CommonFunctionService {
           case "date":
             setValue = this.dateFormat(setValue);
             condition[2] = this.dateFormat(condition[2]);
-            break;        
+            break;
           default:
             break;
         }
@@ -434,8 +442,8 @@ export class CommonFunctionService {
             } else {
               return false;
             }
-      
-       
+
+
         case 'gte':
           return parseFloat(setValue) >= parseFloat(condition[2]);
         case 'lte':
@@ -504,14 +512,14 @@ export class CommonFunctionService {
     const filterList:any = []
     if(formValue != undefined){
       const criteria:any = [];
-      headElements.forEach((element: any) => {  
-        if(element != null && element.type != null){      
+      headElements.forEach((element: any) => {
+        if(element != null && element.type != null){
         switch (element.type.toLowerCase()) {
           case "button":
           case "text":
           case "tree_view_selection":
           case "dropdown":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){              
+            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
               if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0 && element.type != 'dropdown'){
                 element.api_params_criteria.forEach((cri: any) => {
                   criteria.push(cri)
@@ -548,7 +556,7 @@ export class CommonFunctionService {
             }
             break;
           case "number":
-              if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){              
+              if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
                 if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
                   element.api_params_criteria.forEach((cri: any) => {
                     criteria.push(cri)
@@ -565,7 +573,7 @@ export class CommonFunctionService {
               }
               break;
           case "typeahead":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){ 
+            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
               if(this.isArray(element.dataFilterCriteria) && element.dataFilterCriteria.length > 0){
                 element.dataFilterCriteria.forEach((cri: any) => {
                   criteria.push(cri)
@@ -582,7 +590,7 @@ export class CommonFunctionService {
             }
             break;
           case "info":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){              
+            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
               if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
                 element.api_params_criteria.forEach((cri: any) => {
                   criteria.push(cri)
@@ -600,7 +608,7 @@ export class CommonFunctionService {
             break;
             case "reference_names":
             case "chips":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){              
+            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
               if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
                 element.api_params_criteria.forEach((cri: any) => {
                   criteria.push(cri)
@@ -635,7 +643,7 @@ export class CommonFunctionService {
             }
             break;
           case "daterange":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name].start != '' && formValue[element.field_name].end != null){              
+            if(formValue && formValue[element.field_name] && formValue[element.field_name].start != '' && formValue[element.field_name].end != null){
               if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
                 element.api_params_criteria.forEach((cri: any) => {
                   criteria.push(cri)
@@ -647,8 +655,8 @@ export class CommonFunctionService {
                     "fValue": this.dateFormat(formValue[element.field_name].start),
                     "operator": "gte"
                   }
-                ) 
-              }          
+                )
+              }
             }
             if(formValue && formValue[element.field_name] && formValue[element.field_name].end != '' && formValue[element.field_name].end != null){
               if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
@@ -700,16 +708,16 @@ export class CommonFunctionService {
           if(element.api_params_criteria && element.api_params_criteria != ''){
             criteria =  element.api_params_criteria;
           }
-          staticModal = this.getPaylodWithCriteria(element.api_params,call_back_field,criteria,object?object:{});  
+          staticModal = this.getPaylodWithCriteria(element.api_params,call_back_field,criteria,object?object:{});
           if(element.adkey && element.adkey != '' && element.adkey != null){
             staticModal['adkeys'] = element.adkey;
             staticModalGroup.push(staticModal);
           }else{
             staticModalGroup.push(staticModal);
-          }      
-          
+          }
+
         }
-        
+
       });
     }
 
@@ -724,19 +732,19 @@ export class CommonFunctionService {
           if(element.api_params_criteria && element.api_params_criteria != ''){
             criteria =  element.api_params_criteria;
           }
-          const staticModal = this.getPaylodWithCriteria(element.api_params,call_back_field,criteria,object?object:{});        
-          
+          const staticModal = this.getPaylodWithCriteria(element.api_params,call_back_field,criteria,object?object:{});
+
           staticModalGroup.push(staticModal);
         }
       });
     }
 
     if(tableField.length > 0){
-      
+
       tableField.forEach((element:any) => {
         let call_back_field =  '';
         let criteria = [];
-        if (element.api_params && element.api_params != '' && element.type != "typeahead") {          
+        if (element.api_params && element.api_params != '' && element.type != "typeahead") {
           if(element.call_back_field && element.call_back_field != ''){
             call_back_field =  element.call_back_field;
           }
@@ -749,7 +757,7 @@ export class CommonFunctionService {
           }
           staticModalGroup.push(staticModal);
         }
-        switch (element.type) {            
+        switch (element.type) {
           case "list_of_fields":
           case "group_of_fields":
             if (element.list_of_fields && element.list_of_fields.length > 0) {
@@ -813,9 +821,9 @@ export class CommonFunctionService {
     }
     if(fields.field_class && field.field_class != ''){
       return fields.field_class;
-    }    
+    }
     switch (fields.type) {
-      case "list_of_checkbox":        
+      case "list_of_checkbox":
       case "list_of_fields":
       case "html":
       case "label":
@@ -823,12 +831,12 @@ export class CommonFunctionService {
       case "tabular_data_selector":
       case "group_of_fields":
         return "col-lg-12";
-      default: 
+      default:
         if(fieldsLangth <= 5){
           return "col-lg-12";
         }else if(fieldsLangth <= 10){
           return "col-lg-6";
-        }else{       
+        }else{
           return "col-lg-3";
         }
     }
@@ -845,7 +853,7 @@ export class CommonFunctionService {
   }
 
   getButtonDivClass(field:any){
-    const fields = {...field}    
+    const fields = {...field}
     if(fields.field_class && field.field_class != ''){
       return fields.field_class;
     }
@@ -865,14 +873,14 @@ export class CommonFunctionService {
     // while(matcher.find){
       listMatches.push(matcher[2]);
     // }
-   
+
     listMatches.forEach(element => {
       let valueObj = null;
       let details = matcher[2];
       let valueString = this.getStringValue(details, ja);
       template = template.replace("[" + matcher[2] + "]", valueString);
     });
-   
+
     return template;
   }
 
@@ -910,7 +918,7 @@ export class CommonFunctionService {
           }
         }
         return returnValue
-      case 'date': 
+      case 'date':
         if(value && value != ''){
           if(this.storageService.checkPlatForm() == 'mobile'){
             returnValue =  this.datePipe.transform(value, 'mediumDate');
@@ -940,7 +948,7 @@ export class CommonFunctionService {
           return '<span class="material-icons cursor-pointer">preview</span>';
         } else {
           return '-';
-        }        
+        }
       case "file":
         if (value && value != '') {
           if(this.storageService.checkPlatForm() == 'mobile'){
@@ -987,7 +995,7 @@ export class CommonFunctionService {
               return stringObject[0]
             }else{
               return value;
-            } 
+            }
           }else{
             return value;
           }
@@ -1046,7 +1054,7 @@ export class CommonFunctionService {
       case 'time': return this.datePipe.transform(value, 'h:mm a');
       case "boolean": return value ? "Yes" : "No";
       case "currency": return this.CurrencyPipe.transform(value, 'INR');
-      case "info": 
+      case "info":
       case "file":
       case "template":
       case "image":
@@ -1075,20 +1083,20 @@ export class CommonFunctionService {
   }
   sanitizeObject(tableFields:any, formValue:any, validatField:any,formValueWithCust?:any) {
     for (let index = 0; index < tableFields.length; index++) {
-      const element = tableFields[index];  
-      if(element.type != 'list_of_fields' && element.type != 'group_of_fields'){  
+      const element = tableFields[index];
+      if(element.type != 'list_of_fields' && element.type != 'group_of_fields'){
         switch (element.datatype) {
           case "list_of_object":
           case "list_of_object_with_popup":
           case "chips":
           case "chips_with_mask":
-            if(validatField){            
+            if(validatField){
               if(formValue[element.field_name] != "" && formValue[element.field_name] != null &&  !this.isArray(formValue[element.field_name])){
                 return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
               }else if(this.applicableForValidation(element) && !this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length <= 0){
                 return {'msg':'Please Enter '+ element.label + '. !!!'}
               }
-            }else if (formValue[element.field_name] == "" && !this.isArray(formValue[element.field_name])) {     
+            }else if (formValue[element.field_name] == "" && !this.isArray(formValue[element.field_name])) {
               formValue[element.field_name] = null;
             }
             break;
@@ -1143,7 +1151,7 @@ export class CommonFunctionService {
                 if(typeof formValueWithCust[element.field_name] != 'object' || Object.keys(formValueWithCust[element.field_name]).length <= 0){
                   return {'msg': element.label + ' is required.'}
                 }
-              }             
+              }
             }
           }else{
             if (!this.isArray(formValue[element.field_name]) || formValue[element.field_name].length <= 0) {
@@ -1224,9 +1232,9 @@ export class CommonFunctionService {
           for (let j = 0; j < element.list_of_fields.length; j++) {
           const data = element.list_of_fields[j];
             switch (data.datatype) {
-              case "list_of_object":   
+              case "list_of_object":
               case "chips":
-              case "chips_with_mask":             
+              case "chips_with_mask":
                 if(validatField){
                   if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
                     return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
@@ -1235,9 +1243,9 @@ export class CommonFunctionService {
                   }
                 }else if (formValue[element.field_name][data.field_name] == "" && !this.isArray(formValue[element.field_name][data.field_name])) {
                     formValue[element.field_name][data.field_name] = null;
-                  }                
+                  }
                 break;
-              case "object":                
+              case "object":
                 if(validatField){
                   if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
                     return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
@@ -1279,11 +1287,11 @@ export class CommonFunctionService {
             const step = element.list_of_fields[j];
             if(step.list_of_fields && step.list_of_fields != null && step.list_of_fields.length > 0){
               for (let k = 0; k < step.list_of_fields.length; k++) {
-                const data = step.list_of_fields[k];              
+                const data = step.list_of_fields[k];
                 switch (data.datatype) {
-                  case "list_of_object":  
+                  case "list_of_object":
                   case "chips":
-                  case "chips_with_mask":                  
+                  case "chips_with_mask":
                     if(validatField){
                       if(formValue[data.field_name] != "" && formValue[data.field_name] != null){
                         return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
@@ -1294,7 +1302,7 @@ export class CommonFunctionService {
                       formValue[data.field_name] = null;
                     }
                     break;
-                  case "object": 
+                  case "object":
                     if(validatField){
                       if(formValue[data.field_name] != "" && formValue[data.field_name] != null){
                         return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
@@ -1303,7 +1311,7 @@ export class CommonFunctionService {
                       }
                     }else if (formValue[data.field_name] == "" && typeof formValue[data.field_name] != 'object') {
                       formValue[data.field_name] = null;
-                    }                    
+                    }
                     break;
                   case "number":
                     if (!Number(formValue[data.field_name])) {
@@ -1341,7 +1349,7 @@ export class CommonFunctionService {
       return true;
     }else{
       return formValue;
-    }    
+    }
   }
 
   applicableForValidation(field:any){
@@ -1359,634 +1367,6 @@ export class CommonFunctionService {
       return false;
     }
   }
-  // calculateInvoiceOrderAmount(templateForm: FormGroup, field: any) {
-  //   var net_amount = 0;
-  //   var discount_amount = 0;
-  //   var igst_amount = 0;
-  //   var sgst_amount = 0;
-  //   var cgst_amount = 0;
-  //   var netPayable = 0;
-  //   var surcharge = 0;
-  //   var sez_amount = 0;
-  //   var total = 0;
-
-  //   let templateValue = templateForm.getRawValue();
-  //   if (templateValue['items_list'] != '' && templateValue['items_list'].length > 0) {
-  //     templateValue['items_list'].forEach((element:any) => {
-  //       net_amount = net_amount + element.net_amount;
-  //       discount_amount = discount_amount + element.discount_amount;
-  //       surcharge = surcharge + element.surcharge;
-  //       total = total + element.total;
-  //     });
-  //     if (templateValue['tax_type'] != '' && templateValue['tax_type'] == "GST") {
-  //       sgst_amount = (net_amount * templateValue['tax_percentage']) / 200;
-  //       cgst_amount = sgst_amount;
-
-  //     }
-  //     else if (templateValue['tax_type'] != '' && templateValue['tax_type'] == "IGST") {
-  //       igst_amount = (net_amount * templateValue['tax_percentage']) / 100;
-  //     }
-  //   }
-
-  //   netPayable = net_amount + igst_amount + sgst_amount + cgst_amount + sez_amount;
-
-  //   const fieldWithValue = {
-  //     field: 'total_amount', value: [
-  //       { field: 'taxable_amount', value: net_amount },
-  //       { field: 'sgst_amount', value: sgst_amount },
-  //       { field: 'cgst_amount', value: cgst_amount },
-  //       { field: 'igst_amount', value: igst_amount },
-  //       { field: 'net_payble', value: netPayable },
-  //       { field: 'discount_amount', value: discount_amount },
-  //     ]
-  //   }
-
-
-  //   return this.setValueInVieldsForChild(templateForm, fieldWithValue);
-  // }
-
-  // quote_amount_via_sample_no(templateValue:any,listOfParm:any){    
-  //   let quantity = templateValue.qty;
-  //   let discount = templateValue.discount_percent;
-  //   let updatedParamsList:any=[];
-  //   listOfParm.forEach((element: any) => {
-  //     const data = JSON.parse(JSON.stringify(element));
-  //     data['discount_percent'] = discount;
-  //     data['qty'] = quantity;
-  //     this.calculateNetAmount(data,"qty", "");
-  //     updatedParamsList.push(data)
-  //   });
-  //   templateValue["quotation_param_methods"] = updatedParamsList;
-  //   return this.calculateQquoteAmount(templateValue, {field_name:"quotation_param_methods"});
-  // }
-
-  // calculateInvoiceTotalAmount(formValue:any, invoiceInfos:any){
-  //   let list = invoiceInfos;
-  //   let total = 0;
-  //   for(let i=0; i<list.length;i++){
-  //     total +=  list[i]['netpayableAmount']
-  //   }
-
-  //   let lumpSumAmount = formValue['lumpSumAmount']
-  //   let advanceAmount = formValue['advanceAmount'];
-  //   let toatallumsumOrAdvance= lumpSumAmount+advanceAmount;
-  //   let totalFair = total-toatallumsumOrAdvance;
-
-  //   let obj = {
-  //     totalAmount:(total).toFixed(2),
-  //     payAmount:(totalFair).toFixed(2)
-  //   }
-  //   return obj;
-  // }
-
-  // quote_amount_via_discount_percent(listOfParm:any,templateValue:any){    
-  //   let discount = templateValue.discount_percent;
-  //   let quantity = templateValue.qty;
-  //   let updatedParamsList:any = [];
-  //   listOfParm.forEach((element: any) => {
-  //     const data = JSON.parse(JSON.stringify(element));
-  //     data['discount_percent'] = discount;
-  //     data['qty'] = quantity;
-  //     this.calculateNetAmount(data, "discount_percent","");
-  //     updatedParamsList.push(data);
-  //   });
-  //   templateValue["quotation_param_methods"]=updatedParamsList;
-  //   let total=templateValue["total"];
-  //   let discount_amount:any=this.getDecimalAmount(total * discount/100);
-  //   let net_amount=total-discount_amount;
-    
-  //   let final_amount=net_amount + templateValue["sampling_charge"];
-  //   let unit_price = this.getDecimalAmount(net_amount/templateValue['qty']);
-
-  //   templateValue['total']=total;
-  //   templateValue['discount_amount']=discount_amount;
-  //   templateValue['net_amount']=net_amount;
-  //   templateValue['final_amount']=final_amount;
-  //   templateValue['unit_price']=unit_price;
-
-    
-
-  //   return templateValue;
-
-  // }
-  // samplingAmountAddition(templateValue:any){    
-  //   let net_amount = templateValue['net_amount'];
-  //   let sampling_charge = templateValue['sampling_charge'];
-  //   let totl = net_amount+sampling_charge;
-
-  //   templateValue['final_amount'] = totl
-  //   return templateValue;
-  // }
-  
-
-  // calculateParameterLimsSegmentWise(lims_segment:any, data:any, fieldName:any){
-  //   switch(lims_segment){
-  //     case 'standard':
-  //       this.calculateQuotationParameterAmountForLims(data, fieldName)
-  //       break;
-  //     case 'automotive':
-  //     this.calculateQuotationParameterAmountForAutomotiveLims(data,fieldName)
-  //       break
-  //   }
-
-  // }
-
-  // calculate_quotation(templateValue:any,lims_segment:any, field: any) {
-  //   var total:any = 0;
-  //   let discount_percent:any = 0;
-  //   let net_amount:any = 0;
-  //   let sampling_amount:any = 0;
-  //   let final_amount:any = 0;
-  //   let discount_amount:any = 0;
-  //   let quotation_param_methods:any = [];
-  //   let unit_price:any = 0;
-  //   let paramArray:any = [];
-  //   let gross_amount:any=0;
-  //   let field_name:any = field.field_name;
-  //   let qty:any = 0;
-  //   let product_wise_pricing:any = templateValue['product_wise_pricing'];
-  //   let current_disount:any = 0;
-  //   if(this.coreFunctionService.isNotBlank(templateValue['discount_percent'])){
-  //     current_disount = templateValue['discount_percent'];
-  //   }
-
-  //   if(this.coreFunctionService.isNotBlank(templateValue.qty)){
-  //     qty = templateValue.qty;
-  //   }
-
-  //   if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
-  //     templateValue['quotation_param_methods'].forEach((element: any) => {
-  //       let data = { ...element};
-  //       paramArray.push(data);
-  //     });
-  //   }
-
-
-
-  //   if (templateValue['sampling_charge'] && templateValue['sampling_charge'] != null) {
-  //     sampling_amount = templateValue['sampling_charge'];
-  //   }
-  //   // if(gross_amount>0){
-  //     if(true){
-  //       switch(field_name){
-  //         case 'parameter_array':
-  //           unit_price = 0;
-  //           if(this.coreFunctionService.isNotBlank(templateValue.unit_price)){
-  //             unit_price = templateValue.unit_price;
-  //           }
-  //           if(product_wise_pricing){
-  //             net_amount = qty*unit_price;
-  //             paramArray.forEach((data:any) => {
-  //               this.calculateParameterLimsSegmentWise(lims_segment, data, "qty");
-  //               gross_amount = gross_amount+data['total'];
-  //             })
-  //             discount_amount=gross_amount-net_amount;
-  //             discount_percent =  this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
-  //             paramArray.forEach((data:any) => {
-  //               data.discount_percent = this.getDecimalAmount(+discount_percent);
-  //               this.calculateParameterLimsSegmentWise(lims_segment, data, "discount_percent");
-  //             })
-            
-  //         }else{
-  //           if (paramArray.length > 0) {
-  //             discount_amount=0;
-  //             net_amount=0;
-  //             total=0;
-  //             gross_amount=0;
-  //             if(this.coreFunctionService.isNotBlank(templateValue.qty)){
-  //               qty = templateValue.qty;
-  //             }
-  //             paramArray.forEach((data:any) => {
-  //               if(lims_segment == 'standard'){
-  //                 data['qty'] = qty;
-  //                 this.calculateParameterLimsSegmentWise(lims_segment, data, 'qty');
-  //               }
-  //               gross_amount = gross_amount+data['total'];
-  //               net_amount=net_amount+data['net_amount'];
-  //               discount_amount=discount_amount+data['discount_amount'];
-  //             });
-  //           }
-           
-  //           }
-  //           discount_percent =  this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
-  //           templateValue['discount_amount'] = discount_amount ;
-  //           templateValue['net_amount'] = net_amount ;
-  //           templateValue['discount_percent'] = discount_percent ;
-  //         break;
-
-  //         case 'discount_percent':
-  //           discount_percent = templateValue[field_name];
-  //           paramArray.forEach((data:any) => {
-  //             data.discount_percent = this.getDecimalAmount(+discount_percent);
-  //             this.calculateParameterLimsSegmentWise(lims_segment, data, field_name);
-  //             gross_amount = gross_amount+data['total'];
-  //           })
-  //           discount_amount=gross_amount*discount_percent/100;
-  //           net_amount=gross_amount-discount_amount;
-  //           templateValue['discount_amount'] = discount_amount ;
-  //           templateValue['net_amount'] = net_amount ;
-  //           templateValue['discount_percent'] = discount_percent;
-  //           break;
-
-  //           case 'discount_amount':
-  //             discount_amount = templateValue[field_name];
-  //              paramArray.forEach((data:any) => {
-  //               data.discount_percent = this.getDecimalAmount(+discount_percent);
-  //               this.calculateParameterLimsSegmentWise(lims_segment, data, "discount_percent");
-  //               gross_amount = gross_amount+data['total'];
-  //             })
-  //             discount_percent =  this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
-  //             net_amount=gross_amount-discount_amount;
-  //             templateValue['discount_amount'] = discount_amount ;
-  //             templateValue['net_amount'] = net_amount ;
-  //             templateValue['discount_percent'] = discount_percent;
-  //             break;
-
-
-  //         case 'net_amount':
-  //           discount_percent = 0;
-  //           net_amount=templateValue[field_name];
-  //           paramArray.forEach((data:any) => {
-  //             data.discount_percent = this.getDecimalAmount(+discount_percent);
-  //             this.calculateParameterLimsSegmentWise(lims_segment, data, "qty");
-  //             gross_amount = gross_amount+data['total'];
-  //           })
-          
-           
-  //           discount_amount=gross_amount-net_amount;
-  //           discount_percent =  this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
-  //           paramArray.forEach((data:any) => {
-  //             data.discount_percent = this.getDecimalAmount(+discount_percent);
-  //             this.calculateParameterLimsSegmentWise(lims_segment, data, "discount_percent");
-  //           })
-          
-  //          templateValue["discount_percent"]=discount_percent;
-  //           templateValue["discount_amount"]=discount_amount;
-  //           templateValue['net_amount'] = net_amount ;
-  //           break;
-
-  //         case 'unit_price':
-  //           unit_price = 0;
-  //           if(this.coreFunctionService.isNotBlank(templateValue.unit_price)){
-  //             unit_price = templateValue.unit_price;
-  //           }
-  //           net_amount=qty*unit_price;
-            
-
-  //           paramArray.forEach((data:any) => {
-  //             data.discount_percent = this.getDecimalAmount(+discount_percent);
-  //             this.calculateParameterLimsSegmentWise(lims_segment, data, "qty");
-  //             gross_amount = gross_amount+data['total'];
-  //           })
-  //           discount_amount = gross_amount-net_amount;
-  //           discount_percent =  this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
-  //           paramArray.forEach((data: any) => {
-  //             data.discount_percent = this.getDecimalAmount(+discount_percent);
-  //             this.calculateParameterLimsSegmentWise(lims_segment, data, "unit_price");
-  //           })
-  //           templateValue['discount_amount'] = discount_amount ;
-  //           templateValue['net_amount'] = net_amount ;
-  //           templateValue['discount_percent'] = discount_percent;
-  //           break;
-
-  //           default:
-  //             discount_amount=0;
-  //             net_amount=0;
-  //           if (paramArray.length > 0) {
-  //             paramArray.forEach((data: any) => {
-  //               data['qty'] = qty;
-  //               this.calculateParameterLimsSegmentWise(lims_segment, data, field_name);
-  //              gross_amount = gross_amount+data['total'];
-  //               net_amount=net_amount+data['net_amount'];
-  //               discount_amount=discount_amount+data['discount_amount'];
-  //             });
-  //           }
-  //           if(product_wise_pricing){
-  //             unit_price = templateValue["unit_price"];
-  //             net_amount = unit_price*qty;
-  //             discount_amount = gross_amount-net_amount;
-  //             discount_percent =  this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
-  //             if (paramArray.length > 0) {
-  //               paramArray.forEach((data: any) => {
-  //                 data['discount_percent'] = discount_percent;
-  //                 this.calculateParameterLimsSegmentWise(lims_segment, data, "unit_price");
-  //               });
-  //             }
-  //           }
-  //           discount_percent =  this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
-  //             templateValue['discount_amount'] = discount_amount ;
-  //             templateValue['net_amount'] = net_amount ;
-  //             templateValue['discount_percent'] = discount_percent;
-
-  //         }
-        
-  //     }
-
-  //     final_amount = net_amount + sampling_amount;
-  //       if(templateValue['qty'] > 0){
-  //         unit_price = this.getDecimalAmount(net_amount/templateValue['qty']);
-  //       }else{
-  //         unit_price = templateValue["unit_price"];
-  //       }
-
-  //       templateValue['total'] = gross_amount;
-  //       templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
-  //       templateValue['net_amount'] = this.getDecimalAmount(net_amount);
-  //       templateValue['discount_percent'] = this.getDecimalAmount(discount_percent);
-  //       templateValue['final_amount'] = this.getDecimalAmount(final_amount);
-  //       templateValue['unit_price'] =  unit_price;
-  //       if(paramArray.length > 0){
-  //         templateValue['quotation_param_methods'] = paramArray;
-  //       }
-
-  //     return templateValue;
-
-  // }
- 
-  // calculate_lims_invoice(templateValue:any,lims_segment:any, calculate_on_field: any) {
-   
-  //   if(calculate_on_field == null || calculate_on_field == ''){
-  //     calculate_on_field = 'items_list';
-  //   }
-  //   let	surcharge	=0;
-  //   let	gross_amount	=0;
-  //   let	discount_percent	=0;
-  //   let	discount_amount	=0;
-  //   let	taxable_amount	=0;
-  //   let	net_amount	=0;
-   
-  //       if (this.coreFunctionService.isNotBlank(templateValue[calculate_on_field]) && templateValue[calculate_on_field].length > 0) {
-  //         templateValue[calculate_on_field].forEach((element:any) => {
-  //           if(this.coreFunctionService.isNotBlank(element.total)){
-  //             // gross_amount=gross_amount+element.gross_amount
-  //             gross_amount=gross_amount+element.total
-  //           }
-  //           if(this.coreFunctionService.isNotBlank(element.sampling_charge)) {
-  //             // surcharge=surcharge+element.surcharge
-  //             surcharge=surcharge+element.sampling_charge
-  //           }
-  //           if(this.coreFunctionService.isNotBlank(element.discount_amount)){
-  //             discount_amount=discount_amount+element.discount_amount
-  //           }
-  //           if(this.coreFunctionService.isNotBlank(element.net_amount)){
-  //             net_amount=net_amount+element.net_amount
-  //           }else{
-  //             net_amount=net_amount+element.total
-  //           }
-  //             taxable_amount=net_amount+surcharge;
-  //         });
-  //       }
-  //       templateValue = this.update_invoice_totatl(templateValue,gross_amount,discount_amount,discount_percent,net_amount,surcharge,taxable_amount);
-  //        return templateValue;
-  //     }
-
-// getPercent(templateValue:any,parent:any,field:any){
-//   const calculateValue:any = {};
-//   if(field && field.calSourceTarget && field.calSourceTarget.length >= 1){
-//     let source = field.calSourceTarget[0].source;
-//     let target = field.calSourceTarget[0].target;
-//     let sourceValue = this.getObjectValue(source,templateValue);
-//     if(sourceValue && sourceValue != ''){
-//       if(typeof sourceValue == 'number'){
-//         let fileName = field.field_name;
-//         let percent:any;
-//         if(parent != ''){
-//           percent = templateValue[parent.field_name][fileName]
-//         }else{
-//           percent = templateValue[fileName]
-//         }
-//         if(typeof sourceValue == 'number' && percent && percent >= 1 ){
-//           let percentValue = sourceValue * percent / 100;
-//           let targetFields = target.split('.');
-//           if(targetFields && targetFields.length == 2){
-//             const parent = targetFields[0];
-//             const child = targetFields[1];
-//             calculateValue[parent] = {};
-//             calculateValue[parent][child] = percentValue
-//           }else{
-//             const child = targetFields[0];
-//             calculateValue[child] = percentValue
-//           }
-//         }
-//       }else{
-//         this.notificationService.notify('bg-danger', 'Source Value is not a number.')
-//       }
-//     }else{
-//       this.notificationService.notify('bg-danger', 'Source Field is Required.')
-//     }
-//   }
-
-//   return calculateValue;
-// }
-// update_invoice_total_on_custom_field(templateValue:any,lims_segment:any, field: any){
-//     let total =templateValue['total_amount'];
-//     let	surcharge	=total['surcharge'];
-//     let	gross_amount	=total['gross_amount'];
-//     let	discount_percent	=total['discount_percent'];
-//     let	discount_amount=	total['discount_amount'];
-//     let	taxable_amount=	total['taxable_amount'];
-//     let	net_amount	=total['net_amount'];
-   
-//  if(gross_amount){
-//   switch(field.field_name){
-//     case 'discount_percent': 
-//           if(discount_percent!=0){
-//             discount_amount = gross_amount*discount_percent/100;
-//           }else{
-//           discount_amount = 0;
-//           }
-//     break;
-//     case 'surcharge': 
-//     if(!surcharge){
-//        surcharge = 0;
-//     }
-// break;
-//     case 'discount_amount': 
-//           if(discount_amount){   
-//              discount_percent = discount_amount*100/gross_amount;
-//           }else{
-//             discount_percent=0;
-//           }
-//     break;
-//  }
-// }else{
-
-//   discount_percent=0;
-//   discount_amount=0;
-// }
-
-//   net_amount =gross_amount-discount_amount;
-//   taxable_amount = gross_amount-discount_amount+surcharge;
-//   templateValue = this.update_invoice_totatl(templateValue,gross_amount,discount_amount,discount_percent,net_amount,surcharge,taxable_amount,field);
-       
-//   return templateValue;
-//  }
-
-
-// update_invoice_totatl(templateValue:any,gross_amount:number,discount_amount:number,discount_percent:any,net_amount:number,surcharge:number,taxable_amount:number,field?:any){
-//   let	gst_amount	=0;
-//   let	cgst_amount	=0;
-//   let	sgst_amount	=0;
-//   let	igst_amount	=0;
-//   let	tax_amount	=0;
-//   let	sez_amount	=0;
-
-//   let	net_payble	=0;
-  
-//   let	igst_percent	=0;
-//   let	gst_percent	=0;
-//   let	sez_percent	=0;
-//   let cgst_percent=0;
-//   let sgst_percent=0;
-//   let tax_percentage = 0;
-//   let tax_type = templateValue['tax_type'];
-  
-//   if(this.coreFunctionService.isNotBlank(templateValue.tax_percentage)){
-//     tax_percentage = templateValue.tax_percentage;
-//   }
-   
-//   if((tax_type==null || tax_type==undefined || tax_type=='NA') && tax_percentage==0)
-//   {
-//     net_payble = taxable_amount;
-//   }
-//   else
-//   {
-//     switch(tax_type){
-//       case "GST" :
-//        gst_amount = taxable_amount * tax_percentage/100;
-//        gst_percent=tax_percentage;
-//        cgst_percent = gst_percent/2;
-//        sgst_percent= gst_percent/2;
-//        cgst_amount = gst_amount/2;
-//        sgst_amount = gst_amount/2;
-//        net_payble = taxable_amount+gst_amount;
-//        tax_amount=gst_amount;
-//        igst_amount=0;
-//        igst_percent=0;
-
-//         break;
-//       case "IGST" :
-//         igst_amount = taxable_amount * tax_percentage/100;
-//         igst_percent=tax_percentage;
-//         net_payble = taxable_amount+igst_amount;
-//         tax_amount=igst_amount;
-//         break;
-//         default :  
-
-//   }
-//   }
-//     if(gross_amount>0){
-//       discount_percent = this.getDecimalAmount(100*discount_amount/gross_amount);
-//     }
-//     let total:any ={};
-//     total['surcharge'] = this.getDecimalAmount(surcharge);
-//     total['igst_percent'] = this.getDecimalAmount(igst_percent);
-//     total['gst_percent'] = this.getDecimalAmount(gst_percent);
-//     total['cgst_percent'] = this.getDecimalAmount(cgst_percent);
-//     total['sgst_percent'] = this.getDecimalAmount(sgst_percent);
-    
-//     total['sez_percent'] = this.getDecimalAmount(sez_percent);
-//     total['gross_amount'] = this.getDecimalAmount(gross_amount);
-//     total['discount_percent'] = this.getDecimalAmount(discount_percent);
-//     total['discount_amount'] = this.getDecimalAmount(discount_amount);
-//     total['taxable_amount'] = this.getDecimalAmount(taxable_amount);
-//     total['gst_amount'] = this.getDecimalAmount(gst_amount);
-//     total['cgst_amount'] = this.getDecimalAmount(cgst_amount);
-//     total['sgst_amount'] = this.getDecimalAmount(sgst_amount);
-//     total['igst_amount'] = this.getDecimalAmount(igst_amount);
-//     total['tax_amount'] = this.getDecimalAmount(tax_amount);
-//     total['sez_amount'] = this.getDecimalAmount(sez_amount);
-//     total['net_amount'] = this.getDecimalAmount(net_amount);
-//     total['net_payble'] = this.getDecimalAmount(net_payble);
-
-//     if(field != null && field.field_name != null && field != ""){
-//       delete total[field.field_name]
-//     }
-//     templateValue = {};
-//     templateValue['total_amount'] = total;
-//     return templateValue;
-  
-// }
-
-      // calculate_po_row_item(templateValue:any,lims_segment:any, calculate_on_field: any){
-      //   var po_items = templateValue['po_items'];
-
-      //   var qty= po_items['qty'];
-      //   var cost= po_items['cost'];
-      //   if(qty && cost){ 
-      //     po_items['total'] = qty*cost;
-      //   }else{
-      //     po_items['total'] =0;
-      //   }
-      //   po_items['discount_amount'] =0;
-      //   po_items['net_amount'] = po_items['total'];
-      //   templateValue['po_items']=po_items;
-
-      // return templateValue;
-       
-      // }
-
-      // calculate_manual_row_item(templateValue:any,lims_segment:any, calculate_on_field: any){
-      //   var manualItemsList = templateValue['manualItemsList'];
-
-      //   var qty= manualItemsList['sampleQty'];
-      //   var cost= manualItemsList['sampleCost'];
-      //   if(qty && cost){ 
-      //     manualItemsList['sampleTotal'] = qty*cost;
-      //   }else{
-      //     manualItemsList['sampleTotal'] =0;
-      //   }
-      //   manualItemsList['discount_amount'] =0;
-      //   manualItemsList['net_amount'] = manualItemsList['sampleTotal'];
-      //   templateValue['manualItemsList']=manualItemsList;
-
-      // return templateValue;
-       
-      // }
-
-
-  // calculate_lims_invoice_with_po_items(templateValue:any,lims_segment:any, calculate_on_field: any){
-  //   return this.calculate_lims_invoice(templateValue,lims_segment, 'po_items')
-  // }
-
-  // calculate_lims_invoice_with_manual_items(templateValue:any,lims_segment:any, calculate_on_field: any){
-  //   let calculateOnField = "";
-  //   if(calculate_on_field == null || calculate_on_field == ''){
-  //     calculateOnField = 'manualItemsList';
-  //   }else {
-  //     calculateOnField = calculate_on_field['field_name'] 
-  //   }
-  //   let	surcharge	=0;
-  //   let	gross_amount	=0;
-  //   let	discount_percent	=0;
-  //   let	discount_amount	=0;
-  //   let	taxable_amount	=0;
-  //   let	net_amount	=0;
-   
-  //       if (this.coreFunctionService.isNotBlank(templateValue[calculateOnField]) && templateValue[calculateOnField].length > 0) {
-  //         templateValue[calculateOnField].forEach((element:any) => {
-  //           if(this.coreFunctionService.isNotBlank(element.sampleTotal)){
-  //             // gross_amount=gross_amount+element.gross_amount
-  //             gross_amount=gross_amount+element.sampleTotal
-  //           }
-  //           if(this.coreFunctionService.isNotBlank(element.sampling_charge)) {
-  //             // surcharge=surcharge+element.surcharge
-  //             surcharge=surcharge+element.sampling_charge
-  //           }
-  //           if(this.coreFunctionService.isNotBlank(element.discount_amount)){
-  //             discount_amount=discount_amount+element.discount_amount
-  //           }
-  //           if(this.coreFunctionService.isNotBlank(element.net_amount)){
-  //             net_amount=net_amount+element.net_amount
-  //           }else{
-  //             net_amount=net_amount+element.sampleTotal
-  //           }
-  //             taxable_amount=net_amount+surcharge;
-  //         });
-  //       }
-  //       templateValue = this.update_invoice_totatl(templateValue,gross_amount,discount_amount,discount_percent,net_amount,surcharge,taxable_amount);
-  //        return templateValue;
-  //     }
 
 
    getDateInStringFunction(templateValue:any){
@@ -1994,7 +1374,7 @@ export class CommonFunctionService {
   const fromDate = templateValue['fromDate'];
   const  months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   var monthNumber = templateValue.fromDate.toDate().getMonth()
-  var monthName = months[monthNumber]; 
+  var monthName = months[monthNumber];
   let year = templateValue.fromDate.toDate().getFullYear();
   let result = {
     "labelName": monthName+'-'+year
@@ -2004,634 +1384,6 @@ export class CommonFunctionService {
 
 }
 
-  // getDiscountPercentage(current_disount:number, discount_amount:number, gross_amount:number, quantity:number){
-  //   if(quantity >0 && gross_amount > 0){
-  //     current_disount = discount_amount*100/gross_amount;
-  //   }
-  //   return current_disount;
-  // }
-
-  // calculateQquoteAmount(templateValue:any, field: any) {
-  //   var total:any = 0;
-  //   let discount_percent:any = 0;
-  //   let net_amount:any = 0;
-  //   let sampling_amount:any = 0;
-  //   let final_amount:any = 0;
-  //   let discount_amount:any = 0;
-  //   let quotation_param_methods:any = [];
-  //   let unit_price:any = 0;
-    
-  //   if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
-  //     templateValue['quotation_param_methods'].forEach((element:any) => {
-  //       total = total + element.quotation_effective_rate;
-  //     });
-  //   }
-
-  //   if (templateValue['sampling_charge'] && templateValue['sampling_charge'] != null) {
-  //     sampling_amount = templateValue['sampling_charge'];
-  //   }
-  //   if(total>0){
-  //     if (templateValue[field.field_name] != ''){
-  //       if(field.field_name==='discount_percent'){
-  //         discount_percent = templateValue[field.field_name];
-  //         discount_amount=total*discount_percent/100;
-  //         net_amount=total-discount_amount;
-  //         quotation_param_methods = [];
-  //         templateValue['quotation_param_methods'].forEach((element: any) => {
-  //           const new_element = { ...element };
-  //           new_element.discount_percent = this.getDecimalAmount(+discount_percent);
-  //           this.calculateNetAmount(new_element, "qty", "");
-  //           quotation_param_methods.push(new_element);
-  //         })
-  //         templateValue['quotation_param_methods'].setValue(quotation_param_methods);
-  //         this.calculateQquoteAmount(templateValue, {field_name:"quotation_param_methods"});
-  //       }else if(field.field_name==='net_amount'){
-  //         discount_percent = 0;
-  //         net_amount=templateValue[field.field_name];
-  //         discount_amount=total-net_amount;
-  //         discount_percent =this.getDecimalAmount(100*discount_amount/total);  
-  //         templateValue["discount_percent"]=discount_percent;
-  //         let updatedData = this.quote_amount_via_discount_percent(templateValue["quotation_param_methods"],templateValue)
-  //         updatedData[field.field_name] = net_amount
-  //         return updatedData;        
-  //        }else if(field.field_name==='quotation_param_methods'){
-  //           let list=templateValue[field.field_name];
-  //           list.forEach((element:any) => {
-  //             const new_element={...element};
-  //             discount_amount = discount_amount + element.discount_amount
-  //             net_amount = net_amount + element.net_amount;
-  //           });
-  //           discount_percent =100*discount_amount/total;
-  //       }else {
-  //           total = templateValue['total'];
-  //           discount_amount = templateValue['discount_amount'];
-  //           net_amount = templateValue['net_amount'];
-  //           discount_percent = templateValue['discount_percent'];
-
-  //       }
-  //       final_amount = net_amount + sampling_amount;
-  //       unit_price = this.getDecimalAmount(net_amount/templateValue['qty']);
-  //       quotation_param_methods = [];
-  //       templateValue['quotation_param_methods'].forEach((element: any) => {
-  //         const new_element = { ...element };
-  //         new_element.discount_percent = this.getDecimalAmount(+element.discount_percent);
-  //         new_element.net_amount = this.getDecimalAmount(+(element.quotation_effective_rate * (1 - element.discount_percent / 100)));
-  //         new_element.discount_amount = this.getDecimalAmount(+(element.quotation_effective_rate * element.discount_percent / 100));
-  //         if(new_element.qty>0){
-  //           new_element.per_sample_net_rate = this.getDecimalAmount(+(new_element.net_amount / new_element.qty));
-  //         }
-  //         quotation_param_methods.push(new_element);
-  //       });
-  //       templateValue['total'] = total;
-  //       templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
-  //       templateValue['net_amount'] = this.getDecimalAmount(net_amount);
-  //       templateValue['discount_percent'] = this.getDecimalAmount(discount_percent);
-  //       templateValue['final_amount'] = this.getDecimalAmount(final_amount);
-  //       templateValue['unit_price'] =  unit_price;
-  //       if(quotation_param_methods.length > 0){
-  //         templateValue['quotation_param_methods'] = quotation_param_methods;
-  //       }        
-          
-  //       }
-  //     }
-  //     return templateValue;
-    
-  // }
-  // calculate_pharma_claim_values(new_element : any){
-  //       if(new_element.claim_dependent && !isNaN(new_element.claim_percent)){
-  //                   if( !isNaN(+new_element.limit_from)){
-  //                     if(this.coreFunctionService.isNotBlank(new_element.claim_percent)){
-  //                         new_element.claim_limit_from = (+new_element.limit_from)*(new_element.claim_percent)/100;
-  //                           if(new_element.claim_unit){
-  //                               new_element.claim_limit_from = new_element.claim_limit_from + " " +new_element.claim_unit;
-  //                           }
-  //                   }else{
-  //                       new_element.claim_limit_from =new_element.limit_from;
-  //                   }
-  //                 }
-  //                   if( !isNaN(+new_element.limit_to)){
-  //                     if(this.coreFunctionService.isNotBlank(new_element.claim_percent)){
-  //                       new_element.claim_limit_to = (+new_element.limit_to)*(new_element.claim_percent)/100;
-  //                        if(new_element.claim_unit){
-  //                           new_element.claim_limit_to = new_element.claim_limit_to + " " +new_element.claim_unit;
-  //                        }
-  //                   }else{
-  //                       new_element.claim_limit_to =new_element.limit_to;
-  //                   }
-  //                 }
-  //       }
-  // }
-
-  
-  
-
-  
-
-  // calculateParameterAmtOnInjection(data:any,rate:number,quantity:number){
-  //           let totalInjection = data.no_of_injection;
-  //           if(!this.coreFunctionService.isNotBlank(totalInjection)){
-  //             totalInjection = 0;
-  //           }
-
-  //           if(!this.coreFunctionService.isNotBlank(rate)){
-  //               rate = 0;
-  //             }
-  //             let rate_per_injection = rate;
-  //             let totalAmount = this.getDecimalAmount(totalInjection*rate_per_injection);
-  //             if(data.no_of_injection2 > 0){
-  //               let no_of_injection2 = data.no_of_injection2;
-  //               if(quantity > 1 && no_of_injection2>0){
-  //                 totalInjection = this.getDecimalAmount(totalInjection + (quantity-1)*no_of_injection2);
-  //                 totalAmount = this.getDecimalAmount(totalInjection * rate_per_injection);
-  //               }
-  //             }
-  //             else if(data.no_of_injection > 0 && data.no_of_injection2<=0){
-  //               let no_of_injection = data.no_of_injection;
-  //               if(quantity > 1 && no_of_injection>0){
-  //                 totalInjection = this.getDecimalAmount(totalInjection + (quantity-1)*no_of_injection);
-  //                 totalAmount = this.getDecimalAmount(totalInjection * rate_per_injection);
-  //               }
-  //             }
-  //             else{
-  //               totalAmount = this.getDecimalAmount(quantity*totalInjection * rate_per_injection);
-  //             }
-  //             // data["quotation_effective_rate"]= totalAmount;
-  //             // data["total"] = totalAmount;
-  //             // data["discount_amount"] = this.getDecimalAmount((data.total* data.discount_percent)/100);
-  //             // data["net_amount"] = this.getDecimalAmount(data.total- data.discount_amount);
-  //             data["total_injection"] = totalInjection;
-  //             return totalAmount;
-  // }
-
-  // calculateNetAmount(data:any, fieldName:any,grid_cell_function:any) {
-  // switch(grid_cell_function){
-  //   case "calculateQuotationParameterAmountForAutomotiveLims":
-  //     this.calculateQuotationParameterAmountForAutomotiveLims(data, fieldName["field_name"]);
-  //     break
-
-  //   case "calculateQuotationParameterAmountForLims":
-  //     this.calculateQuotationParameterAmountForLims(data, fieldName["field_name"])
-  //       break;
-
-  //   case "calculate_pharma_claim_values":
-  //     this.calculate_pharma_claim_values(data);
-  //     break;
-
-  //     case "calculate_invoice_amount_row_wise":
-  //     this.calculate_invoice_amount_row_wise(data,fieldName["field_name"]);
-  //     break;
-
-  //     default:
-  //     this.legacyQuotationParameterCalculation(data,fieldName["field_name"]);
-  // }
-
-  // }
-
-  // calculate_invoice_amount_row_wise(data:any,fieldName:any){
-  //   let total = 0;
-  //   let disc_per = 0;
-  //   let disc_amt = 0;
-  //   let final_amt = 0;
-  //   let net_amount=0;
-  //   let surcharge = 0;
-  //   if(this.coreFunctionService.isNotBlank(data.total)){
-  //     total = data.total;
-  //   }
-  //   if(this.coreFunctionService.isNotBlank(data.discount_amount)){
-  //     disc_amt = data.discount_amount;
-  //   }
-  //   if(this.coreFunctionService.isNotBlank(data.sampling_charge)){
-  //     surcharge = data.sampling_charge;
-  //   }
-  //   if(this.coreFunctionService.isNotBlank(data.discount_percent)){
-  //     disc_per = data.discount_percent;
-  //   }
- 
-
-  //   let incoming_field = fieldName;
-  //   switch(incoming_field){
-  //     case "total":
-  //         disc_amt =disc_per*total/100;
-  //         net_amount=total - disc_amt;
-  //         final_amt = surcharge+net_amount;
-  //        // disc_per = (disc_amt/(data.total))*100;
-  //       break;
-  //     case "discount_percent":
-  //       disc_amt =disc_per*total/100;
-  //       net_amount=total - disc_amt;
-  //       final_amt = surcharge+net_amount;
-  //       break;
-  //     case "discount_amount":
-  //       disc_per = (100*disc_amt)/total;
-  //       net_amount=total - disc_amt;
-  //       final_amt = surcharge+net_amount;
-  //       break;
-  //     case "sampling_charge":
-  //       disc_per = (100*disc_amt)/total;
-  //       net_amount=total - disc_amt;
-  //       final_amt = surcharge+net_amount;
-  //       break;
-  //   }
-
-  //   data["discount_percent"] = disc_per;
-  //   data["discount_amount"] = disc_amt;
-  //   data["final_amount"] = final_amt;
-  //   data["net_amount"] = net_amount;
-
-  // }
-
-
-  // calculateQuotationParameterAmountForLims(data:any, fieldName:any){
-  //   let quantity:any = 0;
-  //   let discount_percent:any = 0;
-  //   let cost_rate = 0;
-  //   let net_amount:any = 0;
-  //   let discount_amount = 0;
-  //   let param_quantom = 0;
-  //   let Base_quotation_rate = 0;
-  //   let incoming_field:any = fieldName;
-  //   let sale_rate=data['sale_rate'];
-  //   let gross_amount:any=0;
-  //   let effectiveTotal:any=0;
-  //   let dis_amt:any = 0;
-  //   quantity = data.qty;
-  //   if (!this.coreFunctionService.isNotBlank(quantity)) {
-  //     quantity=0;
-  //   }
-  //   gross_amount=quantity*sale_rate;
-
-  //   switch(incoming_field){
-
-  //       case "qty":
-  //           effectiveTotal = (+quantity) * (+data.offer_rate);
-  //           if(data.no_of_injection > 0){
-  //            this.calculatePharamaParameterAmount(data, data.offer_rate, quantity);
-
-  //           }
-  //           else{
-  //             dis_amt = gross_amount-effectiveTotal;
-  //             if(gross_amount > 0){
-  //               discount_percent =this.getDecimalAmount(100*dis_amt/gross_amount);
-  //             }else{
-  //               discount_percent=0;
-  //             }
-  //             net_amount= effectiveTotal;
-  //           this.populateParameterAmount(data,net_amount,discount_percent,dis_amt,quantity,gross_amount)
-
-  //           }
-  //           break;
-  //           case "discount_percent":
-  //           discount_percent = data.discount_percent;
-  //           if (!this.coreFunctionService.isNotBlank(discount_percent)) {
-  //             discount_percent=0;
-  //           }
-  //          if(data.no_of_injection > 0){
-  //           let offeringRate=data.rate_per_injection*(1-discount_percent/100);
-  //           this.calculatePharamaParameterAmount(data, offeringRate, quantity);
-  //             }else{
-  //             dis_amt = this.getDecimalAmount(((+gross_amount) * (+discount_percent)) / 100);
-  //             net_amount = this.getDecimalAmount((+gross_amount) - dis_amt);
-  //             this.populateParameterAmount(data,net_amount,discount_percent,dis_amt,quantity,gross_amount)
-  //             }
-  //           break;
-
-  //           case "unit_price":
-  //             discount_percent = data.discount_percent;
-  //             if (!this.coreFunctionService.isNotBlank(discount_percent)) {
-  //               discount_percent=0;
-  //             }
-  //            if(data.no_of_injection > 0){
-  //              let offeringRate=data.rate_per_injection*(1-discount_percent/100);
-  //             this.calculatePharamaParameterAmount(data, offeringRate, quantity);
-  //               }else{
-  //               dis_amt = this.getDecimalAmount(((+gross_amount) * (+discount_percent)) / 100);
-  //               net_amount = this.getDecimalAmount((+gross_amount) - dis_amt);
-
-  //               this.populateParameterAmount(data,net_amount,discount_percent,dis_amt,quantity,gross_amount)
-  //               }
-  //             break;
-
-  //         case "offer_rate"  :
-  //           let offer_rate = data.offer_rate;
-  //           if (!this.coreFunctionService.isNotBlank(offer_rate)) {
-  //             offer_rate=0;
-  //           }
-  //         if(data.no_of_injection > 0){
-
-  //           this.calculatePharamaParameterAmount(data, offer_rate, quantity);
-
-  //           }else{
-  //               if(offer_rate){
-  //                 effectiveTotal=quantity*offer_rate;
-  //                 dis_amt=gross_amount-effectiveTotal;
-  //                 if(gross_amount > 0){
-  //                   discount_percent =this.getDecimalAmount(100*dis_amt/gross_amount);
-  //                 }else{
-  //                   discount_percent=0;
-  //                 }
-  //                 net_amount = gross_amount-dis_amt;
-  //               }
-  //             this.populateParameterAmount(data,net_amount,discount_percent,dis_amt,quantity,gross_amount);
-  //             data["offer_rate"] = offer_rate;
-  //          }
-  //            break;
-  //           case "discount_amount"  :
-  //             dis_amt = data.discount_amount;
-  //             if (!this.coreFunctionService.isNotBlank(dis_amt)) {
-  //               dis_amt=0;
-  //             }
-  //             if(data.no_of_injection > 0){
-  //               if(!this.coreFunctionService.isNotBlank(data['rate_per_injection'])){
-  //                 data['rate_per_injection'] = 0;
-  //               }
-  //             let offeringRate=data['rate_per_injection']-dis_amt;
-  //             this.calculatePharamaParameterAmount(data, offeringRate, quantity,incoming_field);
-  //           }else{
-  //             effectiveTotal = gross_amount-dis_amt;
-  //               net_amount =effectiveTotal;
-  //               if(gross_amount>0){
-  //                 discount_percent = this.getDecimalAmount(((+dis_amt) * 100) / (+gross_amount));
-  //             }else{
-  //               discount_percent=0;
-  //             }
-  //             this.populateParameterAmount(data,net_amount,discount_percent,dis_amt,quantity,gross_amount)
-  //           }
-  //           break;
-
-  //   }
-
-
-  // }
-  // populateParameterAmount(data:any,net_amount:number,discount_percent:number,discount_amount:number,quantity:number,gross_amount:number){
-  //   data['net_amount'] = this.getDecimalAmount(net_amount);
-  //   if(data['total_injection'] && data['total_injection'] > 0){
-  //     data['per_sample_net_rate'] =   this.getDecimalAmount(data['net_amount'] / data['total_injection']);
-  //     data["offer_rate"] = data["per_sample_net_rate"];
-  //   }
-  //   else if(data['qty']>0){
-  //     data['per_sample_net_rate'] =   this.getDecimalAmount(data['net_amount'] / data['qty']);
-  //     data["offer_rate"] = data["per_sample_net_rate"];
-  //   }else{
-  //     data['per_sample_net_rate'] =0;
-  //   }
-    
-  //   data['discount_percent'] = this.getDecimalAmount(discount_percent);
-  //   data['discount_amount'] = this.getDecimalAmount(+discount_amount);
-  //   data['qty'] = quantity;
-  //   data['total'] = this.getDecimalAmount(gross_amount);
-  //   data['quotation_effective_rate'] =  this.getDecimalAmount(gross_amount);
-    
-  // }
-  // calculateQuotationParameterAmountForAutomotiveLims(data:any, fieldName:any){
-  //   let quantity:any = 0;
-  //   let discount_percent:any = 0;
-  //   let cost_rate:any = 0;
-  //   let net_amount:any = 0;
-  //   let param_quantom:any = 0;
-  //   let Base_quotation_rate:any = 0;
-  //   let incoming_field:any = fieldName;
-
-  //   let gross_amount:any=0;
-  //   let dis_amt:any = 0;
-  //   switch(incoming_field){
-  //      case "parameter_quantum" :
-  //        let parameterQuantum = data.parameter_quantum;
-  //         if (!this.coreFunctionService.isNotBlank(parameterQuantum)) {
-  //           parameterQuantum=0;
-  //         }
-  //           data['quantum_rate'] = (+data.quotation_rate) * (+parameterQuantum);
-  //           data['quotation_effective_rate'] = (+data.qty) * (+data.quantum_rate);
-  //           net_amount = +data.quotation_effective_rate
-  //           if (data.discount_percent) {
-  //             let discount = ((+data.quotation_effective_rate) * (+data.discount_percent)) / 100;
-  //             data['discount_amount'] = discount;
-  //             net_amount = (+data.quotation_effective_rate) - discount;
-  //           }
-  //           data['net_amount'] = net_amount
-
-  //         break;
-  //       case "qty":
-  //       let quantity = data.qty;
-  //         if (!this.coreFunctionService.isNotBlank(quantity)) {
-  //           quantity=0;
-  //         }
-
-  //              data['quotation_effective_rate'] = (+quantity) * (+data.quantum_rate);
-  //              if (data.discount_percent) {
-  //               let discount = this.getDecimalAmount((+data.quotation_effective_rate) * (+data.discount_percent)) / 100;
-  //               data['discount_amount'] = discount;
-  //             }
-  //             net_amount = this.getDecimalAmount((+data.quotation_effective_rate) - data['discount_amount']);
-  //             data['net_amount'] = net_amount
-  //             data['total'] = +data.quotation_effective_rate;
-  //             data['qty'] = data.qty
-
-  //           break;
-  //           case "discount_percent":
-  //           let discount_per = data.discount_percent;
-  //         if (!this.coreFunctionService.isNotBlank(discount_per)) {
-  //           discount_per=0;
-  //         }
-  //             data['quotation_effective_rate'] = (+data.qty) * (+data.quantum_rate);
-  //             net_amount = +data.quotation_effective_rate
-  //             let discount:any = this.getDecimalAmount(((+data.quotation_effective_rate) * (+discount_per)) / 100);
-  //             data['discount_amount'] = discount;
-  //             net_amount = this.getDecimalAmount((+data.quotation_effective_rate) - discount);
-  //             data['net_amount'] = net_amount
-  //             data['total'] = +data.quotation_effective_rate;
-  //             data['qty'] = data.qty;
-  //             data['discount_percent'] = +discount_per;
-
-  //           break;
-
-  //          case "discount_amount"  :
-  //           let discount_amt = data.discount_amount;
-  //           if (!this.coreFunctionService.isNotBlank(discount_amt)) {
-  //             discount_amt=0;
-  //           }
-
-  //               net_amount = (+data.quotation_effective_rate) - (+discount_amt);
-  //               let discount_perc = this.getDecimalAmount(((+discount_amt) * 100) / (+data.quotation_effective_rate));
-  //               data['net_amount'] = net_amount;
-  //               data['discount_percent'] = discount_perc;
-  //               data['discount_amount'] = +data['discount_amount'];
-
-  //           break;
-  //           default:
-
-  //   }
-  //   if(data['qty']>0){
-  //     data['per_sample_net_rate'] =   this.getDecimalAmount(data['net_amount'] / data['qty']);
-  //   }else{
-  //     data['per_sample_net_rate'] = 0;
-  //   }
-  // this.sanitizeParameterAmount(data);
-  // }
-
-  // calculatePharamaParameterAmount(data:any, offer_rate:number, quantity:number,field_name?:any){
-  //   let gross_amount:any =  this.calculateParameterAmtOnInjection(data,data["rate_per_injection"],quantity)
-  //   let effectiveTotal:any = this.calculateParameterAmtOnInjection(data,offer_rate,quantity)
-  //   let dis_amt = gross_amount-effectiveTotal;
-  //   switch (field_name){
-  //     case 'discount_amount':
-  //     effectiveTotal = gross_amount-data['discount_amount'];
-  //     dis_amt = data['discount_amount'];
-  //     break;
-  //     default:
-
-  //   }
-  //   let discount_percent = 0;
-  //   if(gross_amount > 0){
-  //     discount_percent = (dis_amt/gross_amount)*100;
-  //   }
-  //   else{
-  //     discount_percent=0;
-  //   }
-  // this.populateParameterAmount(data,effectiveTotal,discount_percent,dis_amt,quantity,gross_amount)
-  // }
-
-
-  // sanitizeParameterAmount(data:any){
-  //   let amountFields = [
-  //     'quotation_effective_rate',
-  //     'discount_amount',
-  //     'discount_percent',
-  //     'net_amount',
-  //     'total',
-  //     'per_sample_net_rate'
-  //   ];
-  //   amountFields.forEach(column => {
-  //     data[column] =   this.getDecimalAmount(data[column]);
-  //     if(typeof(data[column]) != 'number'){
-  //       data[column]=0;
-  //     }
-  //   });
-  // }
-
-  // legacyQuotationParameterCalculation(data:any, fieldName:any){
-  //   let quantity:any = 0;
-  //   let discount_percent:any = 0;
-  //   let cost_rate:any = 0;
-  //   let net_amount:any = 0;
-  //   let param_quantom:any = 0;
-  //   let Base_quotation_rate:any = 0;
-  //   let incoming_field:any = fieldName.field_name;
-    
-  //   let gross_amount:any=0; 
-  //   let dis_amt:any = 0;
-  //   switch(incoming_field){
-  //      case "claim_unit" :
-  //      case "claim_percent" :
-  //       this.calculate_pharma_claim_values(data);
-  //       break;
-  //      case "parameter_quantum" :
-  //         if (data.parameter_quantum) {
-  //           data['quantum_rate'] = (+data.quotation_rate) * (+data.parameter_quantum);
-  //           data['quotation_effective_rate'] = (+data.qty) * (+data.quantum_rate);
-  //           net_amount = +data.quotation_effective_rate
-  //           if (data.discount_percent) {
-  //             let discount:any = ((+data.quotation_effective_rate) * (+data.discount_percent)) / 100;
-  //             data['discount_amount'] = discount;
-  //             net_amount = (+data.quotation_effective_rate) - discount;
-  //           }
-  //           data['net_amount'] = net_amount
-  //         }
-  //         break;
-  //       case "qty":  
-  //           if (data.qty) {
-  //             if(data.branch && data.branch.name && data.branch.name==="Pune"){
-  //              data['quotation_effective_rate'] = (+data.qty) * (+data.quantum_rate);
-  //           }else{
-  //             data['quotation_effective_rate'] = (+data.qty) * (+data.offer_rate);
-  //           }
-
-
-  //           if(data.no_of_injection > 0){
-  //             // this.calculateParameterAmtOnInjection(data);
-  //           }
-  //           else{
-  //             net_amount = +data.quotation_effective_rate
-  //             if (data.discount_percent) {
-  //               let discount:any = this.getDecimalAmount((+data.quotation_effective_rate) * (+data.discount_percent)) / 100;
-  //               data['discount_amount'] = discount;
-  //               net_amount = this.getDecimalAmount((+data.quotation_effective_rate) - discount);
-  //             }
-  //             data['net_amount'] = net_amount
-  //             data['total'] = +data.quotation_effective_rate;
-  //             data['qty'] = data.qty
-  //           }
-            
-  //           }
-  //           break;
-  //           case "discount_percent":  
-  //           if (!data.discount_percent) {
-  //               data.discount_percent=0;
-  //            }if(data.no_of_injection > 0){
-  //             // this.calculateParameterAmtOnInjection(data);
-  //             }else if(data.branch && data.branch.name && data.branch.name==="Pune"){
-  //             data['quotation_effective_rate'] = (+data.qty) * (+data.quantum_rate);
-  //           }else{
-  //             data['quotation_effective_rate'] = (+data.qty) * (+data.offer_rate);
-  //           }
-  //             net_amount = +data.quotation_effective_rate
-  //             let discount:any = this.getDecimalAmount(((+data.quotation_effective_rate) * (+data.discount_percent)) / 100);
-  //             data['discount_amount'] = discount;
-  //             net_amount = this.getDecimalAmount((+data.quotation_effective_rate) - discount);
-  //             data['discount_percent'] = data.discount_percent;
-  //             data['net_amount'] = net_amount
-  //             data['total'] = +data.quotation_effective_rate;
-  //             data['qty'] = data.qty;
-  //             data['discount_percent'] = +data['discount_percent'];
-            
-  //           break;
-
-  //         case "offer_rate"  :
-  //         if(data.no_of_injection > 0){
-  //             if(data.offer_rate){
-  //               data["rate_per_injection"] = data.offer_rate;
-  //             }
-
-  //             // this.calculateParameterAmtOnInjection(data);
-  //           }else{
-  //               if(data.offer_rate){
-  //                  gross_amount = this.getDecimalAmount(data.offer_rate * data.qty);
-  //                 if(data.discount_percent && data.discount_percent>0){
-  //                   dis_amt = this.getDecimalAmount((gross_amount*data.discount_percent)/100);
-  //                 }
-  //                 net_amount = gross_amount-dis_amt;
-  //               }
-  //             data['net_amount'] = net_amount;
-  //             data['discount_amount'] = dis_amt;
-  //             data['total'] = gross_amount;
-  //             data['quotation_effective_rate'] =  gross_amount;
-  //          }
-  //            break;
-  //           case "discount_amount"  :
-  //             if ((data.discount_amount == 0) || (data.discount_amount )) {
-  //               net_amount = (+data.quotation_effective_rate) - (+data.discount_amount);
-  //               let discount_per = this.getDecimalAmount(((+data.discount_amount) * 100) / (+data.quotation_effective_rate));
-  //               data['net_amount'] = net_amount;
-  //               data['discount_percent'] = discount_per;
-  //               data['discount_amount'] = +data['discount_amount'];
-  //             }
-  //           break;          
-
-  //   }
-  //   if(data['qty']>0){
-  //     data['per_sample_net_rate'] =   this.getDecimalAmount(data['net_amount'] / data['qty']);
-  //   }
-  //   let amountFields = [
-  //     'quotation_effective_rate',
-  //     'discount_amount',
-  //     'discount_percent',
-  //     'net_amount',
-  //     'total',
-  //     'per_sample_net_rate'
-  //   ];
-  //   amountFields.forEach(column => {
-  //     data[column] =   this.getDecimalAmount(data[column]);
-  //   });
-  // }
 
   populatefields(value:any, populate_fields:any,field:any,multipleFormCollection?:any) {
     let obj:any = {}
@@ -2659,7 +1411,7 @@ export class CommonFunctionService {
             obj[parent][child] =this.mergeMultiFieldsValues(el.from, value);
           }else{
             obj[parent][child] = "";
-          }            
+          }
         }else{
           const field = toList[0];
           if(check){
@@ -2674,7 +1426,7 @@ export class CommonFunctionService {
   }
 
   mergeMultiFieldsValues(field:any, object:any){
-    let result = ""; 
+    let result = "";
     if(field && field != null && field != '' && field != " "){
       let list = field.split("+")
       for (let index = 0; index < list.length; index++) {
@@ -2708,14 +1460,7 @@ export class CommonFunctionService {
 
   }
 
-  // getDecimalAmount(value:any): any | undefined {
-  //   if (typeof(value) == 'number' && value != undefined && value != null) {
-  //     return Number(value.toFixed(2));
-  //   } else {
-  //     return;
-  //   }
 
-  // }
   getNetAmountWithPercent(total:number, percent:number) {
     let percentAmount = 0;
     let netAmount = 0;
@@ -2723,19 +1468,7 @@ export class CommonFunctionService {
     netAmount = total - percentAmount;
     return { p_amount: percentAmount, net_amount: netAmount }
   }
-  // setValueInVields(templateForm: FormGroup, field: any) {
-  //   field.forEach((element:any) => {
-  //     if(templateForm.controls[element.field]!==undefined){
-  //       if(typeof(element.value) == 'string'){
-  //         templateForm.controls[element.field].setValue(element.value);
-  //       }
-  //       else{
-  //         templateForm.controls[element.field].setValue(this.getDecimalAmount(element.value));
-  //       }
-  //     }
-  //   });
-  //   return templateForm;
-  // }  
+
 
   claimAmountCalculation(field1:any, field2:any, field3:any) {
     let total = 0;
@@ -2760,7 +1493,7 @@ export class CommonFunctionService {
     }
     arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
     return arr; // for testing
-  };  
+  };
 
   openFileUpload(fieldName:any, modalName:any, formValue:any, fileData:any) {
     const alertData = {
@@ -2775,10 +1508,10 @@ export class CommonFunctionService {
     }
     if (fieldName.tableFields) {
       alertData['tableFields'] = fieldName.tableFields;
-    }    
+    }
     if (fieldName.defaultBucket) {
       alertData['defaultBucket'] = fieldName.defaultBucket;
-    }    
+    }
     if (fieldName.defaultS3Key) {
       alertData['defaultS3Key'] = fieldName.defaultS3Key;
     }
@@ -2949,8 +1682,8 @@ export class CommonFunctionService {
     switch (parentfield.type) {
       case "list_of_fields":
       case "group_of_fields":
-        custmizedKey = parentfield.field_name+'_'+parentfield.type                
-        break;          
+        custmizedKey = parentfield.field_name+'_'+parentfield.type
+        break;
       default:
         custmizedKey = parentfield.field_name;
         break;
@@ -2972,26 +1705,20 @@ export class CommonFunctionService {
     return check;
   }
   getVariableStorageValue(object:any,parent:any,chield:any): Array<any>{
-    let data:any = [];    
+    let data:any = [];
     if(parent != '' && parent != undefined && parent != null){
-      const parentKey = this.custmizedKey(parent); 
+      const parentKey = this.custmizedKey(parent);
       if(this.checkStorageValue(object,parent,chield)){
-        data = object[parentKey][chield.field_name] 
-      }       
+        data = object[parentKey][chield.field_name]
+      }
     }else {
       if(this.checkStorageValue(object,'',chield)){
         data = object[chield.field_name]
-      }      
+      }
     }
      return data;
   }
 
-  // calculation_of_script_for_tds(object:any, field: any) {
-  //   const staticModal = []
-  //   staticModal.push(this.getPaylodWithCriteria('QTMP:CALCULATION_SCRIPT', field.onchange_call_back_field, field.onchange_api_params_criteria, object));
-  //   staticModal[0]['data'] = object;
-  //   return staticModal;
-  // }
 
   checkCustmizedValuValidation(fields:any, value:any) {
     let validate:any = [];
@@ -3028,10 +1755,10 @@ export class CommonFunctionService {
 
       });
       response.msg = fieldName + ' Required.';
-      response.status = false;      
+      response.status = false;
       // this.notificationService.notify('bg-danger', fieldName + ' Required.')
     } else {
-      response.status = true; 
+      response.status = true;
     }
     return response;
   }
@@ -3049,35 +1776,13 @@ export class CommonFunctionService {
     }
   }
 
-  // create_professional_email(templateForm:any){
-  //   let templateValue = templateForm.getRawValue();
-  //   let name = templateValue.name;
-  //   let prof_email = "";
-  //   let strt = name.substring(0, 2);
-  //   let last = name.slice(-2);
-  //   prof_email = strt+last+"@gmail.com";
-  //   const fieldWithValue = [
-  //     { field: 'prof_email', value: prof_email },
-  //   ]
-
-  //   this.setValueInVields(templateForm, fieldWithValue);
-  // }
-
   price_after_disc_health_test(templateForm:any){
     let templateValue = templateForm.getRawValue();
     let discount = 0;
     discount = templateValue.discount;
   }
 
-  // autopopulateFields(templateForm:any){
-  //   let templateValue = templateForm.getRawValue();
-  //   let product = templateValue.product.name;
-  //   const fieldWithValue = [
-  //     { field: 'sample_name', value: product },
-  //   ]
 
-  //   this.setValueInVields(templateForm, fieldWithValue);
-  // }
   getDataForGrid(page:any,tab:any,currentMenu:any,headElements:any,filterForm:any,selectContact:any){
     let grid_api_params_criteria = [];
     if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
@@ -3086,12 +1791,12 @@ export class CommonFunctionService {
     if(this.isGridFieldExist(tab,"api_params_criteria")){
       grid_api_params_criteria = tab.grid.api_params_criteria;
     }
-    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);     
+    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
     this.getfilterCrlist(headElements,filterForm).forEach((element: any) => {
       data.crList.push(element);
     });
     if(selectContact != ''){
-      const tabFilterCrlist = {        
+      const tabFilterCrlist = {
         "fName": 'account._id',
         "fValue": selectContact,
         "operator": 'eq'
@@ -3106,7 +1811,7 @@ export class CommonFunctionService {
   }
   setPageNoAndSize(payload:any,page:number){
     payload['pageNo'] = page - 1;
-    payload['pageSize'] = this.itemNumOfGrid; 
+    payload['pageSize'] = this.itemNumOfGrid;
     return payload;
   }
   getRealTimeGridData(currentMenu:any, object:any) {
@@ -3114,7 +1819,7 @@ export class CommonFunctionService {
     let page = 1;
     let criteria = "_id;eq;" + object._id + ";STATIC";
     grid_api_params_criteria.push(criteria);
-    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page); 
+    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
     const getFilterData = {
       data: data,
       path: null
@@ -3123,10 +1828,10 @@ export class CommonFunctionService {
   }
   setPageNumverAndSize(payload:any,page:number,){
     payload['pageNo'] = page - 1;
-    payload['pageSize'] = this.itemNumOfGrid; 
+    payload['pageSize'] = this.itemNumOfGrid;
     return payload;
   }
-  getPage(page: number,tab:any,currentMenu:string,headElements:object,filterForm:object,selectContact:any) {  
+  getPage(page: number,tab:any,currentMenu:string,headElements:object,filterForm:object,selectContact:any) {
   return this.getDataForGrid(page,tab,currentMenu,headElements,filterForm,selectContact);
   }
   isGridFieldExist(tab:any,fieldName:any){
@@ -3155,7 +1860,7 @@ export class CommonFunctionService {
       for (let i = 0; i < array.length; i++) {
         const element = array[i];
         if(key != undefined && key != null){
-          if(this.isArray(key) && key.length > 0 && Object.keys(id).length > 0){          
+          if(this.isArray(key) && key.length > 0 && Object.keys(id).length > 0){
             if (this.getMatchingInList(key,id,element)) {
               index = i;
             }
@@ -3178,58 +1883,91 @@ export class CommonFunctionService {
   openModal(id:any, data:any){
   this.modalService.open(id, data);
   }
-  // calculate_next_calibration_due_date(templateForm: FormGroup){
-  //       const objectValue = templateForm.getRawValue();
-  //       let calibration_date =objectValue['calibration_date']
-  //       let calibration_frequency =objectValue['calibration_frequency']
-  //       if(calibration_date!=null && calibration_date!==undefined && calibration_frequency!=null && calibration_frequency!==undefined && calibration_date!=="" && calibration_frequency!=="" ) {
-  //         let date = new Date();
-  //         date.setDate(calibration_date.getDate() + calibration_frequency );
-  //         templateForm.controls['next_date'].setValue(date);
-  //       }
-  //   }
-  // calculateAutoEffRate(data:any){
-  //   data.forEach((element:any) => {
-  //     element["per_sample_net_rate"] = element["no_of_samples"]*element["quotation_effective_rate"];
-  //   });
-  //   return data;
-  // }
 
-  checkDataAlreadyAddedInListOrNot(primary_key:string,incomingData:any,alreadyDataAddedlist:any){
-    if(alreadyDataAddedlist == undefined){
-      alreadyDataAddedlist = [];
+  checkDataAlreadyAddedInListOrNot(field:any,incomingData:any,alreadyDataAddedlist:any,i?:any){
+    if(field && field.type && field.type == "date"){
+      incomingData = ""+incomingData;
     }
-    let alreadyExist = "false";
-    if(typeof incomingData == 'object'){
-      alreadyDataAddedlist.forEach((element:any) => {
-        if(element._id && element._id == incomingData._id){
-          alreadyExist =  "true";
-        }else if(element[primary_key] && element[primary_key] == incomingData){
-          alreadyExist =  "true";
-        }
-      });
-    }
-    else if(typeof incomingData == 'string'){
-      alreadyDataAddedlist.forEach((element: string) => {
-        if(typeof element == 'string'){
-          if(element == incomingData){
-            alreadyExist =  "true";
-          }
-        }else{
-          if(element[primary_key] == incomingData){
-            alreadyExist =  "true";
-          }
-        }
-      
-      });
+    let checkStatus = {
+      status : false,
+      msg : ""
+    };
+    if(field && field.allowDuplicacy){
+      checkStatus.status = false;
+      return checkStatus;
     }else{
-      alreadyExist =  "false";
+      let primary_key = field.field_name
+      let criteria = primary_key+"#eq#"+incomingData;
+      let primaryCriteriaList=[];
+      primaryCriteriaList.push(criteria);
+      if(field && field.primaryKeyCriteria && Array.isArray(field.primaryKeyCriteria) && field.primaryKeyCriteria.length > 0){
+        field.primaryKeyCriteria.forEach((criteria:any) => {
+          const crList = criteria.split("#");
+          const cr = crList[0]+"#"+crList[1]+"#"+incomingData;
+          primaryCriteriaList.push(cr);
+        });
+      }
+      if(alreadyDataAddedlist == undefined){
+        alreadyDataAddedlist = [];
+      }
+      let alreadyExist = false;
+      if(typeof incomingData == 'object'){
+        alreadyDataAddedlist.forEach((element:any) => {
+          if(element._id == incomingData._id){
+            alreadyExist =  true;
+          }
+        });
+      }
+      else if(typeof incomingData == 'string'){
+        for (let index = 0; index < alreadyDataAddedlist.length; index++) {
+          const element = alreadyDataAddedlist[index];
+          if(i == undefined || i == -1){
+            if(typeof element == 'string'){
+              if(element == incomingData){
+                alreadyExist =  true;
+              }
+            }else{
+              if(primaryCriteriaList && primaryCriteriaList.length > 0){
+                for (let index = 0; index < primaryCriteriaList.length; index++) {
+                  const cri = primaryCriteriaList[index];
+                  alreadyExist = this.checkIfCondition(cri,element,field.type);
+                  if(alreadyExist){
+                    const crList = cri.split("#");
+                    switch (crList[1]) {
+                      case "lte":
+                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is gretter then to "+crList[0]+". !!!";
+                        break;
+                      case "gte":
+                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is less then to "+crList[0]+". !!!";
+                        break;
+                      default:
+                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is already added. !!!";
+                        break;
+                    }
+                    break;
+                  }
+                }
+              }
+            }
+            if(alreadyExist){
+              break;
+            }
+          }else{
+            break;
+          }
+        };
+      }else{
+        alreadyExist =  false;
+      }
+      if(alreadyExist){
+        checkStatus.status = true;
+        return checkStatus;
+      }else{
+        checkStatus.status = false;
+        return checkStatus;
+      }
     }
-    if(alreadyExist == "true"){
-      return true;
-    }else{
-      return false;
-    }
+
   }
 
   getOperatorSymbol(operator:any){
@@ -3260,7 +1998,7 @@ export class CommonFunctionService {
       if(redirectUrl.indexOf('%') != -1){
         searchKey = '%';
       }
-      
+
       let newUrlWithQuery = '';
       if(searchKey != ''){
         const index = redirectUrl.indexOf(searchKey);
@@ -3268,7 +2006,7 @@ export class CommonFunctionService {
         const queryPrams = redirectUrl.substring(index,stringLength);
         const newParam = queryPrams.replace('%3F','');
         newUrlWithQuery = newParam.replace('%3D',':');
-      }      
+      }
       return {newUrlWithQuery};
   }
 
@@ -3291,7 +2029,7 @@ export class CommonFunctionService {
                   dummyData[key] = currentData[key];
                 });
               }
-             
+
             });
         }
         if(Object.keys(formValue).length > 0){
@@ -3312,7 +2050,7 @@ export class CommonFunctionService {
     keysList.forEach((key: string,i: string) => {
       object[key] = source_targetList[i];
     });
-    
+
     listOfObjects.push(object);
   });
    return listOfObjects;
@@ -3363,7 +2101,7 @@ export class CommonFunctionService {
           if(element._id == refObj._id){
             matchIndex = index;
             break;
-          }         
+          }
         }
         if(matchIndex  > -1){
           if(parent != ''){
@@ -3375,7 +2113,7 @@ export class CommonFunctionService {
                 if(subMenu._id == data._id){
                   submenuMatchIndex = j;
                   break;
-                }         
+                }
               }
             }
             if(submenuMatchIndex > -1){
@@ -3404,7 +2142,7 @@ export class CommonFunctionService {
           }else{
             fieldData.push(refObj);
           }
-        }        
+        }
       }else{
         fieldData = [];
         fieldData.push(refObj);
@@ -3418,7 +2156,7 @@ export class CommonFunctionService {
       dataList.push(refObj);
       uRef['userId'] = userRef;
       uRef[fieldName] = dataList;
-    }    
+    }
     return uRef
   }
   getReferenceObject(obj:any){
@@ -3430,7 +2168,7 @@ export class CommonFunctionService {
       ref["version"] = obj.version
     }
     return ref;
-  }  
+  }
   dateDiff(dateSent:any){
     let obj:any={};
     let currentDate = new Date();
@@ -3445,7 +2183,7 @@ export class CommonFunctionService {
     obj['hours'] = hours;
     obj['minutes'] = minutes;
     obj['seconds'] = seconds;
- 
+
      return obj;
    }
   getUserNotification(pageNo:any){
@@ -3467,20 +2205,20 @@ export class CommonFunctionService {
       list.forEach((element: any) => {
         let value = JSON.parse(JSON.stringify(element));
         value[fieldName] = true;
-        modifyList.push(value);        
+        modifyList.push(value);
       });
     }
     return modifyList;
   }
   modifiedGridColumns(gridColumns:any,object:any){
-    if(gridColumns.length > 0){     
+    if(gridColumns.length > 0){
       gridColumns.forEach((field:any) => {
         if(this.coreFunctionService.isNotBlank(field.show_if)){
           if(!this.showIf(field,object)){
             field['display'] = false;
           }else{
             field['display'] = true;
-          }                
+          }
         }else{
           field['display'] = true;
         }
@@ -3488,7 +2226,7 @@ export class CommonFunctionService {
     }
     return gridColumns;
   }
-  
+
   getApplicationAllSettings() {
     const payload1 = this.setPageNoAndSize(this.getPaylodWithCriteria("application_setting", "", [], {}), 1);
     this.apiService.getAplicationsSetting(payload1);
@@ -3496,55 +2234,7 @@ export class CommonFunctionService {
     this.apiService.getAplicationsThemeSetting(payload);
   }
 
-  // buggetForcastCalc(templateForm: FormGroup): void{
-  //   let templateValue = templateForm.getRawValue();
-  //   let actualCurYr = templateValue.actual_current;
-  //   let actualLastYr = templateValue.actuals;
-  //   let budget = templateValue.this_year;
-  //   let growthpers:any = {};
-  //   let budgetpers:any = {};
-  //   let value:any = [];
-  //   let value1:any = [];
-  //   Object.keys(actualCurYr).forEach(key => {
-  //     let growthper=0;
-  //     let budgetper=0;
-  //     let actualCurYrMonth = actualCurYr[key];
-  //     let actualLastYrMonth = actualLastYr[key];
-  //     if(actualLastYrMonth != 0){
-  //       growthper = actualCurYrMonth/actualLastYrMonth;
-  //     }
 
-  //     let budgetcurYrMonth = budget[key];
-  //     if(budgetcurYrMonth != 0){
-  //       budgetper = actualCurYrMonth/budgetcurYrMonth;
-  //     }
-
-  //       growthpers[key] = growthper;
-  //       let obj = {
-  //         field: key, value: growthpers[key] 
-  //       }
-  //       value.push(obj)
-
-  //       budgetpers[key] = budgetper;
-  //       let obj1 = {
-  //         field: key, value: budgetpers[key] 
-  //       }
-  //       value1.push(obj1)
-  //   })
-  //   const fieldWithValueforgrowth:any = {
-  //     field: 'growth_per', value: value
-  //   }
-  //   fieldWithValueforgrowth.value.forEach((element:any) => {
-  //       (<FormGroup>templateForm.controls[fieldWithValueforgrowth.field]).controls[element.field].patchValue(element.value);
-  //   })
-
-  //   const fieldWithValueforBudget:any = {
-  //     field: 'budget_per', value: value1
-  //   }
-  //   fieldWithValueforBudget.value.forEach((element:any) => {
-  //       (<FormGroup>templateForm.controls[fieldWithValueforBudget.field]).controls[element.field].patchValue(element.value);
-  //   })
-  // }
   manufactured_as_customer(templateForm: FormGroup) {
     (<FormGroup>templateForm.controls["sample_details"]).controls["mfg_by"].patchValue(templateForm.value.account.name);
   }
@@ -3560,59 +2250,7 @@ export class CommonFunctionService {
     return templateForm;
   }
 
-  // calculateTotalFair(value:any){
-  //   let totalFair = 0;
-  //   let claimSheet = value.claimSheet;
-  //   let localTa = claimSheet.localTa;
-  //   let travelFair = claimSheet.travelFare;
-  //   let dailyAllowance = claimSheet.dailyAllowance;
-  //   let food = claimSheet.food;
-  //   let hotel = claimSheet.hotel;
-  //   let parking = claimSheet.parking;
-  //   let toolCharge = claimSheet.tollCharge;
-  //   let miscellaneous = claimSheet.miscellaneous;
-  //   totalFair = (+travelFair)+(+localTa)+(+dailyAllowance)+(+food)+(+hotel)+(+parking)+(+toolCharge)+(+miscellaneous);
-  //   let obj1 = {
-  //     totalForTheDay:totalFair
-  //   }
-  //   let obj = {
-  //     claimSheet:obj1
-  //   }
-  //   return obj;
-  // }
 
-  // calculateTotalAmount(formValue:any){
-  //   let list = formValue['claimSheet'];
-  //   let total = 0;
-  //   for(let i=0; i<list.length;i++){
-  //     total +=  list[i]['totalForTheDay']
-  //   }
-
-  //   let obj = {
-  //     totalAmountOfTravelCliam:total
-  //   }
-  //   return obj;
-  // }
-
-  
-  // getTaWithCalculation(value:any){
-    
-  //   let localTas = 0;
-  //   let claimSheet = value.claimSheet;
-  //   let priceInKm = claimSheet.priceInKm;
-  //   let distanceInkm = claimSheet.distanceInKm;
-   
-  //   localTas = priceInKm*distanceInkm;
-  
-  //   let obj1 = {
-  //     localTa:localTas
-  //   }  
-  //   let obj = {
-  //     claimSheet:obj1
-  //   }  
-  //   return obj;
-  
-  // }
 
   funModeTravelChange(value:any){
 
@@ -3626,29 +2264,12 @@ export class CommonFunctionService {
     return obj;
   }
 
-  // calculateBalanceAmountEngLetter(tamplateFormValue:any,multiFormValue:any){
-  //   let list = tamplateFormValue['billingPlan'];
-  //   let fees = +multiFormValue['totalFees'];
-  //   let milestoneAchievedtotal = 0;
-  //   let total = 0;
-  //   if(list != null && list != undefined){
-  //     for(let i=0; i<list.length;i++){
-  //       milestoneAchievedtotal +=  list[i]['feesOnMilestoneAchieved']
-  //     }
-  //   }
-  //   total = milestoneAchievedtotal+tamplateFormValue['feesOnMilestoneAchieved'];
-  //   let remaningAmount = fees-total;
 
-  //   let obj = {
-  //     balanceAmount:remaningAmount
-  //   }
-  //   return obj;
-  // }
 
   print(data:any): void {
     let popupWin;
-    popupWin = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');    
-    popupWin!.document.write('<div class="noprint" style="text-align:right;"><a onClick="window.print()" style="text-align: right;display: inline-block;cursor: pointer;border: 2px solid #4285f4!important;background-color: transparent!important;color: #4285f4!important;box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);padding: 7px 25px;font-size: .81rem;transition: .2s ease-in-out;margin: .375rem;text-transform: uppercase;">Print</a></div><style>@media print{.noprint{display:none;}}</style>'+data);   
+    popupWin = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');
+    popupWin!.document.write('<div class="noprint" style="text-align:right;"><a onClick="window.print()" style="text-align: right;display: inline-block;cursor: pointer;border: 2px solid #4285f4!important;background-color: transparent!important;color: #4285f4!important;box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);padding: 7px 25px;font-size: .81rem;transition: .2s ease-in-out;margin: .375rem;text-transform: uppercase;">Print</a></div><style>@media print{.noprint{display:none;}}</style>'+data);
     popupWin!.document.close();
     popupWin!.print()
   }
@@ -3711,7 +2332,7 @@ export class CommonFunctionService {
           }
         }
       });
-    }                  
+    }
     return fileList;
   }
   getFirstCharOfString(char:any){
@@ -3725,5 +2346,5 @@ export class CommonFunctionService {
     data[column.field_name].splice(i,1);
     return data[column.field_name];
   }
-  
+
 }

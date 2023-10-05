@@ -33,7 +33,7 @@ constructor(
       }
       modifyRow[column.field_name+"_tooltip"] = this.CommonFunctionService.getValueForGridTooltip(column,row);
       if(column.editable){
-        modifyRow[column.field_name+"_disabled"] = this.isDisable(column,row); 
+        modifyRow[column.field_name+"_disabled"] = this.isDisable(column,row);
         if(column.type == 'file' && editableGridColumns.length > 0) {
           if(row && row[column.field_name] && this.CommonFunctionService.isArray(row[column.field_name]) && row[column.field_name].length > 0) {
             modifyRow[column.field_name] = this.fileHandlerService.modifyUploadFiles(row[column.field_name]);
@@ -219,47 +219,6 @@ constructor(
     }
     return "Search Parameter ...";
   }
-  checkDataAlreadyAddedInListOrNot(primary_key:string,incomingData:any,alreadyDataAddedlist:any){
-    if(alreadyDataAddedlist == undefined){
-      alreadyDataAddedlist = [];
-    }
-    let alreadyExist = "false";
-    if(typeof incomingData == 'object'){
-      alreadyDataAddedlist.forEach((element:any) => {
-        if(element._id == incomingData._id){
-          alreadyExist =  "true";
-        }
-      });
-    }
-    else if(typeof incomingData == 'string'){
-      alreadyDataAddedlist.forEach((element: string) => {
-        if(typeof element == 'string'){
-          if(element == incomingData){
-            alreadyExist =  "true";
-          }
-        }else{
-          if(element[primary_key] == incomingData){
-            alreadyExist =  "true";
-          }
-        }
-
-      });
-    }else{
-      alreadyExist =  "false";
-    }
-    if(alreadyExist == "true"){
-      return true;
-    }else{
-      return false;
-    }
-  }
-  // fieldButtonLabel(field){
-  //   if(field && field.grid_selection_button_label != null && field.grid_selection_button_label != ''){
-  //     return field.grid_selection_button_label;
-  //   }else{
-  //     return field.label;
-  //   }
-  // }
   modifyTableFields(tablefields:any){
 
   }
@@ -433,5 +392,82 @@ constructor(
     }
     return background;
   }
+  modifiedGridColumns(gridColumns:any,selectedRow:any,formValue:any){
+    if(gridColumns.length > 0){
+      gridColumns.forEach((field:any) => {
+        if(this.coreFunctionService.isNotBlank(field.show_if)){
+          if(!this.CommonFunctionService.checkShowIf(field,selectedRow,formValue)){
+            field['display'] = false;
+          }else{
+            field['display'] = true;
+          }
+        }else{
+          field['display'] = true;
+        }
+      });
+    }
+    return gridColumns;
+  }
+  checkGridSelectionMendetory(gridSelectionMendetoryList:any,selectedRow:any,formValue:any,custmizedFormValue:any){
+    let validation = {
+      'status' : true,
+      'msg' : ''
+    }
+    if(gridSelectionMendetoryList && gridSelectionMendetoryList.length > 0){
+      let check = 0;
+      gridSelectionMendetoryList.forEach((field:any) => {
+        let data:any = [];
+        if(custmizedFormValue[field.field_name]){
+          data = custmizedFormValue[field.field_name];
+        }
+        if(field.mendetory_fields && field.mendetory_fields.length > 0){
+          field.mendetory_fields = this.modifiedGridColumns(field.mendetory_fields,selectedRow,formValue)
+          if(data && data.length > 0){
+            field.mendetory_fields.forEach((mField:any) => {
+              const fieldName = mField.field_name;
+              if(mField.display){
+                data.forEach((row:any) => {
+                  if(row && row[fieldName] == undefined || row[fieldName] == '' || row[fieldName] == null){
+                    if(validation.msg == ''){
+                      validation.msg = mField.label + ' of ' + field.label+' is required.';
+                    }
+                    check = 1;
+                  }
+                });
+              }
+            });
+          }
+        }
+      });
+      if(check != 0){
+        validation.status = false;
+        return validation;
+      }else{
+        return validation
+      }
+    }else{
+      return validation;
+    }
+  }
+
+  getGridSelectedData(data:any,field:any){
+    let responce:any ={
+      gridSelectedData:[],
+      customEntryData:[]
+    }
+    if(data && data.length > 0 && field.add_new_enabled){
+      data.forEach((grid:any) => {
+        if(grid && grid.customEntry){
+          responce.customEntryData[field.field_name].push(grid);
+        }else{
+          responce.gridSelectedData.push(grid);
+        }
+      });
+    }else {
+      responce.gridSelectedData = data;
+    }
+    return responce;
+  }
+
 
 }

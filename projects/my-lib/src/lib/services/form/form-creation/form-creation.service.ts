@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { CommonFunctionService } from '../../common-utils/common-function.service';
 import { EnvService } from '../../env/env.service';
 import { FormGroup } from '@angular/forms';
+import { StorageService } from '../../storage/storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,14 +12,62 @@ export class FormCreationService {
   minDate: Date;
   maxDate: Date;
 
-constructor(
-  private commonFunctionService:CommonFunctionService,
-  private envService:EnvService
-) {
-  const currentYear = new Date().getFullYear();
-    this.minDate = new Date(currentYear - 100, 0, 1);
-    this.maxDate = new Date(currentYear + 25, 11, 31);
-}
+  constructor(
+    private commonFunctionService:CommonFunctionService,
+    private envService:EnvService,
+    private storageService:StorageService
+  ) {
+    const currentYear = new Date().getFullYear();
+      this.minDate = new Date(currentYear - 100, 0, 1);
+      this.maxDate = new Date(currentYear + 25, 11, 31);
+  }
+  getTempData(tempData:any,tabIndex:any,currentMenu:any,formName:any,dinamic_form:any){
+    let responce:any={
+      tab:{},
+      currentMenu:currentMenu,
+      grid_view_mode:"",
+      form:{},
+      forms:{}
+    }
+    if(tempData[0].templateTabs){
+      responce.tab = tempData[0].templateTabs[tabIndex];
+    }
+    let tab = responce.tab
+    if (tab && tab.tab_name != "" && tab.tab_name != null && tab.tab_name != undefined) {
+      if(currentMenu && currentMenu.name && currentMenu.name != undefined && currentMenu.name != null){
+        const menu = {"name":tab.tab_name};
+        this.storageService.SetActiveMenu(menu);
+        responce.currentMenu.name = tab.tab_name;
+      }
+    }
+    if(tab  && tab.grid != null && tab.grid != undefined ){
+      if(tab.grid.grid_view != null && tab.grid.grid_view != undefined && tab.grid.grid_view != ''){
+        responce.grid_view_mode=tab.grid.grid_view;
+      }else{
+        responce.grid_view_mode='tableView';
+      }
+    }
+
+    if(tab && formName != ''){
+      if(formName == 'DINAMIC_FORM'){
+        responce.form = dinamic_form
+      }else if(tab.forms != null && tab.forms != undefined ){
+        responce.forms = tab.forms;
+        let gridActionButtons = [];
+        if(tab.grid && tab.grid.action_buttons){
+          gridActionButtons = tab.grid.action_buttons;
+        }
+        responce.form = this.commonFunctionService.getForm(responce.forms,formName,gridActionButtons)
+        if(formName == 'clone_object'){
+          responce.form['api_params'] = "QTMP:CLONE_OBJECT";
+        }
+        //this.setForm();
+      }else{
+        responce.form = {};
+      }
+    }
+    return responce;
+  }
 
   checkFormDetails(form:any,tab:any){
     let responce:any={
@@ -548,7 +597,7 @@ constructor(
         if(field && field.addNewButtonIf && field.addNewButtonIf != ''){
           let modifyedField:any = {};
           modifyedField['show_if'] = field.addNewButtonIf;
-          check = this.showIf(modifyedField,selectedRow,formValue);
+          check = this.commonFunctionService.checkShowIf(modifyedField,selectedRow,formValue);
         }
         break;
       default:
@@ -556,20 +605,7 @@ constructor(
     }
     return check;
   }
-  showIf(field:any,selectedRow:any,formValue:any){
-    const  objectc = selectedRow?selectedRow:{}
-    const object = JSON.parse(JSON.stringify(objectc));
-    if(formValue && typeof formValue == 'object' && Object.keys(formValue).length > 0){
-      Object.keys(formValue).forEach(key => {
-        object[key] = formValue[key];
-      })
-    }
-    const display = this.commonFunctionService.showIf(field,object);
-    const modifiedField = JSON.parse(JSON.stringify(field));
-    modifiedField['display'] = display;
-    field = modifiedField;
-    return display;
-  }
+
   setDefaultDate(element:any){
     let value:any = "";
     let today = new Date();
@@ -588,6 +624,87 @@ constructor(
         break;
     }
     return value;
+  }
+  getFocusField(previousFormFocusField:any,tableFields:any,templateForm:FormGroup,focusFieldParent:any,checkFormFieldAutfocus:any){
+    let responce:any={
+      checkFormFieldAutfocus:checkFormFieldAutfocus,
+      previousFormFocusField:previousFormFocusField,
+      focusFieldParent:focusFieldParent,
+      id:""
+    }
+    if(previousFormFocusField && previousFormFocusField._id){
+      responce = this.focusField("",previousFormFocusField,templateForm,focusFieldParent,checkFormFieldAutfocus,previousFormFocusField,responce)
+    }else{
+      if(previousFormFocusField == undefined || previousFormFocusField._id == undefined){
+        for (const key of tableFields) {
+          if(key.type == "stepper"){
+            if(key.list_of_fields && key.list_of_fields != null && key.list_of_fields.length > 0){
+              for (const step of key.list_of_fields) {
+                if(step.list_of_fields && step.list_of_fields != null && step.list_of_fields.length > 0){
+                  for (const field of step.list_of_fields) {
+                    if (field.field_name) {
+                      responce = this.focusField(step,field,templateForm,focusFieldParent,checkFormFieldAutfocus,previousFormFocusField,responce);
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          }else if (key.field_name) {
+            if(key.type == 'text'){
+              responce = this.focusField("",key,templateForm,focusFieldParent,checkFormFieldAutfocus,previousFormFocusField,responce);
+              break;
+            }else{
+              responce.checkFormFieldAutfocus = false;
+              break;
+            }
+          }
+        }
+      }
+    }
+    return responce;
+  }
+  focusField(parent:any,key:any,templateForm:FormGroup,focusFieldParent:any,checkFormFieldAutfocus:any,previousFormFocusField:any,responce:any){
+    responce.id = key._id + "_" + key.field_name;
+    let field:any = {};
+    if(parent == ''){
+      if(focusFieldParent && focusFieldParent.field_name && focusFieldParent.field_name != ''){
+        parent = focusFieldParent;
+      }
+    }
+    if(parent != ""){
+      field = (<FormGroup>templateForm.controls[parent.field_name]).controls[key.field_name];
+    }else{
+      field = templateForm.controls[key.field_name];
+    }
+    if(field && field.touched){
+      responce.checkFormFieldAutfocus = false;
+      if(previousFormFocusField && previousFormFocusField._id){
+        responce.previousFormFocusField = {};
+        responce.focusFieldParent={};
+      }
+    }else if(field == undefined){
+      responce.previousFormFocusField = {};
+      responce.focusFieldParent={};
+    }
+    return responce;
+  }
+  checkFieldShowOrHide(field:any,showIfFieldList:any){
+    let check = false;
+    for (let index = 0; index < showIfFieldList.length; index++) {
+      const element = showIfFieldList[index];
+      if(element.field_name == field.field_name){
+        if(element.show){
+          check = true;
+          break;
+        }else{
+          check=false;
+          break;
+        }
+      }
+
+    }
+    return check;
   }
 
 }
