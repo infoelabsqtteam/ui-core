@@ -376,8 +376,6 @@ GetExportExclLink(payload:any){
   )
 }
 
-
-
 resetGetExportExclLink(){
   this.dataShareService.setExportExcelLink('');
 }
