@@ -376,7 +376,6 @@ GetExportExclLink(payload:any){
   )
 }
 
-
 GetExportCVSLink(payload:any){
   let api = this.envService.getApi('CSV_EXPORT_GRID_DATA');
   this.http.post(api, payload.data, payload.responce).subscribe(

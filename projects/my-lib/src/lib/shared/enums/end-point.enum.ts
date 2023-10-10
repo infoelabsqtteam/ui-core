@@ -10,7 +10,6 @@ export enum EndPoint {
     GET_COUNT_DATA = "rpts/gd_list",
     GET_TEMPLATE_NAMES = "template/names",
     EXPORT_GRID_DATA = "downloads/excelExport",
-    CSV_EXPORT_GRID_DATA = "downloads/csvExport",
     SAVE_NAVIGATION = "ins/save/navigation",
     SAVE_PERMISSION = "ins/save/permissions",
     GET_STATIC_DATA = "rpts/gsd",
