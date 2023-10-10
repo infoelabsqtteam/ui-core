@@ -917,8 +917,6 @@ export class LimsCalculationsService {
     return templateValue;
   }
 
-
-
   calculate_lims_invoice_extra_amount(templateValue:any, lims_segment:any, calculate_on_field: any) {
     if (calculate_on_field == null || calculate_on_field == '') {
       calculate_on_field = 'items_list';
