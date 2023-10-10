@@ -929,7 +929,7 @@ export class LimsCalculationsService {
     let discount_amount = 0;
     let taxable_amount = 0;
     let net_amount = 0;
-    let extra_amount = 0
+    let extraAmount = 0
 
     if (this.coreFunctionService.isNotBlank(templateValue[calculate_on_field]) && templateValue[calculate_on_field].length > 0) {
       templateValue[calculate_on_field].forEach((element:any) => {
@@ -951,10 +951,10 @@ export class LimsCalculationsService {
         }
 
 
-        if (element && element.extra_amount) {
-          extra_amount = Number(extra_amount) + Number(element.extra_amount)
+        if (element && element.extraAmount) {
+          extraAmount = Number(extraAmount) + Number(element.extraAmount)
         }
-        taxable_amount = net_amount + surcharge + extra_amount;
+        taxable_amount = net_amount + surcharge + extraAmount;
       });
     }
     templateValue = this.update_invoice_totatl_extra_amount(templateValue, gross_amount, discount_amount, discount_percent, net_amount, surcharge, extra_amount, taxable_amount);
@@ -1501,7 +1501,7 @@ export class LimsCalculationsService {
 
 
 
-  update_invoice_totatl_extra_amount(templateValue:any,gross_amount:number,discount_amount:number,discount_percent:any,net_amount:number,surcharge:number,extra_amount:number,taxable_amount:number,field?:any){
+  update_invoice_totatl_extra_amount(templateValue:any,gross_amount:number,discount_amount:number,discount_percent:any,net_amount:number,surcharge:number,extraAmount:number,taxable_amount:number,field?:any){
     let	gst_amount	=0;
     let	cgst_amount	=0;
     let	sgst_amount	=0;
@@ -1576,7 +1576,7 @@ export class LimsCalculationsService {
       total['sez_amount'] = this.getDecimalAmount(sez_amount);
       total['net_amount'] = this.getDecimalAmount(net_amount);
       total['net_payble'] = this.getDecimalAmount(net_payble);
-      total['extra_amount'] = this.getDecimalAmount(extra_amount);
+      total['extraAmount'] = this.getDecimalAmount(extraAmount);
       if(field != null && field.field_name != null && field != ""){
         delete total[field.field_name]
       }
