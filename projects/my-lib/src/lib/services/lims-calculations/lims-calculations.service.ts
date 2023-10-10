@@ -957,7 +957,7 @@ export class LimsCalculationsService {
         taxable_amount = net_amount + surcharge + extraAmount;
       });
     }
-    templateValue = this.update_invoice_totatl_extra_amount(templateValue, gross_amount, discount_amount, discount_percent, net_amount, surcharge, extra_amount, taxable_amount);
+    templateValue = this.update_invoice_totatl_extra_amount(templateValue, gross_amount, discount_amount, discount_percent, net_amount, surcharge, extraAmount, taxable_amount);
     return templateValue;
   }
 
