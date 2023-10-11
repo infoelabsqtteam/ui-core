@@ -949,8 +949,8 @@ export class LimsCalculationsService {
         }
 
 
-        if (element && element.extraAmount) {
-          extraAmount = Number(extraAmount) + Number(element.extraAmount)
+        if (element && element.extra_amount) {
+          extraAmount = Number(extraAmount) + Number(element.extra_amount)
         }
         taxable_amount = net_amount + surcharge + extraAmount;
       });
