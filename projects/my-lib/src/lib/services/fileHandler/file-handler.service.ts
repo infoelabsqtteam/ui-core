@@ -23,8 +23,19 @@ export class FileHandlerService {
           }
         }
       });
-    }                  
+    }
     return fileList;
+  }
+  modifyFileSetValue(files:any){
+    let fileName = '';
+    let fileLength = files.length;
+    let file = files[0];
+    if(fileLength == 1 && (file.fileName || file.rollName)){
+      fileName = file.fileName || file.rollName;
+    }else if(fileLength > 1){
+      fileName = fileLength + " Files";
+    }
+    return fileName;
   }
 
 

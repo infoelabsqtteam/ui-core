@@ -17,7 +17,7 @@ export class FormCreationService {
     private envService:EnvService,
     private storageService:StorageService
   ) {
-    const currentYear = new Date().getFullYear();
+      const currentYear = new Date().getFullYear();
       this.minDate = new Date(currentYear - 100, 0, 1);
       this.maxDate = new Date(currentYear + 25, 11, 31);
   }

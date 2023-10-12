@@ -2346,5 +2346,12 @@ export class CommonFunctionService {
     data[column.field_name].splice(i,1);
     return data[column.field_name];
   }
+  checkObjecOrString(data:any){
+    if(data._id){
+      return data._id;
+    }else{
+      return data;
+    }
+  }
 
 }

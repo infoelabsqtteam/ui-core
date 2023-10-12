@@ -37,5 +37,8 @@ export * from './lib/services/data-share/common-app-data-share/common-app-data-s
 export * from './lib/services/fileHandler/file-handler.service';
 export * from './lib/shared/configuration/editor-config';
 export * from './lib/services/form/form-creation/form-creation.service';
+export * from './lib/services/form/form-value/form-value.service';
+export * from './lib/services/api-call/api-call.service';
+export * from './lib/services/form/form-control/form-control.service';
 
 
