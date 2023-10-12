@@ -507,6 +507,18 @@ export class CommonFunctionService {
     }
     this.modalService.open(modalName, alertData);
   }
+  getValueForDotFieldName(value:any,fieldName:any){
+    let crValue = "";
+    if(typeof value == "string"){
+      crValue = value;
+    }else if(typeof value == "object"){
+      let fName = fieldName.indexOf('.') != -1 ? (fieldName).split('.')[0]:fieldName;
+      let objectValue:any = {};
+      objectValue[fName] =  value
+      crValue = fieldName.indexOf('.') != -1 ?this.getObjectValue(fieldName,objectValue): this.getddnDisplayVal(value);
+    }
+    return crValue;
+  }
 
   getfilterCrlist(headElements:any,formValue:any) {
     const filterList:any = []
@@ -514,49 +526,84 @@ export class CommonFunctionService {
       const criteria:any = [];
       headElements.forEach((element: any) => {
         if(element != null && element.type != null){
-        switch (element.type.toLowerCase()) {
-          case "button":
-          case "text":
-          case "tree_view_selection":
-          case "dropdown":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
-              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0 && element.type != 'dropdown'){
-                element.api_params_criteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else if (element.multi_select && element.datatype == "object"){
-               let fvalue = '';
-               const value = formValue[element.field_name];
-               if(value && value.length > 0){
-                 value.forEach((vl: string, i: number) => {
-                   if((value.length - 1) == i){
-                      fvalue = fvalue + vl;
-                   }else{
-                      fvalue = fvalue + vl + ":";
-                   }
-                 });
-               }
-               filterList.push(
-                {
-                    "fName": element.field_name,
-                    "fValue": fvalue,
-                    "operator": "in"
+          let fieldName = element.field_name;
+          let value = formValue[element.field_name];
+          switch (element.type.toLowerCase()) {
+            case "button":
+            case "text":
+            case "tree_view_selection":
+            case "dropdown":
+              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
+                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0 && element.type != 'dropdown'){
+                  element.api_params_criteria.forEach((cri: any) => {
+                    criteria.push(cri)
+                  });
+                }else if (element.multi_select && element.datatype == "object"){
+                  let fvalue = '';
+                  if(value && value.length > 0){
+                    value.forEach((vl: string, i: number) => {
+                      if((value.length - 1) == i){
+                          fvalue = fvalue + vl;
+                      }else{
+                          fvalue = fvalue + vl + ":";
+                      }
+                    });
                   }
-                )
+                  filterList.push(
+                    {
+                        "fName": fieldName,
+                        "fValue": fvalue,
+                        "operator": "in"
+                      }
+                    )
+                }
+                else{
+                  filterList.push(
+                    {
+                      "fName": fieldName,
+                      "fValue": this.getValueForDotFieldName(value,fieldName),
+                      "operator": "stwic"
+                    }
+                  )
+                }
               }
-              else{
-                filterList.push(
-                  {
-                    "fName": element.field_name,
-                    "fValue": this.getddnDisplayVal(formValue[element.field_name]),
-                    "operator": "stwic"
+              break;
+            case "number":
+                if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
+                  if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+                    element.api_params_criteria.forEach((cri: any) => {
+                      criteria.push(cri)
+                    });
+                  }else{
+                    filterList.push(
+                      {
+                        "fName": fieldName,
+                        "fValue": this.getddnDisplayVal(value),
+                        "operator": "eq"
+                      }
+                    )
                   }
-                )
+                }
+                break;
+            case "typeahead":
+              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
+                if(this.isArray(element.dataFilterCriteria) && element.dataFilterCriteria.length > 0){
+                  element.dataFilterCriteria.forEach((cri: any) => {
+                    criteria.push(cri)
+                  });
+                }else{
+                  filterList.push(
+                    {
+                      "fName": fieldName,
+                      "fValue": this.getValueForDotFieldName(value,fieldName),
+                      "operator": "stwic"
+                    }
+                  )
+                }
               }
-            }
-            break;
-          case "number":
-              if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
+              break;
+            case "info":
+              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
                 if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
                   element.api_params_criteria.forEach((cri: any) => {
                     criteria.push(cri)
@@ -564,120 +611,86 @@ export class CommonFunctionService {
                 }else{
                   filterList.push(
                     {
-                      "fName": element.field_name,
-                      "fValue": this.getddnDisplayVal(formValue[element.field_name]),
+                      "fName": fieldName,
+                      "fValue": this.getddnDisplayVal(value),
+                      "operator": "stwic"
+                    }
+                  )
+                }
+              }
+              break;
+              case "reference_names":
+              case "chips":
+              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
+                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+                  element.api_params_criteria.forEach((cri: any) => {
+                    criteria.push(cri)
+                  });
+                }else{
+                  filterList.push(
+                    {
+                      "fName": fieldName+".name",
+                      "fValue": this.getddnDisplayVal(value),
+                      "operator": "stwic"
+                    }
+                  )
+                }
+              }
+              break;
+            case "date":
+            case "datetime":
+              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
+                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+                  element.api_params_criteria.forEach((cri: any) => {
+                    criteria.push(cri)
+                  });
+                }else{
+                  filterList.push(
+                    {
+                      "fName": fieldName,
+                      "fValue": this.dateFormat(value),
                       "operator": "eq"
                     }
                   )
                 }
               }
               break;
-          case "typeahead":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
-              if(this.isArray(element.dataFilterCriteria) && element.dataFilterCriteria.length > 0){
-                element.dataFilterCriteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else{
-                filterList.push(
-                  {
-                    "fName": element.field_name,
-                    "fValue": this.getddnDisplayVal(formValue[element.field_name]),
-                    "operator": "stwic"
-                  }
-                )
+            case "daterange":
+              if(formValue && formValue[fieldName] && formValue[fieldName].start != '' && formValue[fieldName].end != null){
+                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+                  element.api_params_criteria.forEach((cri: any) => {
+                    criteria.push(cri)
+                  });
+                }else{
+                  filterList.push(
+                    {
+                      "fName": fieldName,
+                      "fValue": this.dateFormat(value.start),
+                      "operator": "gte"
+                    }
+                  )
+                }
               }
-            }
-            break;
-          case "info":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
-              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                element.api_params_criteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else{
-                filterList.push(
-                  {
-                    "fName": element.field_name,
-                    "fValue": this.getddnDisplayVal(formValue[element.field_name]),
-                    "operator": "stwic"
-                  }
-                )
+              if(formValue && formValue[fieldName] && formValue[fieldName].end != '' && formValue[fieldName].end != null){
+                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+                  element.api_params_criteria.forEach((cri: any) => {
+                    criteria.push(cri)
+                  });
+                }else{
+                  filterList.push(
+                    {
+                      "fName": fieldName,
+                      "fValue": this.dateFormat(value.end),
+                      "operator": "lte"
+                    }
+                  )
+                }
               }
-            }
-            break;
-            case "reference_names":
-            case "chips":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
-              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                element.api_params_criteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else{
-                filterList.push(
-                  {
-                    "fName": element.field_name+".name",
-                    "fValue": this.getddnDisplayVal(formValue[element.field_name]),
-                    "operator": "stwic"
-                  }
-                )
-              }
-            }
-            break;
-          case "date":
-          case "datetime":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
-              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                element.api_params_criteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else{
-                filterList.push(
-                  {
-                    "fName": element.field_name,
-                    "fValue": this.dateFormat(formValue[element.field_name]),
-                    "operator": "eq"
-                  }
-                )
-              }
-            }
-            break;
-          case "daterange":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name].start != '' && formValue[element.field_name].end != null){
-              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                element.api_params_criteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else{
-                filterList.push(
-                  {
-                    "fName": element.field_name,
-                    "fValue": this.dateFormat(formValue[element.field_name].start),
-                    "operator": "gte"
-                  }
-                )
-              }
-            }
-            if(formValue && formValue[element.field_name] && formValue[element.field_name].end != '' && formValue[element.field_name].end != null){
-              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                element.api_params_criteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else{
-                filterList.push(
-                  {
-                    "fName": element.field_name,
-                    "fValue": this.dateFormat(formValue[element.field_name].end),
-                    "operator": "lte"
-                  }
-                )
-              }
-            }
-            break;
-          default:
-            break;
+              break;
+            default:
+              break;
+          }
         }
-      }
       });
       if(criteria && criteria.length > 0){
         const crList = this.getCriteriaList(criteria,formValue);
@@ -1468,7 +1481,6 @@ export class CommonFunctionService {
     netAmount = total - percentAmount;
     return { p_amount: percentAmount, net_amount: netAmount }
   }
-
 
   claimAmountCalculation(field1:any, field2:any, field3:any) {
     let total = 0;
