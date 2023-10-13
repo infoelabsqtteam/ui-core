@@ -706,5 +706,33 @@ export class FormCreationService {
     }
     return check;
   }
+  getDonotResetFields(tableFields:any,donotResetFieldLists:any,FormValue:any){
+    tableFields.forEach((tablefield:any) => {
+      if(tablefield.do_not_refresh_on_add && tablefield.type != "list_of_fields" && tablefield.type != "group_of_fields" && tablefield.type != "stepper"){
+        donotResetFieldLists[tablefield.field_name] = FormValue[tablefield.field_name];
+      }else if(tablefield.type == "group_of_fields"){
+        if(tablefield.list_of_fields && tablefield.list_of_fields.length > 0){
+          tablefield.list_of_fields.forEach((field:any) => {
+            if(field.do_not_refresh_on_add){
+              donotResetFieldLists[tablefield.field_name][field.field_name] = FormValue[tablefield.field_name][field.field_name];
+            }
+          });
+        }
+      }else if(tablefield.type == "stepper"){
+        if(tablefield.list_of_fields && tablefield.list_of_fields.length > 0){
+          tablefield.list_of_fields.forEach((step:any) => {
+            if(step.list_of_fields && step.list_of_fields.length > 0){
+              step.list_of_fields.forEach((field:any) => {
+                if(field.do_not_refresh_on_add){
+                  donotResetFieldLists[step.field_name][field.field_name] = FormValue[step.field_name][field.field_name];
+                }
+              });
+            }
+          });
+        }
+      }
+    });
+    return donotResetFieldLists;
+  }
 
 }

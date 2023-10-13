@@ -113,5 +113,14 @@ export class ApiCallService {
     }
     return staticModal;
   }
+  getOnClickLoadDataPayloads(field:any,multipleFormCollection:any,formValue:any,formValueWithCustomData:any){
+    let api_params = field.onClickApiParams;
+    let callBackfield = field.onClickCallBackField;
+    let criteria = field.onClickApiParamsCriteria
+    const payload = this.commonFunctionService.getPaylodWithCriteria(api_params,callBackfield,criteria,formValue);
+    let payloads = [];
+    payloads.push(this.commonFunctionService.checkQtmpApi(api_params,field,payload,multipleFormCollection,formValue,formValueWithCustomData));
+    return payloads;
+  }
 
 }

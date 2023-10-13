@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
-import { CommonFunctionService } from '../common-utils/common-function.service';
-import { FileHandlerService } from '../fileHandler/file-handler.service';
+import { CoreFunctionService } from '../../common-utils/core-function/core-function.service';
+import { CommonFunctionService } from '../../common-utils/common-function.service';
+import { FileHandlerService } from '../../fileHandler/file-handler.service';
 @Injectable({
   providedIn: 'root'
 })

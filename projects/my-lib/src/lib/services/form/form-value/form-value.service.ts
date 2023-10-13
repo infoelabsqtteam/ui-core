@@ -5,7 +5,7 @@ import { PermissionService } from '../../permission/permission.service';
 import { EnvService } from '../../env/env.service';
 import { CommonFunctionService } from '../../common-utils/common-function.service';
 import { StorageService } from '../../storage/storage.service';
-import { GridCommonFunctionService } from '../../grid-common-function/grid-common-function.service';
+import { GridCommonFunctionService } from '../../grid/grid-common-function/grid-common-function.service';
 
 @Injectable({
   providedIn: 'root'
