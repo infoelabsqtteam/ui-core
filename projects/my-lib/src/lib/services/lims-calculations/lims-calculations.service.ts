@@ -916,6 +916,49 @@ export class LimsCalculationsService {
     templateValue = this.update_invoice_totatl(templateValue, gross_amount, discount_amount, discount_percent, net_amount, surcharge, taxable_amount);
     return templateValue;
   }
+
+  calculate_lims_invoice_extra_amount(templateValue:any, lims_segment:any, calculate_on_field: any) {
+    if (calculate_on_field == null || calculate_on_field == '') {
+      calculate_on_field = 'items_list';
+    }
+    let surcharge = 0;
+    let gross_amount = 0;
+    let discount_percent = 0;
+    let discount_amount = 0;
+    let taxable_amount = 0;
+    let net_amount = 0;
+    let extraAmount = 0
+
+    if (this.coreFunctionService.isNotBlank(templateValue[calculate_on_field]) && templateValue[calculate_on_field].length > 0) {
+      templateValue[calculate_on_field].forEach((element:any) => {
+        if (this.coreFunctionService.isNotBlank(element.total)) {
+          // gross_amount=gross_amount+element.gross_amount
+          gross_amount = gross_amount + element.total
+        }
+        if (this.coreFunctionService.isNotBlank(element.sampling_charge)) {
+          // surcharge=surcharge+element.surcharge
+          surcharge = surcharge + element.sampling_charge
+        }
+        if (this.coreFunctionService.isNotBlank(element.discount_amount)) {
+          discount_amount = discount_amount + element.discount_amount
+        }
+        if (this.coreFunctionService.isNotBlank(element.net_amount)) {
+          net_amount = net_amount + element.net_amount
+        } else {
+          net_amount = net_amount + element.total
+        }
+
+
+        if (element && element.extra_amount) {
+          extraAmount = Number(extraAmount) + Number(element.extra_amount)
+        }
+        taxable_amount = net_amount + surcharge + extraAmount;
+      });
+    }
+    templateValue = this.update_invoice_totatl_extra_amount(templateValue, gross_amount, discount_amount, discount_percent, net_amount, surcharge, extraAmount, taxable_amount);
+    return templateValue;
+  }
+
   getPercent(templateValue:any, parent:any, field:any) {
     const calculateValue:any = {};
     if (field && field.calSourceTarget && field.calSourceTarget.length >= 1) {
@@ -1168,6 +1211,71 @@ export class LimsCalculationsService {
 
   }
 
+  calculate_quotation_for_lims(templateValue:any, lims_segment:any, field: any) {
+    var total = 0;
+    let discount_percent = 0;
+    let net_amount = 0;
+    let sampling_amount = 0;
+    let final_amount = 0;
+    let discount_amount = 0;
+    let quotation_param_methods = [];
+    let unit_price:any = 0;
+    let paramArray:any = [];
+    let gross_amount = 0;
+    let field_name = field.field_name;
+    let qty = 0;
+    let product_wise_pricing = templateValue['product_wise_pricing'];
+    let current_disount = 0;
+    if (this.coreFunctionService.isNotBlank(templateValue['discount_percent'])) {
+      current_disount = templateValue['discount_percent'];
+    }
+
+    if (this.coreFunctionService.isNotBlank(templateValue.qty)) {
+      qty = templateValue.qty;
+    }
+
+    if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
+      templateValue['quotation_param_methods'].forEach((element:any) => {
+        let data = { ...element };
+        paramArray.push(data);
+      });
+    }
+
+    // if(gross_amount>0){
+    if (true) {
+      discount_amount = 0;
+      net_amount = 0;
+      if (paramArray.length > 0) {
+        paramArray.forEach((data:any) => {
+          data['qty'] = qty;
+          this.calculateParameterLimsSegmentWise(lims_segment, data, field_name);
+          gross_amount = gross_amount + data['total'];
+          net_amount = net_amount + data['net_amount'];
+          discount_amount = discount_amount + data['discount_amount'];
+        });
+      }
+      if (product_wise_pricing) {
+        unit_price = templateValue["unit_price"];
+        net_amount = unit_price * qty;
+        discount_amount = gross_amount - net_amount;
+        discount_percent = this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
+        if (paramArray.length > 0) {
+          paramArray.forEach((data:any) => {
+            data['discount_percent'] = discount_percent;
+            this.calculateParameterLimsSegmentWise(lims_segment, data, "unit_price");
+          });
+        }
+      }
+    }
+    templateValue['total'] = gross_amount;
+    templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
+    templateValue['net_amount'] = this.getDecimalAmount(net_amount);
+    templateValue['discount_percent'] = this.getDecimalAmount(discount_percent);
+    templateValue['unit_price'] = unit_price;
+    return templateValue;
+
+  }
+
 
   calculateParameterLimsSegmentWise(lims_segment: any, data: any, fieldName: string) {
     switch (lims_segment) {
@@ -1379,6 +1487,94 @@ export class LimsCalculationsService {
       total['net_amount'] = this.getDecimalAmount(net_amount);
       total['net_payble'] = this.getDecimalAmount(net_payble);
 
+      if(field != null && field.field_name != null && field != ""){
+        delete total[field.field_name]
+      }
+      templateValue = {};
+      templateValue['total_amount'] = total;
+      return templateValue;
+
+  }
+
+
+
+
+  update_invoice_totatl_extra_amount(templateValue:any,gross_amount:number,discount_amount:number,discount_percent:any,net_amount:number,surcharge:number,extraAmount:number,taxable_amount:number,field?:any){
+    let	gst_amount	=0;
+    let	cgst_amount	=0;
+    let	sgst_amount	=0;
+    let	igst_amount	=0;
+    let	tax_amount	=0;
+    let	sez_amount	=0;
+
+    let	net_payble	=0;
+
+    let	igst_percent	=0;
+    let	gst_percent	=0;
+    let	sez_percent	=0;
+    let cgst_percent=0;
+    let sgst_percent=0;
+    let tax_percentage = 0;
+    let tax_type = templateValue['tax_type'];
+
+    if(this.coreFunctionService.isNotBlank(templateValue.tax_percentage)){
+      tax_percentage = templateValue.tax_percentage;
+    }
+
+    if((tax_type==null || tax_type==undefined || tax_type=='NA') && tax_percentage==0)
+    {
+      net_payble = taxable_amount;
+    }
+    else
+    {
+      switch(tax_type){
+        case "GST" :
+         gst_amount = taxable_amount * tax_percentage/100;
+         gst_percent=tax_percentage;
+         cgst_percent = gst_percent/2;
+         sgst_percent= gst_percent/2;
+         cgst_amount = gst_amount/2;
+         sgst_amount = gst_amount/2;
+         net_payble = taxable_amount+gst_amount;
+         tax_amount=gst_amount;
+         igst_amount=0;
+         igst_percent=0;
+
+          break;
+        case "IGST" :
+          igst_amount = taxable_amount * tax_percentage/100;
+          igst_percent=tax_percentage;
+          net_payble = taxable_amount+igst_amount;
+          tax_amount=igst_amount;
+          break;
+          default :
+
+    }
+    }
+      if(gross_amount>0){
+        discount_percent = this.getDecimalAmount(100*discount_amount/gross_amount);
+      }
+      let total:any ={};
+      total['surcharge'] = this.getDecimalAmount(surcharge);
+      total['igst_percent'] = this.getDecimalAmount(igst_percent);
+      total['gst_percent'] = this.getDecimalAmount(gst_percent);
+      total['cgst_percent'] = this.getDecimalAmount(cgst_percent);
+      total['sgst_percent'] = this.getDecimalAmount(sgst_percent);
+
+      total['sez_percent'] = this.getDecimalAmount(sez_percent);
+      total['gross_amount'] = this.getDecimalAmount(gross_amount);
+      total['discount_percent'] = this.getDecimalAmount(discount_percent);
+      total['discount_amount'] = this.getDecimalAmount(discount_amount);
+      total['taxable_amount'] = this.getDecimalAmount(taxable_amount);
+      total['gst_amount'] = this.getDecimalAmount(gst_amount);
+      total['cgst_amount'] = this.getDecimalAmount(cgst_amount);
+      total['sgst_amount'] = this.getDecimalAmount(sgst_amount);
+      total['igst_amount'] = this.getDecimalAmount(igst_amount);
+      total['tax_amount'] = this.getDecimalAmount(tax_amount);
+      total['sez_amount'] = this.getDecimalAmount(sez_amount);
+      total['net_amount'] = this.getDecimalAmount(net_amount);
+      total['net_payble'] = this.getDecimalAmount(net_payble);
+      total['extraAmount'] = this.getDecimalAmount(extraAmount);
       if(field != null && field.field_name != null && field != ""){
         delete total[field.field_name]
       }

@@ -21,11 +21,11 @@ export class CommonFunctionService {
   itemNumOfGrid: any = Common.ITEM_NUM_OF_GRID;
 
   constructor(
-    private formBuilder: FormBuilder, 
-    private storageService: StorageService, 
-    private modalService: ModelService, 
-    private datePipe: DatePipe, 
-    private CurrencyPipe: CurrencyPipe, 
+    private formBuilder: FormBuilder,
+    private storageService: StorageService,
+    private modalService: ModelService,
+    private datePipe: DatePipe,
+    private CurrencyPipe: CurrencyPipe,
     private customvalidationService:CustomvalidationService,
     private notificationService:NotificationService,
     private apiService:ApiService,
@@ -69,7 +69,7 @@ export class CommonFunctionService {
             switch (field.api_call_name) {
               case "gst_number":
                 forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
-                break;            
+                break;
               default:
                 forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
                 break;
@@ -80,12 +80,12 @@ export class CommonFunctionService {
             switch (field.datatype) {
               case 'object':
                 forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidData.bind(this.customvalidationService))
-                break;            
+                break;
               default:
                 forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
                 break;
             }
-            break;       
+            break;
           default:
             forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
             break;
@@ -127,15 +127,15 @@ export class CommonFunctionService {
           validator.push(Validators.email);
           break;
         default:
-          break; 
+          break;
       }
-    }    
+    }
     if (field.min_length != undefined && field.min_length != null && field.min_length != '' && Number(field.min_length) && field.min_length > 0) {
       validator.push(Validators.minLength(field.min_length))
     }
     if(field.max_length != undefined && field.max_length != null && field.max_length != '' && Number(field.max_length) && field.max_length > 0){
       validator.push(Validators.maxLength(field.max_length))
-    }       
+    }
     return validator;
   }
 
@@ -169,13 +169,13 @@ export class CommonFunctionService {
         crList.forEach((element: any) => {
           staticModal.crList.push(element);
         });
-      }      
-    }    
+      }
+    }
     return staticModal;
   }
   getTabsCountPyload(tabs:any){
     let payloads:any = [];
-    if(tabs && tabs.length >= 1 ){      
+    if(tabs && tabs.length >= 1 ){
       tabs.forEach((element: any) => {
         let grid_api_params_criteria = [];
         if(this.isGridFieldExist(element,"api_params_criteria")){
@@ -184,14 +184,14 @@ export class CommonFunctionService {
         const payload = this.getPaylodWithCriteria(element.tab_name,element.tab_name+"_"+element.name,grid_api_params_criteria,{});
         payload['countOnly'] = true;
         payloads.push(payload);
-      }); 
+      });
     }
     if(payloads && payloads.length > 0){
       this.apiService.getGridCountData(payloads);
-    } 
+    }
   }
   getCriteriaList(criteria:any,object:any){
-    const crList:any = [];    
+    const crList:any = [];
     criteria.forEach((element: string) => {
       const criteria = element.split(";");
       const fValue = criteria[2]
@@ -265,7 +265,7 @@ export class CommonFunctionService {
     condition = data.split('#');
     if (condition.length == 4 && condition[3] != 'dynamic' && condition[3] != 'STATIC') {
       let check = "";
-      let checkList = [];      
+      let checkList = [];
       let setValue = formValue ? this.getObjectValue(condition[0], formValue) : "";
       if(setValue && setValue.length > 0){
         for (let index = 0; index < setValue.length; index++) {
@@ -279,14 +279,14 @@ export class CommonFunctionService {
                 check = check + conditons + '#';
               }else if(index == 2){
                 check = check + conditons + '#STATIC';
-              }        
+              }
             }
             checkList.push(check);
             check = "";
           }else{
             return false;
           }
-        }        
+        }
       }else{
         return false;
       }
@@ -308,7 +308,7 @@ export class CommonFunctionService {
 
   }
   //   calculateAdditionalCost(obj:any){
-    
+
   //   let list = obj['additional_cost'];
   //   let sum = 0;
   //   let net_amt = obj['net_amount'];
@@ -317,12 +317,12 @@ export class CommonFunctionService {
   //       sum += +(element.amount);
   //     });
   //   }
-    
+
 
   //   let final_amt = sum+net_amt;
   //   obj['sampling_charge'] = sum;
   //   obj['final_amount'] = final_amt;
-    
+
   //  return obj;
 
   // }
@@ -335,7 +335,7 @@ export class CommonFunctionService {
       if (tableField.disable_if && tableField.disable_if != '') {
         return this.checkIfCondition(tableField.disable_if, formValue)
       }
-     
+
       if (updateMode) {
         if (tableField.disable_on_update != undefined && tableField.disable_on_update) {
           return this.checkAddUpdateIf(tableField,'can_update_if');
@@ -397,7 +397,7 @@ export class CommonFunctionService {
         setValue = condition[0];
       }else{
         setValue = formValue ? this.getObjectValue(condition[0], formValue) : "";
-      }      
+      }
       if (setValue === undefined || setValue === "") {
         setValue = "";
       } else {
@@ -408,7 +408,7 @@ export class CommonFunctionService {
           case "date":
             setValue = this.dateFormat(setValue);
             condition[2] = this.dateFormat(condition[2]);
-            break;        
+            break;
           default:
             break;
         }
@@ -434,8 +434,8 @@ export class CommonFunctionService {
             } else {
               return false;
             }
-      
-       
+
+
         case 'gte':
           return parseFloat(setValue) >= parseFloat(condition[2]);
         case 'lte':
@@ -499,56 +499,103 @@ export class CommonFunctionService {
     }
     this.modalService.open(modalName, alertData);
   }
+  getValueForDotFieldName(value:any,fieldName:any){
+    let crValue = "";
+    if(typeof value == "string"){
+      crValue = value;
+    }else if(typeof value == "object"){
+      let fName = fieldName.indexOf('.') != -1 ? (fieldName).split('.')[0]:fieldName;
+      let objectValue:any = {};
+      objectValue[fName] =  value
+      crValue = fieldName.indexOf('.') != -1 ?this.getObjectValue(fieldName,objectValue): this.getddnDisplayVal(value);
+    }
+    return crValue;
+  }
 
   getfilterCrlist(headElements:any,formValue:any) {
     const filterList:any = []
     if(formValue != undefined){
       const criteria:any = [];
-      headElements.forEach((element: any) => {  
-        if(element != null && element.type != null){      
-        switch (element.type.toLowerCase()) {
-          case "button":
-          case "text":
-          case "tree_view_selection":
-          case "dropdown":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){              
-              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0 && element.type != 'dropdown'){
-                element.api_params_criteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else if (element.multi_select && element.datatype == "object"){
-               let fvalue = '';
-               const value = formValue[element.field_name];
-               if(value && value.length > 0){
-                 value.forEach((vl: string, i: number) => {
-                   if((value.length - 1) == i){
-                      fvalue = fvalue + vl;
-                   }else{
-                      fvalue = fvalue + vl + ":";
-                   }
-                 });
-               }
-               filterList.push(
-                {
-                    "fName": element.field_name,
-                    "fValue": fvalue,
-                    "operator": "in"
+      headElements.forEach((element: any) => {
+        if(element != null && element.type != null){
+          let fieldName = element.field_name;
+          let value = formValue[element.field_name];
+          switch (element.type.toLowerCase()) {
+            case "button":
+            case "text":
+            case "tree_view_selection":
+            case "dropdown":
+              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
+                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0 && element.type != 'dropdown'){
+                  element.api_params_criteria.forEach((cri: any) => {
+                    criteria.push(cri)
+                  });
+                }else if (element.multi_select && element.datatype == "object"){
+                  let fvalue = '';
+                  if(value && value.length > 0){
+                    value.forEach((vl: string, i: number) => {
+                      if((value.length - 1) == i){
+                          fvalue = fvalue + vl;
+                      }else{
+                          fvalue = fvalue + vl + ":";
+                      }
+                    });
                   }
-                )
+                  filterList.push(
+                    {
+                        "fName": fieldName,
+                        "fValue": fvalue,
+                        "operator": "in"
+                      }
+                    )
+                }
+                else{
+                  filterList.push(
+                    {
+                      "fName": fieldName,
+                      "fValue": this.getValueForDotFieldName(value,fieldName),
+                      "operator": "stwic"
+                    }
+                  )
+                }
               }
-              else{
-                filterList.push(
-                  {
-                    "fName": element.field_name,
-                    "fValue": this.getddnDisplayVal(formValue[element.field_name]),
-                    "operator": "stwic"
+              break;
+            case "number":
+                if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
+                  if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+                    element.api_params_criteria.forEach((cri: any) => {
+                      criteria.push(cri)
+                    });
+                  }else{
+                    filterList.push(
+                      {
+                        "fName": fieldName,
+                        "fValue": this.getddnDisplayVal(value),
+                        "operator": "eq"
+                      }
+                    )
                   }
-                )
+                }
+                break;
+            case "typeahead":
+              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
+                if(this.isArray(element.dataFilterCriteria) && element.dataFilterCriteria.length > 0){
+                  element.dataFilterCriteria.forEach((cri: any) => {
+                    criteria.push(cri)
+                  });
+                }else{
+                  filterList.push(
+                    {
+                      "fName": fieldName,
+                      "fValue": this.getValueForDotFieldName(value,fieldName),
+                      "operator": "stwic"
+                    }
+                  )
+                }
               }
-            }
-            break;
-          case "number":
-              if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){              
+              break;
+            case "info":
+              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
                 if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
                   element.api_params_criteria.forEach((cri: any) => {
                     criteria.push(cri)
@@ -556,120 +603,86 @@ export class CommonFunctionService {
                 }else{
                   filterList.push(
                     {
-                      "fName": element.field_name,
-                      "fValue": this.getddnDisplayVal(formValue[element.field_name]),
+                      "fName": fieldName,
+                      "fValue": this.getddnDisplayVal(value),
+                      "operator": "stwic"
+                    }
+                  )
+                }
+              }
+              break;
+              case "reference_names":
+              case "chips":
+              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
+                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+                  element.api_params_criteria.forEach((cri: any) => {
+                    criteria.push(cri)
+                  });
+                }else{
+                  filterList.push(
+                    {
+                      "fName": fieldName+".name",
+                      "fValue": this.getddnDisplayVal(value),
+                      "operator": "stwic"
+                    }
+                  )
+                }
+              }
+              break;
+            case "date":
+            case "datetime":
+              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
+                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+                  element.api_params_criteria.forEach((cri: any) => {
+                    criteria.push(cri)
+                  });
+                }else{
+                  filterList.push(
+                    {
+                      "fName": fieldName,
+                      "fValue": this.dateFormat(value),
                       "operator": "eq"
                     }
                   )
                 }
               }
               break;
-          case "typeahead":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){ 
-              if(this.isArray(element.dataFilterCriteria) && element.dataFilterCriteria.length > 0){
-                element.dataFilterCriteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else{
-                filterList.push(
-                  {
-                    "fName": element.field_name,
-                    "fValue": this.getddnDisplayVal(formValue[element.field_name]),
-                    "operator": "stwic"
-                  }
-                )
+            case "daterange":
+              if(formValue && formValue[fieldName] && formValue[fieldName].start != '' && formValue[fieldName].end != null){
+                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+                  element.api_params_criteria.forEach((cri: any) => {
+                    criteria.push(cri)
+                  });
+                }else{
+                  filterList.push(
+                    {
+                      "fName": fieldName,
+                      "fValue": this.dateFormat(value.start),
+                      "operator": "gte"
+                    }
+                  )
+                }
               }
-            }
-            break;
-          case "info":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){              
-              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                element.api_params_criteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else{
-                filterList.push(
-                  {
-                    "fName": element.field_name,
-                    "fValue": this.getddnDisplayVal(formValue[element.field_name]),
-                    "operator": "stwic"
-                  }
-                )
+              if(formValue && formValue[fieldName] && formValue[fieldName].end != '' && formValue[fieldName].end != null){
+                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
+                  element.api_params_criteria.forEach((cri: any) => {
+                    criteria.push(cri)
+                  });
+                }else{
+                  filterList.push(
+                    {
+                      "fName": fieldName,
+                      "fValue": this.dateFormat(value.end),
+                      "operator": "lte"
+                    }
+                  )
+                }
               }
-            }
-            break;
-            case "reference_names":
-            case "chips":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){              
-              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                element.api_params_criteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else{
-                filterList.push(
-                  {
-                    "fName": element.field_name+".name",
-                    "fValue": this.getddnDisplayVal(formValue[element.field_name]),
-                    "operator": "stwic"
-                  }
-                )
-              }
-            }
-            break;
-          case "date":
-          case "datetime":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name] != ''){
-              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                element.api_params_criteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else{
-                filterList.push(
-                  {
-                    "fName": element.field_name,
-                    "fValue": this.dateFormat(formValue[element.field_name]),
-                    "operator": "eq"
-                  }
-                )
-              }
-            }
-            break;
-          case "daterange":
-            if(formValue && formValue[element.field_name] && formValue[element.field_name].start != '' && formValue[element.field_name].end != null){              
-              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                element.api_params_criteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else{
-                filterList.push(
-                  {
-                    "fName": element.field_name,
-                    "fValue": this.dateFormat(formValue[element.field_name].start),
-                    "operator": "gte"
-                  }
-                ) 
-              }          
-            }
-            if(formValue && formValue[element.field_name] && formValue[element.field_name].end != '' && formValue[element.field_name].end != null){
-              if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                element.api_params_criteria.forEach((cri: any) => {
-                  criteria.push(cri)
-                });
-              }else{
-                filterList.push(
-                  {
-                    "fName": element.field_name,
-                    "fValue": this.dateFormat(formValue[element.field_name].end),
-                    "operator": "lte"
-                  }
-                )
-              }
-            }
-            break;
-          default:
-            break;
+              break;
+            default:
+              break;
+          }
         }
-      }
       });
       if(criteria && criteria.length > 0){
         const crList = this.getCriteriaList(criteria,formValue);
@@ -700,16 +713,16 @@ export class CommonFunctionService {
           if(element.api_params_criteria && element.api_params_criteria != ''){
             criteria =  element.api_params_criteria;
           }
-          staticModal = this.getPaylodWithCriteria(element.api_params,call_back_field,criteria,object?object:{});  
+          staticModal = this.getPaylodWithCriteria(element.api_params,call_back_field,criteria,object?object:{});
           if(element.adkey && element.adkey != '' && element.adkey != null){
             staticModal['adkeys'] = element.adkey;
             staticModalGroup.push(staticModal);
           }else{
             staticModalGroup.push(staticModal);
-          }      
-          
+          }
+
         }
-        
+
       });
     }
 
@@ -724,19 +737,19 @@ export class CommonFunctionService {
           if(element.api_params_criteria && element.api_params_criteria != ''){
             criteria =  element.api_params_criteria;
           }
-          const staticModal = this.getPaylodWithCriteria(element.api_params,call_back_field,criteria,object?object:{});        
-          
+          const staticModal = this.getPaylodWithCriteria(element.api_params,call_back_field,criteria,object?object:{});
+
           staticModalGroup.push(staticModal);
         }
       });
     }
 
     if(tableField.length > 0){
-      
+
       tableField.forEach((element:any) => {
         let call_back_field =  '';
         let criteria = [];
-        if (element.api_params && element.api_params != '' && element.type != "typeahead") {          
+        if (element.api_params && element.api_params != '' && element.type != "typeahead") {
           if(element.call_back_field && element.call_back_field != ''){
             call_back_field =  element.call_back_field;
           }
@@ -749,7 +762,7 @@ export class CommonFunctionService {
           }
           staticModalGroup.push(staticModal);
         }
-        switch (element.type) {            
+        switch (element.type) {
           case "list_of_fields":
           case "group_of_fields":
             if (element.list_of_fields && element.list_of_fields.length > 0) {
@@ -813,9 +826,9 @@ export class CommonFunctionService {
     }
     if(fields.field_class && field.field_class != ''){
       return fields.field_class;
-    }    
+    }
     switch (fields.type) {
-      case "list_of_checkbox":        
+      case "list_of_checkbox":
       case "list_of_fields":
       case "html":
       case "label":
@@ -823,12 +836,12 @@ export class CommonFunctionService {
       case "tabular_data_selector":
       case "group_of_fields":
         return "col-lg-12";
-      default: 
+      default:
         if(fieldsLangth <= 5){
           return "col-lg-12";
         }else if(fieldsLangth <= 10){
           return "col-lg-6";
-        }else{       
+        }else{
           return "col-lg-3";
         }
     }
@@ -845,7 +858,7 @@ export class CommonFunctionService {
   }
 
   getButtonDivClass(field:any){
-    const fields = {...field}    
+    const fields = {...field}
     if(fields.field_class && field.field_class != ''){
       return fields.field_class;
     }
@@ -865,14 +878,14 @@ export class CommonFunctionService {
     // while(matcher.find){
       listMatches.push(matcher[2]);
     // }
-   
+
     listMatches.forEach(element => {
       let valueObj = null;
       let details = matcher[2];
       let valueString = this.getStringValue(details, ja);
       template = template.replace("[" + matcher[2] + "]", valueString);
     });
-   
+
     return template;
   }
 
@@ -910,7 +923,7 @@ export class CommonFunctionService {
           }
         }
         return returnValue
-      case 'date': 
+      case 'date':
         if(value && value != ''){
           if(this.storageService.checkPlatForm() == 'mobile'){
             returnValue =  this.datePipe.transform(value, 'mediumDate');
@@ -940,7 +953,7 @@ export class CommonFunctionService {
           return '<span class="material-icons cursor-pointer">preview</span>';
         } else {
           return '-';
-        }        
+        }
       case "file":
         if (value && value != '') {
           if(this.storageService.checkPlatForm() == 'mobile'){
@@ -987,7 +1000,7 @@ export class CommonFunctionService {
               return stringObject[0]
             }else{
               return value;
-            } 
+            }
           }else{
             return value;
           }
@@ -1046,7 +1059,7 @@ export class CommonFunctionService {
       case 'time': return this.datePipe.transform(value, 'h:mm a');
       case "boolean": return value ? "Yes" : "No";
       case "currency": return this.CurrencyPipe.transform(value, 'INR');
-      case "info": 
+      case "info":
       case "file":
       case "template":
       case "image":
@@ -1075,20 +1088,20 @@ export class CommonFunctionService {
   }
   sanitizeObject(tableFields:any, formValue:any, validatField:any,formValueWithCust?:any) {
     for (let index = 0; index < tableFields.length; index++) {
-      const element = tableFields[index];  
-      if(element.type != 'list_of_fields' && element.type != 'group_of_fields'){  
+      const element = tableFields[index];
+      if(element.type != 'list_of_fields' && element.type != 'group_of_fields'){
         switch (element.datatype) {
           case "list_of_object":
           case "list_of_object_with_popup":
           case "chips":
           case "chips_with_mask":
-            if(validatField){            
+            if(validatField){
               if(formValue[element.field_name] != "" && formValue[element.field_name] != null &&  !this.isArray(formValue[element.field_name])){
                 return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
               }else if(this.applicableForValidation(element) && !this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length <= 0){
                 return {'msg':'Please Enter '+ element.label + '. !!!'}
               }
-            }else if (formValue[element.field_name] == "" && !this.isArray(formValue[element.field_name])) {     
+            }else if (formValue[element.field_name] == "" && !this.isArray(formValue[element.field_name])) {
               formValue[element.field_name] = null;
             }
             break;
@@ -1143,7 +1156,7 @@ export class CommonFunctionService {
                 if(typeof formValueWithCust[element.field_name] != 'object' || Object.keys(formValueWithCust[element.field_name]).length <= 0){
                   return {'msg': element.label + ' is required.'}
                 }
-              }             
+              }
             }
           }else{
             if (!this.isArray(formValue[element.field_name]) || formValue[element.field_name].length <= 0) {
@@ -1224,9 +1237,9 @@ export class CommonFunctionService {
           for (let j = 0; j < element.list_of_fields.length; j++) {
           const data = element.list_of_fields[j];
             switch (data.datatype) {
-              case "list_of_object":   
+              case "list_of_object":
               case "chips":
-              case "chips_with_mask":             
+              case "chips_with_mask":
                 if(validatField){
                   if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
                     return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
@@ -1235,9 +1248,9 @@ export class CommonFunctionService {
                   }
                 }else if (formValue[element.field_name][data.field_name] == "" && !this.isArray(formValue[element.field_name][data.field_name])) {
                     formValue[element.field_name][data.field_name] = null;
-                  }                
+                  }
                 break;
-              case "object":                
+              case "object":
                 if(validatField){
                   if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
                     return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
@@ -1279,11 +1292,11 @@ export class CommonFunctionService {
             const step = element.list_of_fields[j];
             if(step.list_of_fields && step.list_of_fields != null && step.list_of_fields.length > 0){
               for (let k = 0; k < step.list_of_fields.length; k++) {
-                const data = step.list_of_fields[k];              
+                const data = step.list_of_fields[k];
                 switch (data.datatype) {
-                  case "list_of_object":  
+                  case "list_of_object":
                   case "chips":
-                  case "chips_with_mask":                  
+                  case "chips_with_mask":
                     if(validatField){
                       if(formValue[data.field_name] != "" && formValue[data.field_name] != null){
                         return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
@@ -1294,7 +1307,7 @@ export class CommonFunctionService {
                       formValue[data.field_name] = null;
                     }
                     break;
-                  case "object": 
+                  case "object":
                     if(validatField){
                       if(formValue[data.field_name] != "" && formValue[data.field_name] != null){
                         return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
@@ -1303,7 +1316,7 @@ export class CommonFunctionService {
                       }
                     }else if (formValue[data.field_name] == "" && typeof formValue[data.field_name] != 'object') {
                       formValue[data.field_name] = null;
-                    }                    
+                    }
                     break;
                   case "number":
                     if (!Number(formValue[data.field_name])) {
@@ -1341,7 +1354,7 @@ export class CommonFunctionService {
       return true;
     }else{
       return formValue;
-    }    
+    }
   }
 
   applicableForValidation(field:any){
@@ -1405,7 +1418,7 @@ export class CommonFunctionService {
   //   return this.setValueInVieldsForChild(templateForm, fieldWithValue);
   // }
 
-  // quote_amount_via_sample_no(templateValue:any,listOfParm:any){    
+  // quote_amount_via_sample_no(templateValue:any,listOfParm:any){
   //   let quantity = templateValue.qty;
   //   let discount = templateValue.discount_percent;
   //   let updatedParamsList:any=[];
@@ -1439,7 +1452,7 @@ export class CommonFunctionService {
   //   return obj;
   // }
 
-  // quote_amount_via_discount_percent(listOfParm:any,templateValue:any){    
+  // quote_amount_via_discount_percent(listOfParm:any,templateValue:any){
   //   let discount = templateValue.discount_percent;
   //   let quantity = templateValue.qty;
   //   let updatedParamsList:any = [];
@@ -1454,7 +1467,7 @@ export class CommonFunctionService {
   //   let total=templateValue["total"];
   //   let discount_amount:any=this.getDecimalAmount(total * discount/100);
   //   let net_amount=total-discount_amount;
-    
+
   //   let final_amount=net_amount + templateValue["sampling_charge"];
   //   let unit_price = this.getDecimalAmount(net_amount/templateValue['qty']);
 
@@ -1464,12 +1477,12 @@ export class CommonFunctionService {
   //   templateValue['final_amount']=final_amount;
   //   templateValue['unit_price']=unit_price;
 
-    
+
 
   //   return templateValue;
 
   // }
-  // samplingAmountAddition(templateValue:any){    
+  // samplingAmountAddition(templateValue:any){
   //   let net_amount = templateValue['net_amount'];
   //   let sampling_charge = templateValue['sampling_charge'];
   //   let totl = net_amount+sampling_charge;
@@ -1477,7 +1490,7 @@ export class CommonFunctionService {
   //   templateValue['final_amount'] = totl
   //   return templateValue;
   // }
-  
+
 
   // calculateParameterLimsSegmentWise(lims_segment:any, data:any, fieldName:any){
   //   switch(lims_segment){
@@ -1546,7 +1559,7 @@ export class CommonFunctionService {
   //               data.discount_percent = this.getDecimalAmount(+discount_percent);
   //               this.calculateParameterLimsSegmentWise(lims_segment, data, "discount_percent");
   //             })
-            
+
   //         }else{
   //           if (paramArray.length > 0) {
   //             discount_amount=0;
@@ -1566,7 +1579,7 @@ export class CommonFunctionService {
   //               discount_amount=discount_amount+data['discount_amount'];
   //             });
   //           }
-           
+
   //           }
   //           discount_percent =  this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
   //           templateValue['discount_amount'] = discount_amount ;
@@ -1611,15 +1624,15 @@ export class CommonFunctionService {
   //             this.calculateParameterLimsSegmentWise(lims_segment, data, "qty");
   //             gross_amount = gross_amount+data['total'];
   //           })
-          
-           
+
+
   //           discount_amount=gross_amount-net_amount;
   //           discount_percent =  this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
   //           paramArray.forEach((data:any) => {
   //             data.discount_percent = this.getDecimalAmount(+discount_percent);
   //             this.calculateParameterLimsSegmentWise(lims_segment, data, "discount_percent");
   //           })
-          
+
   //          templateValue["discount_percent"]=discount_percent;
   //           templateValue["discount_amount"]=discount_amount;
   //           templateValue['net_amount'] = net_amount ;
@@ -1631,7 +1644,7 @@ export class CommonFunctionService {
   //             unit_price = templateValue.unit_price;
   //           }
   //           net_amount=qty*unit_price;
-            
+
 
   //           paramArray.forEach((data:any) => {
   //             data.discount_percent = this.getDecimalAmount(+discount_percent);
@@ -1679,7 +1692,7 @@ export class CommonFunctionService {
   //             templateValue['discount_percent'] = discount_percent;
 
   //         }
-        
+
   //     }
 
   //     final_amount = net_amount + sampling_amount;
@@ -1702,9 +1715,9 @@ export class CommonFunctionService {
   //     return templateValue;
 
   // }
- 
+
   // calculate_lims_invoice(templateValue:any,lims_segment:any, calculate_on_field: any) {
-   
+
   //   if(calculate_on_field == null || calculate_on_field == ''){
   //     calculate_on_field = 'items_list';
   //   }
@@ -1714,7 +1727,7 @@ export class CommonFunctionService {
   //   let	discount_amount	=0;
   //   let	taxable_amount	=0;
   //   let	net_amount	=0;
-   
+
   //       if (this.coreFunctionService.isNotBlank(templateValue[calculate_on_field]) && templateValue[calculate_on_field].length > 0) {
   //         templateValue[calculate_on_field].forEach((element:any) => {
   //           if(this.coreFunctionService.isNotBlank(element.total)){
@@ -1786,23 +1799,23 @@ export class CommonFunctionService {
 //     let	discount_amount=	total['discount_amount'];
 //     let	taxable_amount=	total['taxable_amount'];
 //     let	net_amount	=total['net_amount'];
-   
+
 //  if(gross_amount){
 //   switch(field.field_name){
-//     case 'discount_percent': 
+//     case 'discount_percent':
 //           if(discount_percent!=0){
 //             discount_amount = gross_amount*discount_percent/100;
 //           }else{
 //           discount_amount = 0;
 //           }
 //     break;
-//     case 'surcharge': 
+//     case 'surcharge':
 //     if(!surcharge){
 //        surcharge = 0;
 //     }
 // break;
-//     case 'discount_amount': 
-//           if(discount_amount){   
+//     case 'discount_amount':
+//           if(discount_amount){
 //              discount_percent = discount_amount*100/gross_amount;
 //           }else{
 //             discount_percent=0;
@@ -1818,7 +1831,7 @@ export class CommonFunctionService {
 //   net_amount =gross_amount-discount_amount;
 //   taxable_amount = gross_amount-discount_amount+surcharge;
 //   templateValue = this.update_invoice_totatl(templateValue,gross_amount,discount_amount,discount_percent,net_amount,surcharge,taxable_amount,field);
-       
+
 //   return templateValue;
 //  }
 
@@ -1832,7 +1845,7 @@ export class CommonFunctionService {
 //   let	sez_amount	=0;
 
 //   let	net_payble	=0;
-  
+
 //   let	igst_percent	=0;
 //   let	gst_percent	=0;
 //   let	sez_percent	=0;
@@ -1840,11 +1853,11 @@ export class CommonFunctionService {
 //   let sgst_percent=0;
 //   let tax_percentage = 0;
 //   let tax_type = templateValue['tax_type'];
-  
+
 //   if(this.coreFunctionService.isNotBlank(templateValue.tax_percentage)){
 //     tax_percentage = templateValue.tax_percentage;
 //   }
-   
+
 //   if((tax_type==null || tax_type==undefined || tax_type=='NA') && tax_percentage==0)
 //   {
 //     net_payble = taxable_amount;
@@ -1871,7 +1884,7 @@ export class CommonFunctionService {
 //         net_payble = taxable_amount+igst_amount;
 //         tax_amount=igst_amount;
 //         break;
-//         default :  
+//         default :
 
 //   }
 //   }
@@ -1884,7 +1897,7 @@ export class CommonFunctionService {
 //     total['gst_percent'] = this.getDecimalAmount(gst_percent);
 //     total['cgst_percent'] = this.getDecimalAmount(cgst_percent);
 //     total['sgst_percent'] = this.getDecimalAmount(sgst_percent);
-    
+
 //     total['sez_percent'] = this.getDecimalAmount(sez_percent);
 //     total['gross_amount'] = this.getDecimalAmount(gross_amount);
 //     total['discount_percent'] = this.getDecimalAmount(discount_percent);
@@ -1905,7 +1918,7 @@ export class CommonFunctionService {
 //     templateValue = {};
 //     templateValue['total_amount'] = total;
 //     return templateValue;
-  
+
 // }
 
       // calculate_po_row_item(templateValue:any,lims_segment:any, calculate_on_field: any){
@@ -1913,7 +1926,7 @@ export class CommonFunctionService {
 
       //   var qty= po_items['qty'];
       //   var cost= po_items['cost'];
-      //   if(qty && cost){ 
+      //   if(qty && cost){
       //     po_items['total'] = qty*cost;
       //   }else{
       //     po_items['total'] =0;
@@ -1923,7 +1936,7 @@ export class CommonFunctionService {
       //   templateValue['po_items']=po_items;
 
       // return templateValue;
-       
+
       // }
 
       // calculate_manual_row_item(templateValue:any,lims_segment:any, calculate_on_field: any){
@@ -1931,7 +1944,7 @@ export class CommonFunctionService {
 
       //   var qty= manualItemsList['sampleQty'];
       //   var cost= manualItemsList['sampleCost'];
-      //   if(qty && cost){ 
+      //   if(qty && cost){
       //     manualItemsList['sampleTotal'] = qty*cost;
       //   }else{
       //     manualItemsList['sampleTotal'] =0;
@@ -1941,7 +1954,7 @@ export class CommonFunctionService {
       //   templateValue['manualItemsList']=manualItemsList;
 
       // return templateValue;
-       
+
       // }
 
 
@@ -1954,7 +1967,7 @@ export class CommonFunctionService {
   //   if(calculate_on_field == null || calculate_on_field == ''){
   //     calculateOnField = 'manualItemsList';
   //   }else {
-  //     calculateOnField = calculate_on_field['field_name'] 
+  //     calculateOnField = calculate_on_field['field_name']
   //   }
   //   let	surcharge	=0;
   //   let	gross_amount	=0;
@@ -1962,7 +1975,7 @@ export class CommonFunctionService {
   //   let	discount_amount	=0;
   //   let	taxable_amount	=0;
   //   let	net_amount	=0;
-   
+
   //       if (this.coreFunctionService.isNotBlank(templateValue[calculateOnField]) && templateValue[calculateOnField].length > 0) {
   //         templateValue[calculateOnField].forEach((element:any) => {
   //           if(this.coreFunctionService.isNotBlank(element.sampleTotal)){
@@ -1994,7 +2007,7 @@ export class CommonFunctionService {
   const fromDate = templateValue['fromDate'];
   const  months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   var monthNumber = templateValue.fromDate.toDate().getMonth()
-  var monthName = months[monthNumber]; 
+  var monthName = months[monthNumber];
   let year = templateValue.fromDate.toDate().getFullYear();
   let result = {
     "labelName": monthName+'-'+year
@@ -2020,7 +2033,7 @@ export class CommonFunctionService {
   //   let discount_amount:any = 0;
   //   let quotation_param_methods:any = [];
   //   let unit_price:any = 0;
-    
+
   //   if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
   //     templateValue['quotation_param_methods'].forEach((element:any) => {
   //       total = total + element.quotation_effective_rate;
@@ -2049,11 +2062,11 @@ export class CommonFunctionService {
   //         discount_percent = 0;
   //         net_amount=templateValue[field.field_name];
   //         discount_amount=total-net_amount;
-  //         discount_percent =this.getDecimalAmount(100*discount_amount/total);  
+  //         discount_percent =this.getDecimalAmount(100*discount_amount/total);
   //         templateValue["discount_percent"]=discount_percent;
   //         let updatedData = this.quote_amount_via_discount_percent(templateValue["quotation_param_methods"],templateValue)
   //         updatedData[field.field_name] = net_amount
-  //         return updatedData;        
+  //         return updatedData;
   //        }else if(field.field_name==='quotation_param_methods'){
   //           let list=templateValue[field.field_name];
   //           list.forEach((element:any) => {
@@ -2090,12 +2103,12 @@ export class CommonFunctionService {
   //       templateValue['unit_price'] =  unit_price;
   //       if(quotation_param_methods.length > 0){
   //         templateValue['quotation_param_methods'] = quotation_param_methods;
-  //       }        
-          
+  //       }
+
   //       }
   //     }
   //     return templateValue;
-    
+
   // }
   // calculate_pharma_claim_values(new_element : any){
   //       if(new_element.claim_dependent && !isNaN(new_element.claim_percent)){
@@ -2122,10 +2135,10 @@ export class CommonFunctionService {
   //       }
   // }
 
-  
-  
 
-  
+
+
+
 
   // calculateParameterAmtOnInjection(data:any,rate:number,quantity:number){
   //           let totalInjection = data.no_of_injection;
@@ -2206,7 +2219,7 @@ export class CommonFunctionService {
   //   if(this.coreFunctionService.isNotBlank(data.discount_percent)){
   //     disc_per = data.discount_percent;
   //   }
- 
+
 
   //   let incoming_field = fieldName;
   //   switch(incoming_field){
@@ -2374,13 +2387,13 @@ export class CommonFunctionService {
   //   }else{
   //     data['per_sample_net_rate'] =0;
   //   }
-    
+
   //   data['discount_percent'] = this.getDecimalAmount(discount_percent);
   //   data['discount_amount'] = this.getDecimalAmount(+discount_amount);
   //   data['qty'] = quantity;
   //   data['total'] = this.getDecimalAmount(gross_amount);
   //   data['quotation_effective_rate'] =  this.getDecimalAmount(gross_amount);
-    
+
   // }
   // calculateQuotationParameterAmountForAutomotiveLims(data:any, fieldName:any){
   //   let quantity:any = 0;
@@ -2516,8 +2529,8 @@ export class CommonFunctionService {
   //   let param_quantom:any = 0;
   //   let Base_quotation_rate:any = 0;
   //   let incoming_field:any = fieldName.field_name;
-    
-  //   let gross_amount:any=0; 
+
+  //   let gross_amount:any=0;
   //   let dis_amt:any = 0;
   //   switch(incoming_field){
   //      case "claim_unit" :
@@ -2537,7 +2550,7 @@ export class CommonFunctionService {
   //           data['net_amount'] = net_amount
   //         }
   //         break;
-  //       case "qty":  
+  //       case "qty":
   //           if (data.qty) {
   //             if(data.branch && data.branch.name && data.branch.name==="Pune"){
   //              data['quotation_effective_rate'] = (+data.qty) * (+data.quantum_rate);
@@ -2560,10 +2573,10 @@ export class CommonFunctionService {
   //             data['total'] = +data.quotation_effective_rate;
   //             data['qty'] = data.qty
   //           }
-            
+
   //           }
   //           break;
-  //           case "discount_percent":  
+  //           case "discount_percent":
   //           if (!data.discount_percent) {
   //               data.discount_percent=0;
   //            }if(data.no_of_injection > 0){
@@ -2582,7 +2595,7 @@ export class CommonFunctionService {
   //             data['total'] = +data.quotation_effective_rate;
   //             data['qty'] = data.qty;
   //             data['discount_percent'] = +data['discount_percent'];
-            
+
   //           break;
 
   //         case "offer_rate"  :
@@ -2614,7 +2627,7 @@ export class CommonFunctionService {
   //               data['discount_percent'] = discount_per;
   //               data['discount_amount'] = +data['discount_amount'];
   //             }
-  //           break;          
+  //           break;
 
   //   }
   //   if(data['qty']>0){
@@ -2659,7 +2672,7 @@ export class CommonFunctionService {
             obj[parent][child] =this.mergeMultiFieldsValues(el.from, value);
           }else{
             obj[parent][child] = "";
-          }            
+          }
         }else{
           const field = toList[0];
           if(check){
@@ -2674,7 +2687,7 @@ export class CommonFunctionService {
   }
 
   mergeMultiFieldsValues(field:any, object:any){
-    let result = ""; 
+    let result = "";
     if(field && field != null && field != '' && field != " "){
       let list = field.split("+")
       for (let index = 0; index < list.length; index++) {
@@ -2735,7 +2748,7 @@ export class CommonFunctionService {
   //     }
   //   });
   //   return templateForm;
-  // }  
+  // }
 
   claimAmountCalculation(field1:any, field2:any, field3:any) {
     let total = 0;
@@ -2760,7 +2773,7 @@ export class CommonFunctionService {
     }
     arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
     return arr; // for testing
-  };  
+  };
 
   openFileUpload(fieldName:any, modalName:any, formValue:any, fileData:any) {
     const alertData = {
@@ -2775,10 +2788,10 @@ export class CommonFunctionService {
     }
     if (fieldName.tableFields) {
       alertData['tableFields'] = fieldName.tableFields;
-    }    
+    }
     if (fieldName.defaultBucket) {
       alertData['defaultBucket'] = fieldName.defaultBucket;
-    }    
+    }
     if (fieldName.defaultS3Key) {
       alertData['defaultS3Key'] = fieldName.defaultS3Key;
     }
@@ -2949,8 +2962,8 @@ export class CommonFunctionService {
     switch (parentfield.type) {
       case "list_of_fields":
       case "group_of_fields":
-        custmizedKey = parentfield.field_name+'_'+parentfield.type                
-        break;          
+        custmizedKey = parentfield.field_name+'_'+parentfield.type
+        break;
       default:
         custmizedKey = parentfield.field_name;
         break;
@@ -2972,16 +2985,16 @@ export class CommonFunctionService {
     return check;
   }
   getVariableStorageValue(object:any,parent:any,chield:any): Array<any>{
-    let data:any = [];    
+    let data:any = [];
     if(parent != '' && parent != undefined && parent != null){
-      const parentKey = this.custmizedKey(parent); 
+      const parentKey = this.custmizedKey(parent);
       if(this.checkStorageValue(object,parent,chield)){
-        data = object[parentKey][chield.field_name] 
-      }       
+        data = object[parentKey][chield.field_name]
+      }
     }else {
       if(this.checkStorageValue(object,'',chield)){
         data = object[chield.field_name]
-      }      
+      }
     }
      return data;
   }
@@ -3028,10 +3041,10 @@ export class CommonFunctionService {
 
       });
       response.msg = fieldName + ' Required.';
-      response.status = false;      
+      response.status = false;
       // this.notificationService.notify('bg-danger', fieldName + ' Required.')
     } else {
-      response.status = true; 
+      response.status = true;
     }
     return response;
   }
@@ -3086,12 +3099,12 @@ export class CommonFunctionService {
     if(this.isGridFieldExist(tab,"api_params_criteria")){
       grid_api_params_criteria = tab.grid.api_params_criteria;
     }
-    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);     
+    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
     this.getfilterCrlist(headElements,filterForm).forEach((element: any) => {
       data.crList.push(element);
     });
     if(selectContact != ''){
-      const tabFilterCrlist = {        
+      const tabFilterCrlist = {
         "fName": 'account._id',
         "fValue": selectContact,
         "operator": 'eq'
@@ -3106,7 +3119,7 @@ export class CommonFunctionService {
   }
   setPageNoAndSize(payload:any,page:number){
     payload['pageNo'] = page - 1;
-    payload['pageSize'] = this.itemNumOfGrid; 
+    payload['pageSize'] = this.itemNumOfGrid;
     return payload;
   }
   getRealTimeGridData(currentMenu:any, object:any) {
@@ -3114,7 +3127,7 @@ export class CommonFunctionService {
     let page = 1;
     let criteria = "_id;eq;" + object._id + ";STATIC";
     grid_api_params_criteria.push(criteria);
-    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page); 
+    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
     const getFilterData = {
       data: data,
       path: null
@@ -3123,10 +3136,10 @@ export class CommonFunctionService {
   }
   setPageNumverAndSize(payload:any,page:number,){
     payload['pageNo'] = page - 1;
-    payload['pageSize'] = this.itemNumOfGrid; 
+    payload['pageSize'] = this.itemNumOfGrid;
     return payload;
   }
-  getPage(page: number,tab:any,currentMenu:string,headElements:object,filterForm:object,selectContact:any) {  
+  getPage(page: number,tab:any,currentMenu:string,headElements:object,filterForm:object,selectContact:any) {
   return this.getDataForGrid(page,tab,currentMenu,headElements,filterForm,selectContact);
   }
   isGridFieldExist(tab:any,fieldName:any){
@@ -3155,7 +3168,7 @@ export class CommonFunctionService {
       for (let i = 0; i < array.length; i++) {
         const element = array[i];
         if(key != undefined && key != null){
-          if(this.isArray(key) && key.length > 0 && Object.keys(id).length > 0){          
+          if(this.isArray(key) && key.length > 0 && Object.keys(id).length > 0){
             if (this.getMatchingInList(key,id,element)) {
               index = i;
             }
@@ -3220,7 +3233,7 @@ export class CommonFunctionService {
             alreadyExist =  "true";
           }
         }
-      
+
       });
     }else{
       alreadyExist =  "false";
@@ -3260,7 +3273,7 @@ export class CommonFunctionService {
       if(redirectUrl.indexOf('%') != -1){
         searchKey = '%';
       }
-      
+
       let newUrlWithQuery = '';
       if(searchKey != ''){
         const index = redirectUrl.indexOf(searchKey);
@@ -3268,7 +3281,7 @@ export class CommonFunctionService {
         const queryPrams = redirectUrl.substring(index,stringLength);
         const newParam = queryPrams.replace('%3F','');
         newUrlWithQuery = newParam.replace('%3D',':');
-      }      
+      }
       return {newUrlWithQuery};
   }
 
@@ -3291,7 +3304,7 @@ export class CommonFunctionService {
                   dummyData[key] = currentData[key];
                 });
               }
-             
+
             });
         }
         if(Object.keys(formValue).length > 0){
@@ -3312,7 +3325,7 @@ export class CommonFunctionService {
     keysList.forEach((key: string,i: string) => {
       object[key] = source_targetList[i];
     });
-    
+
     listOfObjects.push(object);
   });
    return listOfObjects;
@@ -3363,7 +3376,7 @@ export class CommonFunctionService {
           if(element._id == refObj._id){
             matchIndex = index;
             break;
-          }         
+          }
         }
         if(matchIndex  > -1){
           if(parent != ''){
@@ -3375,7 +3388,7 @@ export class CommonFunctionService {
                 if(subMenu._id == data._id){
                   submenuMatchIndex = j;
                   break;
-                }         
+                }
               }
             }
             if(submenuMatchIndex > -1){
@@ -3404,7 +3417,7 @@ export class CommonFunctionService {
           }else{
             fieldData.push(refObj);
           }
-        }        
+        }
       }else{
         fieldData = [];
         fieldData.push(refObj);
@@ -3418,7 +3431,7 @@ export class CommonFunctionService {
       dataList.push(refObj);
       uRef['userId'] = userRef;
       uRef[fieldName] = dataList;
-    }    
+    }
     return uRef
   }
   getReferenceObject(obj:any){
@@ -3430,7 +3443,7 @@ export class CommonFunctionService {
       ref["version"] = obj.version
     }
     return ref;
-  }  
+  }
   dateDiff(dateSent:any){
     let obj:any={};
     let currentDate = new Date();
@@ -3445,7 +3458,7 @@ export class CommonFunctionService {
     obj['hours'] = hours;
     obj['minutes'] = minutes;
     obj['seconds'] = seconds;
- 
+
      return obj;
    }
   getUserNotification(pageNo:any){
@@ -3467,20 +3480,20 @@ export class CommonFunctionService {
       list.forEach((element: any) => {
         let value = JSON.parse(JSON.stringify(element));
         value[fieldName] = true;
-        modifyList.push(value);        
+        modifyList.push(value);
       });
     }
     return modifyList;
   }
   modifiedGridColumns(gridColumns:any,object:any){
-    if(gridColumns.length > 0){     
+    if(gridColumns.length > 0){
       gridColumns.forEach((field:any) => {
         if(this.coreFunctionService.isNotBlank(field.show_if)){
           if(!this.showIf(field,object)){
             field['display'] = false;
           }else{
             field['display'] = true;
-          }                
+          }
         }else{
           field['display'] = true;
         }
@@ -3488,7 +3501,7 @@ export class CommonFunctionService {
     }
     return gridColumns;
   }
-  
+
   getApplicationAllSettings() {
     const payload1 = this.setPageNoAndSize(this.getPaylodWithCriteria("application_setting", "", [], {}), 1);
     this.apiService.getAplicationsSetting(payload1);
@@ -3521,13 +3534,13 @@ export class CommonFunctionService {
 
   //       growthpers[key] = growthper;
   //       let obj = {
-  //         field: key, value: growthpers[key] 
+  //         field: key, value: growthpers[key]
   //       }
   //       value.push(obj)
 
   //       budgetpers[key] = budgetper;
   //       let obj1 = {
-  //         field: key, value: budgetpers[key] 
+  //         field: key, value: budgetpers[key]
   //       }
   //       value1.push(obj1)
   //   })
@@ -3594,24 +3607,24 @@ export class CommonFunctionService {
   //   return obj;
   // }
 
-  
+
   // getTaWithCalculation(value:any){
-    
+
   //   let localTas = 0;
   //   let claimSheet = value.claimSheet;
   //   let priceInKm = claimSheet.priceInKm;
   //   let distanceInkm = claimSheet.distanceInKm;
-   
+
   //   localTas = priceInKm*distanceInkm;
-  
+
   //   let obj1 = {
   //     localTa:localTas
-  //   }  
+  //   }
   //   let obj = {
   //     claimSheet:obj1
-  //   }  
+  //   }
   //   return obj;
-  
+
   // }
 
   funModeTravelChange(value:any){
@@ -3647,8 +3660,8 @@ export class CommonFunctionService {
 
   print(data:any): void {
     let popupWin;
-    popupWin = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');    
-    popupWin!.document.write('<div class="noprint" style="text-align:right;"><a onClick="window.print()" style="text-align: right;display: inline-block;cursor: pointer;border: 2px solid #4285f4!important;background-color: transparent!important;color: #4285f4!important;box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);padding: 7px 25px;font-size: .81rem;transition: .2s ease-in-out;margin: .375rem;text-transform: uppercase;">Print</a></div><style>@media print{.noprint{display:none;}}</style>'+data);   
+    popupWin = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');
+    popupWin!.document.write('<div class="noprint" style="text-align:right;"><a onClick="window.print()" style="text-align: right;display: inline-block;cursor: pointer;border: 2px solid #4285f4!important;background-color: transparent!important;color: #4285f4!important;box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);padding: 7px 25px;font-size: .81rem;transition: .2s ease-in-out;margin: .375rem;text-transform: uppercase;">Print</a></div><style>@media print{.noprint{display:none;}}</style>'+data);
     popupWin!.document.close();
     popupWin!.print()
   }
@@ -3711,7 +3724,7 @@ export class CommonFunctionService {
           }
         }
       });
-    }                  
+    }
     return fileList;
   }
   getFirstCharOfString(char:any){
@@ -3725,5 +3738,5 @@ export class CommonFunctionService {
     data[column.field_name].splice(i,1);
     return data[column.field_name];
   }
-  
+
 }
