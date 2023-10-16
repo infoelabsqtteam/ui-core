@@ -69,9 +69,9 @@ export class FormCreationService {
     return responce;
   }
 
-  checkFormDetails(form:any,tab:any){
+  checkFormDetails(form:any,tab:any,currentMenu:any){
     let responce:any={
-      currentMenu:{},
+      currentMenu:currentMenu,
       bulkupdates:false,
       getLocation:false,
       headerFiledsData:[],

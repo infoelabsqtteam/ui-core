@@ -348,5 +348,31 @@ export class TreeComponentService {
     node.item = name;
     this.dataChange.next(this.data);
   }
+  updateTreeViewData(responce:any,field:any,treeViewData:any){
+    let result = {
+      treeViewData:treeViewData
+    }
+    const fieldName = field.field_name;
+    let keys = [];
+    let fields = [];
+    if(field && field.treeViewKeys){
+      keys = field.treeViewKeys;
+    }
+    if(field && field.fields && field.fields.length > 0){
+      fields = field.fields;
+    }
+    const treeData = this.buildFileTree(responce,0,keys);
+    //console.log(treeData);
+    let selectedNodeList = this.convertTreeToList(JSON.parse(JSON.stringify(treeData)),[]);
+    let childList = [];
+    if(fields && fields.length > 0){
+      childList = this.convertParentNodeToChildNodeList(selectedNodeList,fields);
+    }
+    //console.log(selectedNodeList);
+    //console.log(childList);
+    //this.dataSource[fieldName].data = treeData;
+    result.treeViewData[fieldName] = childList;
+    return result;
+  }
 
 }
