@@ -1089,7 +1089,6 @@ export class CommonFunctionService {
   sanitizeObject(tableFields:any, formValue:any, validatField:any,formValueWithCust?:any) {
     for (let index = 0; index < tableFields.length; index++) {
       const element = tableFields[index];
-
       if(element.type != 'list_of_fields' && element.type != 'group_of_fields'){
         switch (element.datatype) {
           case "list_of_object":
