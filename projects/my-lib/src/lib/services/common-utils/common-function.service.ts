@@ -1089,6 +1089,7 @@ export class CommonFunctionService {
   sanitizeObject(tableFields:any, formValue:any, validatField:any,formValueWithCust?:any) {
     for (let index = 0; index < tableFields.length; index++) {
       const element = tableFields[index];
+
       if(element.type != 'list_of_fields' && element.type != 'group_of_fields'){
         switch (element.datatype) {
           case "list_of_object":
@@ -1126,6 +1127,10 @@ export class CommonFunctionService {
             break
           default:
             break;
+        }
+        if (typeof formValue[element.field_name] === "string") {
+          let formtrimValue = formValue[element.field_name];
+          formValue[element.field_name] = formtrimValue.trim();
         }
       }
       switch (element.type) {
