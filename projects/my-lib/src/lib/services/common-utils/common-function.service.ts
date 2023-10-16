@@ -1127,6 +1127,10 @@ export class CommonFunctionService {
           default:
             break;
         }
+        if (typeof formValue[element.field_name] === "string") {
+          let formtrimValue = formValue[element.field_name];
+          formValue[element.field_name] = formtrimValue.trim();
+        }
       }
       switch (element.type) {
         case "list_of_string":
