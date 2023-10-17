@@ -1142,7 +1142,13 @@ export class CommonFunctionService {
             }
           }else if (formValue[element.field_name] == "" && !this.isArray(formValue[element.field_name])) {
             formValue[element.field_name] = null;
-          }
+          }else if (formValue[element.field_name] != "") {
+            let formtrimValue = formValue[element.field_name];
+            const results = formtrimValue.map((element:any) => {
+              return element.trim();
+            });
+            formValue[element.field_name] = results;
+          } 
           break;
         case "file":
           if (formValue[element.field_name] == "") {
@@ -1224,6 +1230,9 @@ export class CommonFunctionService {
                         formValue[element.field_name].forEach((fiedlList: any) => {
                           if (fiedlList[data.field_name] == "" && !this.isArray(fiedlList[data.field_name])) {
                             fiedlList[data.field_name] = null;
+                          } else if (fiedlList[data.field_name] == "" && this.isArray(fiedlList[data.field_name])) {
+                            let formtrimValue = fiedlList[data.field_name];
+                            formValue[element.field_name] = formtrimValue.trim();
                           }
                         });
                       }
@@ -1231,6 +1240,14 @@ export class CommonFunctionService {
 
                     default:
                       break;
+                  }
+                  if (formValue[element.field_name] != "") {
+                    formValue[element.field_name].forEach((fiedlList: any) => {
+                      let formtrimValue = fiedlList[data.field_name];
+                      console.log (formtrimValue.trim())
+                      fiedlList[data.field_name] = formtrimValue;
+                    });
+                    
                   }
                 }
               }
@@ -1288,6 +1305,10 @@ export class CommonFunctionService {
 
               default:
                 break;
+            }
+            if (formValue[data.field_name] != "") {
+              let formtrimValue = formValue[element.field_name][data.field_name];
+              formValue[element.field_name][data.field_name] = formtrimValue.trim();
             }
           }
           break;
