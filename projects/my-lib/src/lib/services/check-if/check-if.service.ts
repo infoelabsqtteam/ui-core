@@ -70,5 +70,40 @@ export class CheckIfService {
     }
     return responce;
   }
+  checkShowIfListOfFiedlds(parent:any,field:any,formValue:any){
+    //let formValue = this.getFormValue(true);
+    let fieldValue = formValue[parent];
+    if(fieldValue && fieldValue.length > 0 && field && field.show_if && field.show_if != null && field.show_if != ''){
+      let check = 0;
+      for (let index = 0; index < fieldValue.length; index++) {
+        const value = fieldValue[index];
+        formValue[parent] = value;
+        if(this.commonFunctionService.showIf(field,formValue)){
+          check = 1;
+          break;
+        }
+      }
+      if(check == 1){
+        return false;
+      }else{
+        return true;
+      }
+    }else{
+      return false;
+    }
+  }
+  checkAddNewButtonOnGridSelection(buttons:any){
+    let check = false;
+    if(buttons && buttons.length >0){
+        for (let i = 0; i < buttons.length; i++) {
+          const btn = buttons[i];
+          if(btn && btn.onclick && btn.onclick.api && btn.onclick.api == "save"){
+            check = true;
+            break;
+          }
+        }
+    }
+    return check;
+  }
 
 }

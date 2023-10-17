@@ -45,5 +45,6 @@ export * from './lib/services/api-call/api-call.service';
 export * from './lib/services/form/form-control/form-control.service';
 export * from './lib/services/check-if/check-if.service';
 export * from './lib/services/api-call-responce/api-call-responce.service';
+export * from './lib/services/form/multiple-form/multiple-form.service';
 
 
