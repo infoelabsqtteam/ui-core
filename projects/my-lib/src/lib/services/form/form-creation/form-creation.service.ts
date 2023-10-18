@@ -689,23 +689,6 @@ export class FormCreationService {
     }
     return responce;
   }
-  checkFieldShowOrHide(field:any,showIfFieldList:any){
-    let check = false;
-    for (let index = 0; index < showIfFieldList.length; index++) {
-      const element = showIfFieldList[index];
-      if(element.field_name == field.field_name){
-        if(element.show){
-          check = true;
-          break;
-        }else{
-          check=false;
-          break;
-        }
-      }
-
-    }
-    return check;
-  }
   getDonotResetFields(tableFields:any,donotResetFieldLists:any,FormValue:any){
     tableFields.forEach((tablefield:any) => {
       if(tablefield.do_not_refresh_on_add && tablefield.type != "list_of_fields" && tablefield.type != "group_of_fields" && tablefield.type != "stepper"){

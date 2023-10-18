@@ -105,5 +105,174 @@ export class CheckIfService {
     }
     return check;
   }
+  checkFieldShowOrHide(field:any,showIfFieldList:any){
+    let check = false;
+    for (let index = 0; index < showIfFieldList.length; index++) {
+      const element = showIfFieldList[index];
+      if(element.field_name == field.field_name){
+        if(element.show){
+          check = true;
+          break;
+        }else{
+          check=false;
+          break;
+        }
+      }
+
+    }
+    return check;
+  }
+  checkDublicateOnForm(fields:any,value:any,list:any,i:any,showIfFieldList:any,custmizedFormValue:any,templateForm:FormGroup,parent?:any){
+    let checkDublic = {
+      status : false,
+      msg : ""
+    }
+    if(fields && fields.length > 0){
+      let checkValue = 0;
+      let field_control:any = "";
+      let list_of_field_data = value;
+      for (let index = 0; index < fields.length; index++) {
+        const element = fields[index];
+        let custmizedKey = '';
+        let custmizedData = '';
+        if(parent && parent != ''){
+          custmizedKey = this.commonFunctionService.custmizedKey(parent);
+          field_control = templateForm.controls[parent.field_name];
+        }
+        if(custmizedKey && custmizedKey != '' && custmizedFormValue[custmizedKey] && custmizedFormValue[custmizedKey][element.field_name]){
+          custmizedData = custmizedFormValue[custmizedKey][element.field_name]
+        }else{
+          if(custmizedFormValue[element.field_name] && custmizedFormValue[element.field_name].length > 0){
+            custmizedData = custmizedFormValue[element.field_name]
+          }
+        }
+        let mendatory = false;
+        if(element.is_mandatory){
+          if(element && element.show_if && element.show_if != ''){
+            if(this.checkFieldShowOrHide(element,showIfFieldList)){
+              mendatory = true;
+            }else{
+              mendatory = false;
+            }
+          }else{
+            mendatory = true;
+          }
+        }
+        switch (element.datatype) {
+          case 'list_of_object':
+            if (list_of_field_data[element.field_name] == '' || list_of_field_data[element.field_name] == null) {
+              if(mendatory && custmizedData == ''){
+                if(custmizedData.length == 0){
+                  checkValue = 1;
+                  checkDublic.status = true
+                  checkDublic.msg = "Please Enter " + element.label;
+                  //this.notificationService.notify("bg-danger", "Please Enter " + element.label);
+                  return checkDublic;
+                }
+              }
+            }else{
+              checkDublic.status = true
+              checkDublic.msg = 'Entered value for '+element.label+' is not valid. !!!';
+              //this.notificationService.notify('bg-danger','Entered value for '+element.label+' is not valid. !!!');
+              return checkDublic;
+            }
+            break;
+          case 'object':
+            if (list_of_field_data[element.field_name] == '' || list_of_field_data[element.field_name] == null) {
+              if(mendatory){
+                checkValue = 1;
+                checkDublic.status = true
+                checkDublic.msg = "Please Enter " + element.label;
+                //this.notificationService.notify("bg-danger", "Please Enter " + element.label);
+                return checkDublic;
+              }
+            }else if(typeof list_of_field_data[element.field_name] != 'object'){
+              checkDublic.status = true
+              checkDublic.msg = 'Entered value for '+element.label+' is not valid. !!!';
+              //this.notificationService.notify('bg-danger','Entered value for '+element.label+' is not valid. !!!');
+              return checkDublic;
+            }
+            break;
+          default:
+            break;
+        }
+        switch (element.type) {
+          case 'list_of_string':
+            if (list_of_field_data[element.field_name] == '' || list_of_field_data[element.field_name] == null) {
+              if(mendatory && custmizedData == ''){
+                if(custmizedData.length == 0){
+                  checkValue = 1;
+                  checkDublic.status = true
+                  checkDublic.msg = "Please Enter " + element.label;
+                  //this.notificationService.notify("bg-danger", "Please Enter " + element.label);
+                  return checkDublic;
+                }
+              }
+            }else{
+              checkDublic.status = true
+              checkDublic.msg = 'Entered value for '+element.label+' is not valid. !!!';
+              //this.notificationService.notify('bg-danger','Entered value for '+element.label+' is not valid. !!!');
+              return checkDublic;
+            }
+            break;
+          case 'typeahead':
+            if(element.datatype == "text"){
+              if (list_of_field_data[element.field_name] == '' || list_of_field_data[element.field_name] == null) {
+                if(mendatory){
+                  if(custmizedData.length == 0){
+                    checkValue = 1;
+                    checkDublic.status = true
+                    checkDublic.msg = "Please Enter " + element.label;
+                    //this.notificationService.notify("bg-danger", "Please Enter " + element.label);
+                    return checkDublic;
+                  }
+                }
+              }else if(field_control && field_control != "" ){
+                if( field_control.get(element.field_name).errors?.required || field_control.get(element.field_name).errors?.validDataText){
+                  checkDublic.status = true
+                  checkDublic.msg = 'Entered value for '+element.label+' is invalidData. !!!';
+                  //this.notificationService.notify('bg-danger','Entered value for '+element.label+' is invalidData. !!!');
+                  return checkDublic;
+                }
+              }
+
+            }
+            break;
+          default:
+            if (list_of_field_data[element.field_name] == '' || list_of_field_data[element.field_name] == null) {
+              if(mendatory ){
+                checkValue = 1;
+                checkDublic.msg = "Please Enter " + element.label;
+                //this.notificationService.notify("bg-danger", "Please Enter " + element.label);
+              }
+            }
+            break;
+        }
+        if(element.primary_key_for_list){
+          let primary_key_field_value = value[element.field_name];
+          let alreadyAdded = {
+            status : false,
+            msg : ""
+          };
+          if(list && list.length > 0){
+            alreadyAdded = this.commonFunctionService.checkDataAlreadyAddedInListOrNot(element,primary_key_field_value,list,i);
+          }
+          if(alreadyAdded && alreadyAdded.status){
+            checkDublic.status = true;
+            if(alreadyAdded.msg && alreadyAdded.msg != ""){
+              checkDublic.msg = alreadyAdded.msg;
+            }else{
+              checkDublic.msg = "Entered value for "+element.label+" is already added. !!!";
+            }
+            break;
+          }
+        }
+      };
+      if (checkValue == 1) {
+        checkDublic.status = true;
+      }
+    }
+    return checkDublic;
+  }
 
 }
