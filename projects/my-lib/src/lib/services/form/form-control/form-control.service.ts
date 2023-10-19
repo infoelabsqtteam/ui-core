@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { CommonFunctionService } from '../../common-utils/common-function.service';
 import { FileHandlerService } from '../../fileHandler/file-handler.service';
 import { GridCommonFunctionService } from '../../grid/grid-common-function/grid-common-function.service';
@@ -534,5 +534,53 @@ export class FormControlService {
       const object = responce.selectedRow[editeTreeModifyData.field_name];
       responce.templateForm.controls[editeTreeModifyData.field_name].setValue(object)
     }
+  }
+  setCheckboxFileListValue(checkBoxFieldListValue:any,templateForm:FormGroup,staticData:any,selectedRow:any,updateMode:boolean) {
+    let result = {
+      templateForm:templateForm
+    }
+    checkBoxFieldListValue.forEach((element:any) => {
+      let checkCreatControl: any;
+      if (element.parent) {
+        checkCreatControl = (<FormGroup>result.templateForm.controls[element.parent]).controls[element.field_name];
+      } else {
+        checkCreatControl = result.templateForm.controls[element.field_name];
+      }
+      if (staticData[element.ddn_field] && checkCreatControl.controls && checkCreatControl.controls.length == 0) {
+        let checkArray: FormArray;
+        if (element.parent) {
+          checkArray = (<FormGroup>result.templateForm.controls[element.parent]).controls[element.field_name] as FormArray;
+        } else {
+          checkArray = result.templateForm.controls[element.field_name] as FormArray;
+        }
+        staticData[element.ddn_field].forEach((data:any, i:any) => {
+          if (updateMode) {
+            let arrayData;
+            if (element.parent) {
+              arrayData = selectedRow[element.parent][element.field_name];
+            } else {
+              arrayData = selectedRow[element.field_name];
+            }
+            let selected = false;
+            if (arrayData != undefined && arrayData != null) {
+              for (let index = 0; index < arrayData.length; index++) {
+                if (this.commonFunctionService.checkObjecOrString(data) == this.commonFunctionService.checkObjecOrString(arrayData[index])) {
+                  selected = true;
+                  break;
+                }
+              }
+            }
+            if (selected) {
+              checkArray.push(new FormControl(true));
+            } else {
+              checkArray.push(new FormControl(false));
+            }
+          } else {
+            checkArray.push(new FormControl(false));
+          }
+        });
+      }
+    });
+    return result.templateForm;
   }
 }
