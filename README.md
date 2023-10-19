@@ -51,3 +51,5 @@ export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domai
 aws codeartifact list-package-versions --domain ui-libs --domain-owner 292474393014 --repository ui-library --format npm --namespace core --status Published --sort-by PUBLISHED_TIME --max-items 1 --query 'versions[*].[version]' --output text --package web-core
 
 
+#########
+
