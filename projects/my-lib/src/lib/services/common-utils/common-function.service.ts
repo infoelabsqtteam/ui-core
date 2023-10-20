@@ -516,6 +516,7 @@ export class CommonFunctionService {
     const filterList:any = []
     if(formValue != undefined){
       const criteria:any = [];
+      let defaultOperator = this.storageService.getApplicationSetting().defaultSearchOperatorInGrid;
       headElements.forEach((element: any) => {
         if(element != null && element.type != null){
           let fieldName = element.field_name;
@@ -554,7 +555,7 @@ export class CommonFunctionService {
                     {
                       "fName": fieldName,
                       "fValue": this.getValueForDotFieldName(value,fieldName),
-                      "operator": "stwic"
+                      "operator": defaultOperator
                     }
                   )
                 }
@@ -588,7 +589,7 @@ export class CommonFunctionService {
                     {
                       "fName": fieldName,
                       "fValue": this.getValueForDotFieldName(value,fieldName),
-                      "operator": "stwic"
+                      "operator": defaultOperator
                     }
                   )
                 }
@@ -605,7 +606,7 @@ export class CommonFunctionService {
                     {
                       "fName": fieldName,
                       "fValue": this.getddnDisplayVal(value),
-                      "operator": "stwic"
+                      "operator": defaultOperator
                     }
                   )
                 }
@@ -623,7 +624,7 @@ export class CommonFunctionService {
                     {
                       "fName": fieldName+".name",
                       "fValue": this.getddnDisplayVal(value),
-                      "operator": "stwic"
+                      "operator": defaultOperator
                     }
                   )
                 }
