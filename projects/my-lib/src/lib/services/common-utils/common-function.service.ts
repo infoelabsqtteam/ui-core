@@ -1139,13 +1139,7 @@ export class CommonFunctionService {
             }
           }else if (formValue[element.field_name] == "" && !this.isArray(formValue[element.field_name])) {
             formValue[element.field_name] = null;
-          }else if (formValue[element.field_name] != "") {
-            let formtrimValue = formValue[element.field_name];
-            const results = formtrimValue.map((element:any) => {
-              return element.trim();
-            });
-            formValue[element.field_name] = results;
-          } 
+          }
           break;
         case "file":
           if (formValue[element.field_name] == "") {
