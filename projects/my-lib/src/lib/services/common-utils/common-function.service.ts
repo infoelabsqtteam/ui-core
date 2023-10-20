@@ -562,7 +562,7 @@ export class CommonFunctionService {
                     {
                       "fName": fieldName,
                       "fValue": this.getValueForDotFieldName(value,fieldName),
-                      "operator": "stwic"
+                      "operator": this.getOperator()
                     }
                   )
                 }
@@ -596,7 +596,7 @@ export class CommonFunctionService {
                     {
                       "fName": fieldName,
                       "fValue": this.getValueForDotFieldName(value,fieldName),
-                      "operator": "stwic"
+                      "operator": this.getOperator()
                     }
                   )
                 }
@@ -613,7 +613,7 @@ export class CommonFunctionService {
                     {
                       "fName": fieldName,
                       "fValue": this.getddnDisplayVal(value),
-                      "operator": "stwic"
+                      "operator": this.getOperator()
                     }
                   )
                 }
@@ -631,7 +631,7 @@ export class CommonFunctionService {
                     {
                       "fName": fieldName+".name",
                       "fValue": this.getddnDisplayVal(value),
-                      "operator": "stwic"
+                      "operator": this.getOperator()
                     }
                   )
                 }
@@ -705,6 +705,16 @@ export class CommonFunctionService {
   }
   dateFormat(value:any) {
     return this.datePipe.transform(value, 'dd/MM/yyyy');
+  }
+  getOperator() {
+     let defaultOperator = this.storageService.getApplicationSetting().defaultSearchOperatorInGrid;
+     let operator = "";
+     if(defaultOperator && defaultOperator != null && defaultOperator != "") {
+      operator = defaultOperator
+     }else {
+      operator = "stwic";
+     }
+     return operator;
   }
 
   commanApiPayload(headElement:any,tableField:any,actionButton:any,object?:any){
