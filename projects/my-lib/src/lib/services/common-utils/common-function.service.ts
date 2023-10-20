@@ -1128,10 +1128,6 @@ export class CommonFunctionService {
           default:
             break;
         }
-        if (typeof formValue[element.field_name] === "string") {
-          let formtrimValue = formValue[element.field_name];
-          formValue[element.field_name] = formtrimValue.trim();
-        }
       }
       switch (element.type) {
         case "list_of_string":
@@ -1231,9 +1227,6 @@ export class CommonFunctionService {
                         formValue[element.field_name].forEach((fiedlList: any) => {
                           if (fiedlList[data.field_name] == "" && !this.isArray(fiedlList[data.field_name])) {
                             fiedlList[data.field_name] = null;
-                          } else if (fiedlList[data.field_name] == "" && this.isArray(fiedlList[data.field_name])) {
-                            let formtrimValue = fiedlList[data.field_name];
-                            formValue[element.field_name] = formtrimValue.trim();
                           }
                         });
                       }
@@ -1241,14 +1234,6 @@ export class CommonFunctionService {
 
                     default:
                       break;
-                  }
-                  if (formValue[element.field_name] != "") {
-                    formValue[element.field_name].forEach((fiedlList: any) => {
-                      let formtrimValue = fiedlList[data.field_name];
-                      console.log (formtrimValue.trim())
-                      fiedlList[data.field_name] = formtrimValue;
-                    });
-                    
                   }
                 }
               }
@@ -1306,10 +1291,6 @@ export class CommonFunctionService {
 
               default:
                 break;
-            }
-            if (formValue[data.field_name] != "") {
-              let formtrimValue = formValue[element.field_name][data.field_name];
-              formValue[element.field_name][data.field_name] = formtrimValue.trim();
             }
           }
           break;
