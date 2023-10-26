@@ -1,3 +1,4 @@
+import { CheckIfService } from './../../check-if/check-if.service';
 import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { FileHandlerService } from '../../fileHandler/file-handler.service';
@@ -19,7 +20,8 @@ export class FormValueService {
     private envService:EnvService,
     private commonFunctionService:CommonFunctionService,
     private gridCommonFunctionService:GridCommonFunctionService,
-    private storageService:StorageService
+    private storageService:StorageService,
+    private checkIfService:CheckIfService
   ) { }
 
   getFormValue(check:boolean,formValue:any,selectedRowData:any,updateMode:boolean,complete_object_payload_mode:boolean,tableFields:any,latitude:any,longitude:any,address:any,custmizedFormValue:any,checkBoxFieldListValue:any,staticData:any,dataListForUpload:any,selectContact:any,tabFilterData:any,params:any,getLocation:any,center:any){
@@ -347,7 +349,7 @@ export class FormValueService {
     if(hasPermission){
       let gridSelectionValidation:any = this.gridCommonFunctionService.checkGridSelectionMendetory(gridSelectionMendetoryList,selectedRow,dataValue,custmizedFormValue);
       if(formValid && gridSelectionValidation.status){
-        let validationsresponse = this.commonFunctionService.checkCustmizedValuValidation(tableFields,formValue);
+        let validationsresponse = this.checkIfService.checkCustmizedValuValidation(tableFields,formValue);
         if(validationsresponse && validationsresponse.status){
           if (dataSaveInProgress) {
             responce.showNotify = true;

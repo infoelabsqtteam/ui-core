@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { EnvService } from '../env/env.service';
-import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
-import { StorageService } from '../storage/storage.service';
+import { EnvService } from '../../env/env.service';
+import { CoreFunctionService } from '../../common-utils/core-function/core-function.service';
+import { StorageService } from '../../storage/storage.service';
 
 @Injectable({
   providedIn: 'root'

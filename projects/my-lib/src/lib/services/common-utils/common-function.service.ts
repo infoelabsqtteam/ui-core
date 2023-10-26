@@ -1,14 +1,11 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
-import { DatePipe, CurrencyPipe } from '@angular/common';
+import { FormGroup } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { StorageService } from '../../services/storage/storage.service';
 import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
-import { CustomvalidationService } from '../customvalidation/customvalidation.service';
-import { NotificationService } from '../notify/notification.service';
 import { ApiService } from '../api/api.service';
 import { ModelService } from '../model/model.service';
 import { EnvService } from '../env/env.service';
-import { Common } from '../../shared/enums/common.enum';
 
 
 @Injectable({
@@ -17,17 +14,11 @@ import { Common } from '../../shared/enums/common.enum';
 export class CommonFunctionService {
   userInfo: any;
   localTas:any;
-  pageNumber: number = Common.PAGE_NO;
-  itemNumOfGrid: any = Common.ITEM_NUM_OF_GRID;
 
   constructor(
-    private formBuilder: FormBuilder,
     private storageService: StorageService,
     private modalService: ModelService,
     private datePipe: DatePipe,
-    private CurrencyPipe: CurrencyPipe,
-    private customvalidationService:CustomvalidationService,
-    private notificationService:NotificationService,
     private apiService:ApiService,
     private coreFunctionService:CoreFunctionService,
     private envService:EnvService
@@ -51,181 +42,6 @@ export class CommonFunctionService {
       return null;
     }
   }
-  createFormControl(forControl:any, field:any, object:any, type:string) {
-    let disabled = field.is_disabled ? true : ((field.disable_if != undefined && field.disable_if != '') ? true : false);
-    switch (type) {
-      case "list":
-        forControl[field.field_name] = this.formBuilder.array(object, this.validator(field))
-        break;
-        case 'checkbox':
-          forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
-          break;
-      case "text":
-        switch (field.type) {
-          case "gst_number":
-            forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
-            break;
-          case "api":
-            switch (field.api_call_name) {
-              case "gst_number":
-                forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
-                break;
-              default:
-                forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
-                break;
-            }
-              forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
-              break;
-          case "typeahead":
-            switch (field.datatype) {
-              case 'object':
-                forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidData.bind(this.customvalidationService))
-                break;
-              default:
-                forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
-                break;
-            }
-            break;
-          default:
-            forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
-            break;
-        }
-        break;
-      case "group":
-        forControl[field.field_name] = this.formBuilder.group(object)
-        break;
-      default:
-        break;
-    }
-  }
-  validator(field:any) {
-    const validator = []
-    if (field.is_mandatory != undefined && field.is_mandatory) {
-      switch (field.type) {
-        case "grid_selection":
-        case "list_of_string":
-          break;
-        case "typeahead":
-          if (field.datatype != 'list_of_object' && field.datatype != 'chips') {
-            validator.push(Validators.required)
-          }
-          break;
-        case 'checkbox':
-          validator.push(Validators.requiredTrue)
-          break;
-        case "email":
-          validator.push(Validators.required)
-          validator.push(Validators.email);
-          break;
-        default:
-          validator.push(Validators.required)
-          break;
-      }
-    }else{
-      switch (field.type){
-        case "email":
-          validator.push(Validators.email);
-          break;
-        default:
-          break;
-      }
-    }
-    if (field.min_length != undefined && field.min_length != null && field.min_length != '' && Number(field.min_length) && field.min_length > 0) {
-      validator.push(Validators.minLength(field.min_length))
-    }
-    if(field.max_length != undefined && field.max_length != null && field.max_length != '' && Number(field.max_length) && field.max_length > 0){
-      validator.push(Validators.maxLength(field.max_length))
-    }
-    return validator;
-  }
-
-  getPaylodWithCriteria(params:any, callback:any, criteria:any, object:any,data_template?:any) {
-    const tabName =  this.storageService.GetActiveMenu();
-    let tab = '';
-    if(tabName && tabName.name && tabName.name != ''){
-      tab = tabName.name;
-    }
-    let staticModal:any = {
-      "key": this.getRefcode(),
-      "key2": this.storageService.getAppId(),
-      "value": params,
-      "log": this.storageService.getUserLog(),
-      "crList": [],
-      "module": this.storageService.getModule(),
-      "tab": tab
-    }
-    if(data_template){
-      staticModal['data_template'] = data_template;
-    }
-    if(callback && callback != ''){
-      staticModal['key3'] = callback;
-    }
-    if(params.indexOf("FORM_GROUP") >= 0 || params.indexOf("QTMP") >= 0){
-      staticModal["data"]=object;
-    }
-    if (criteria && criteria.length > 0) {
-      const crList = this.getCriteriaList(criteria,object);
-      if(crList && crList.length > 0){
-        crList.forEach((element: any) => {
-          staticModal.crList.push(element);
-        });
-      }
-    }
-    return staticModal;
-  }
-  checkQtmpApi(params:any,field:any,payload:any,multipleFormCollection:any,object:any,objectWithCustom:any){
-    if(params.indexOf("FORM_GROUP") >= 0 || params.indexOf("QTMP") >= 0){
-      let multiCollection = JSON.parse(JSON.stringify(multipleFormCollection));
-      if(field && field.formValueAsObjectForQtmp){
-        let formValue = this.getFormDataInMultiformCollection(multiCollection,object);
-        payload["data"]=formValue;
-      }else{
-        let formValue = this.getFormDataInMultiformCollection(multiCollection,objectWithCustom);
-        payload["data"]=formValue;
-      }
-    }
-    return payload;
-  }
-  getTabsCountPyload(tabs:any){
-    let payloads:any = [];
-    if(tabs && tabs.length >= 1 ){
-      tabs.forEach((element: any) => {
-        let grid_api_params_criteria = [];
-        if(this.isGridFieldExist(element,"api_params_criteria")){
-          grid_api_params_criteria = element.grid.api_params_criteria;
-        }
-        const payload = this.getPaylodWithCriteria(element.tab_name,element.tab_name+"_"+element.name,grid_api_params_criteria,{});
-        payload['countOnly'] = true;
-        payloads.push(payload);
-      });
-    }
-    if(payloads && payloads.length > 0){
-      this.apiService.getGridCountData(payloads);
-    }
-  }
-  getCriteriaList(criteria:any,object:any){
-    const crList:any = [];
-    criteria.forEach((element: string) => {
-      const criteria = element.split(";");
-      const fValue = criteria[2]
-      let fvalue ='';
-      if(criteria[3] && criteria[3] == 'STATIC'){
-        fvalue = fValue;
-      }else{
-        fvalue = this.getObjectValue(fValue, object)
-      }
-      const list = {
-        "fName": criteria[0],
-        "fValue": fvalue,
-        "operator": criteria[1]
-      }
-      if(this.coreFunctionService.isNotBlank(fvalue)){
-        crList.push(list);
-      }
-    });
-    return crList;
-  }
-
   getObjectValue(field:any, object:any) {
     let result = object;
     if (field && field != null && field != '' && field != " ") {
@@ -253,252 +69,6 @@ export class CommonFunctionService {
       return val;
     }
   }
-
-  checkShowIf(field:any,selectedRow:any,formValue:any){
-    const  objectc = selectedRow?selectedRow:{}
-    const object = JSON.parse(JSON.stringify(objectc));
-    if(formValue && typeof formValue == 'object' && Object.keys(formValue).length > 0){
-      Object.keys(formValue).forEach(key => {
-        object[key] = formValue[key];
-      })
-    }
-    const display = this.showIf(field,object);
-    const modifiedField = JSON.parse(JSON.stringify(field));
-    modifiedField['display'] = display;
-    field = modifiedField;
-    return display;
-  }
-  showIf(field:any, formValue:any) {
-    if (field.show_if && field.show_if != null && field.show_if != '') {
-      const showIf = field.show_if.split(';')
-      let checkIf = true;
-      for (let index = 0; index < showIf.length; index++) {
-        checkIf = this.checkIfConditionForArrayListValue(showIf[index], formValue);
-        if (!checkIf) {
-          return;
-        }
-      }
-      if (checkIf) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return true;
-    }
-  }
-  checkIfConditionForArrayListValue(data:any, formValue:any){
-    let condition = []
-    condition = data.split('#');
-    if (condition.length == 4 && condition[3] != 'dynamic' && condition[3] != 'STATIC') {
-      let check = "";
-      let checkList = [];
-      let setValue = formValue ? this.getObjectValue(condition[0], formValue) : "";
-      if(setValue && setValue.length > 0){
-        for (let index = 0; index < setValue.length; index++) {
-          const element = setValue[index];
-          let value = this.getObjectValue(condition[3],element);
-          if(value && value != ''){
-            check = check + value + "#";
-            for (let index = 0; index < condition.length; index++) {
-              const conditons = condition[index];
-              if(index == 1){
-                check = check + conditons + '#';
-              }else if(index == 2){
-                check = check + conditons + '#STATIC';
-              }
-            }
-            checkList.push(check);
-            check = "";
-          }else{
-            return false;
-          }
-        }
-      }else{
-        return false;
-      }
-      if(checkList && checkList.length > 0){
-        for (let index = 0; index < checkList.length; index++) {
-          const condition = checkList[index];
-          let result = this.checkIfCondition(condition,formValue);
-          if(result){
-            return true;
-          }
-        }
-        return false;
-      }else{
-        return false;
-      }
-    }else{
-      return this.checkIfCondition(data,formValue);
-    }
-
-  }
-
-
-  isDisable(tableField:any, updateMode:any, formValue:any) {
-    if (tableField.is_disabled) {
-      return true;
-    } else {
-      if (tableField.disable_if && tableField.disable_if != '') {
-        return this.checkIfCondition(tableField.disable_if, formValue)
-      }
-
-      if (updateMode) {
-        if (tableField.disable_on_update != undefined && tableField.disable_on_update) {
-          return this.checkAddUpdateIf(tableField,'can_update_if');
-        } else {
-          return false;
-        }
-      } else {
-        if (tableField.disable_on_add != undefined && tableField.disable_on_add) {
-          return this.checkAddUpdateIf(tableField,'can_add_if');
-        }else{
-          return false;
-        }
-      }
-    }
-  }
-  is_check_role(id: any) {
-    const userInfo = this.storageService.GetUserInfo();
-    let check = 0;
-    if (userInfo.roles && userInfo.roles != null && userInfo.roles != "" && this.isArray(userInfo.roles) && userInfo.roles.length > 0) {
-      for (let index = 0; index < userInfo.roles.length; index++) {
-        const element = userInfo.roles[index];
-        if (element._id == id) {
-          check = 1;
-          break;
-        } else {
-          check = 0;
-        }
-      }
-    } else {
-      check = 0;
-    }
-    if(check == 1){
-      return true;
-    }else{
-      return false;
-    }
-  }
-  isMendetory(tableField:any, formValue:any) {
-    if (tableField.is_mandatory) {
-      return true;
-    } else {
-      if (tableField.mandatory_if && tableField.mandatory_if != '') {
-        return this.checkIfCondition(tableField.mandatory_if, formValue)
-      }else {
-        return false;
-      }
-    }
-  }
-
-  checkIfCondition(data:any, formValue:any,datatype?:any) {
-    let condition = []
-    condition = data.split('#')
-    if (condition.length >= 2) {
-      if(condition[3] != null && condition[3] != "" && condition[3] == 'dynamic'){
-        condition[2] = this.getObjectValue(condition[2], formValue)+"";
-      }
-      let setValue:any = "";
-      if(condition.length > 3 && condition[3] == 'STATIC'){
-        setValue = condition[0];
-      }else{
-        setValue = formValue ? this.getObjectValue(condition[0], formValue) : "";
-      }
-      if (setValue === undefined || setValue === "") {
-        setValue = "";
-      } else {
-        setValue = setValue + "";
-      }
-      if(datatype){
-        switch (datatype) {
-          case "date":
-            setValue = this.dateFormat(setValue);
-            condition[2] = this.dateFormat(condition[2]);
-            break;
-          default:
-            break;
-        }
-      }
-      switch (condition[1]) {
-        case 'eq':
-        case 'equal':
-          if (condition.length > 2) {
-            //console.log('setValue');
-            return setValue === condition[2];
-          } else {
-            return JSON.parse(setValue);
-          }
-        case 'in':
-          if ((condition[2].split(":")).includes(setValue)) {
-            return true;
-          } else {
-            return false;
-          }
-          case 'nin':
-            if (!(condition[2].split(":")).includes(setValue)) {
-              return true;
-            } else {
-              return false;
-            }
-
-
-        case 'gte':
-          return parseFloat(setValue) >= parseFloat(condition[2]);
-        case 'lte':
-          return parseFloat(setValue) <= parseFloat(condition[2]);
-        case 'exists':
-          if (setValue != null && setValue != undefined && setValue != '' && setValue != 'null') {
-            return true;
-          } else {
-            return false;
-          }
-        case 'notexist':
-          if (setValue == null || setValue == undefined || setValue == '' || setValue == 'null') {
-            return true;
-          } else {
-            return false;
-          }
-        case "neq":
-        case "notequal":
-          if (condition.length > 2) {
-            //console.log('setValue');
-            return !(setValue === condition[2]);
-          } else {
-            return !JSON.parse(setValue);
-          }
-        default:
-          return false;
-      }
-    } else {
-      return true;
-    }
-  }
-
-  checkAddUpdateIf(tableField:any,fieldName:any){
-    let fieldValue = tableField[fieldName];
-    if (fieldValue != undefined && fieldValue.has_role != null && fieldValue.has_role != undefined && this.isArray(fieldValue.has_role) && fieldValue.has_role.length > 0) {
-      let check = 0;
-      for (let index = 0; index < fieldValue.has_role.length; index++) {
-        const element = fieldValue.has_role[index];
-        if (this.is_check_role(element._id)) {
-          check = 1;
-          break;
-        } else {
-          check = 0;
-        }
-      }
-      if(check == 1){
-        return false;
-      }else{
-        return true;
-      }
-    } else {
-      return true;
-    }
-  }
-
   openTreeModal(fieldLabel:any, ddnField:any, modalName:any) {
     const alertData = {
       "event": true,
@@ -507,335 +77,8 @@ export class CommonFunctionService {
     }
     this.modalService.open(modalName, alertData);
   }
-  getValueForDotFieldName(value:any,fieldName:any){
-    let crValue = "";
-    if(typeof value == "string"){
-      crValue = value;
-    }else if(typeof value == "object"){
-      let fName = fieldName.indexOf('.') != -1 ? (fieldName).split('.')[0]:fieldName;
-      let objectValue:any = {};
-      objectValue[fName] =  value
-      crValue = fieldName.indexOf('.') != -1 ?this.getObjectValue(fieldName,objectValue): this.getddnDisplayVal(value);
-    }
-    return crValue;
-  }
-
-  getfilterCrlist(headElements:any,formValue:any) {
-    const filterList:any = []
-    if(formValue != undefined){
-      const criteria:any = [];
-      headElements.forEach((element: any) => {
-        if(element != null && element.type != null){
-          let fieldName = element.field_name;
-          let value = formValue[element.field_name];
-          switch (element.type.toLowerCase()) {
-            case "button":
-            case "text":
-            case "tree_view_selection":
-            case "dropdown":
-              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
-                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0 && element.type != 'dropdown'){
-                  element.api_params_criteria.forEach((cri: any) => {
-                    criteria.push(cri)
-                  });
-                }else if (element.multi_select && element.datatype == "object"){
-                  let fvalue = '';
-                  if(value && value.length > 0){
-                    value.forEach((vl: string, i: number) => {
-                      if((value.length - 1) == i){
-                          fvalue = fvalue + vl;
-                      }else{
-                          fvalue = fvalue + vl + ":";
-                      }
-                    });
-                  }
-                  filterList.push(
-                    {
-                        "fName": fieldName,
-                        "fValue": fvalue,
-                        "operator": "in"
-                      }
-                    )
-                }
-                else{
-                  filterList.push(
-                    {
-                      "fName": fieldName,
-                      "fValue": this.getValueForDotFieldName(value,fieldName),
-                      "operator": this.getOperator()
-                    }
-                  )
-                }
-              }
-              break;
-            case "number":
-                if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
-                  if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                    element.api_params_criteria.forEach((cri: any) => {
-                      criteria.push(cri)
-                    });
-                  }else{
-                    filterList.push(
-                      {
-                        "fName": fieldName,
-                        "fValue": this.getddnDisplayVal(value),
-                        "operator": "eq"
-                      }
-                    )
-                  }
-                }
-                break;
-            case "typeahead":
-              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
-                if(this.isArray(element.dataFilterCriteria) && element.dataFilterCriteria.length > 0){
-                  element.dataFilterCriteria.forEach((cri: any) => {
-                    criteria.push(cri)
-                  });
-                }else{
-                  filterList.push(
-                    {
-                      "fName": fieldName,
-                      "fValue": this.getValueForDotFieldName(value,fieldName),
-                      "operator": this.getOperator()
-                    }
-                  )
-                }
-              }
-              break;
-            case "info":
-              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
-                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                  element.api_params_criteria.forEach((cri: any) => {
-                    criteria.push(cri)
-                  });
-                }else{
-                  filterList.push(
-                    {
-                      "fName": fieldName,
-                      "fValue": this.getddnDisplayVal(value),
-                      "operator": this.getOperator()
-                    }
-                  )
-                }
-              }
-              break;
-              case "reference_names":
-              case "chips":
-              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
-                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                  element.api_params_criteria.forEach((cri: any) => {
-                    criteria.push(cri)
-                  });
-                }else{
-                  filterList.push(
-                    {
-                      "fName": fieldName+".name",
-                      "fValue": this.getddnDisplayVal(value),
-                      "operator": this.getOperator()
-                    }
-                  )
-                }
-              }
-              break;
-            case "date":
-            case "datetime":
-              if(formValue && formValue[fieldName] && formValue[fieldName] != ''){
-                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                  element.api_params_criteria.forEach((cri: any) => {
-                    criteria.push(cri)
-                  });
-                }else{
-                  filterList.push(
-                    {
-                      "fName": fieldName,
-                      "fValue": this.dateFormat(value),
-                      "operator": "eq"
-                    }
-                  )
-                }
-              }
-              break;
-            case "daterange":
-              if(formValue && formValue[fieldName] && formValue[fieldName].start != '' && formValue[fieldName].end != null){
-                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                  element.api_params_criteria.forEach((cri: any) => {
-                    criteria.push(cri)
-                  });
-                }else{
-                  filterList.push(
-                    {
-                      "fName": fieldName,
-                      "fValue": this.dateFormat(value.start),
-                      "operator": "gte"
-                    }
-                  )
-                }
-              }
-              if(formValue && formValue[fieldName] && formValue[fieldName].end != '' && formValue[fieldName].end != null){
-                if(this.isArray(element.api_params_criteria) && element.api_params_criteria.length > 0){
-                  element.api_params_criteria.forEach((cri: any) => {
-                    criteria.push(cri)
-                  });
-                }else{
-                  filterList.push(
-                    {
-                      "fName": fieldName,
-                      "fValue": this.dateFormat(value.end),
-                      "operator": "lte"
-                    }
-                  )
-                }
-              }
-              break;
-            default:
-              break;
-          }
-        }
-      });
-      if(criteria && criteria.length > 0){
-        const crList = this.getCriteriaList(criteria,formValue);
-        if(crList && crList.length > 0){
-          crList.forEach((element: any) => {
-            filterList.push(element);
-          });
-        }
-      }
-    }
-    return filterList;
-  }
   dateFormat(value:any) {
     return this.datePipe.transform(value, 'dd/MM/yyyy');
-  }
-  getOperator() {
-     let defaultOperator = this.storageService.getApplicationSetting().defaultSearchOperatorInGrid;
-     let operator = "";
-     if(defaultOperator && defaultOperator != null && defaultOperator != "") {
-      operator = defaultOperator
-     }else {
-      operator = "stwic";
-     }
-     return operator;
-  }
-
-  commanApiPayload(headElement:any,tableField:any,actionButton:any,object?:any){
-    const staticModalGroup:any = [];
-    let staticModal:any = {};
-    if(headElement.length > 0){
-      headElement.forEach((element: any) => {
-        if (element.api_params && element.api_params != '') {
-          let call_back_field =  '';
-          let criteria = [];
-          if(element.call_back_field && element.call_back_field != ''){
-            call_back_field =  element.call_back_field;
-          }
-          if(element.api_params_criteria && element.api_params_criteria != ''){
-            criteria =  element.api_params_criteria;
-          }
-          staticModal = this.getPaylodWithCriteria(element.api_params,call_back_field,criteria,object?object:{});
-          if(element.adkey && element.adkey != '' && element.adkey != null){
-            staticModal['adkeys'] = element.adkey;
-            staticModalGroup.push(staticModal);
-          }else{
-            staticModalGroup.push(staticModal);
-          }
-
-        }
-
-      });
-    }
-
-    if(actionButton.length > 0){
-      actionButton.forEach((element: any) => {
-        if (element.api_params && element.api_params != '') {
-          let call_back_field =  '';
-          let criteria = [];
-          if(element.call_back_field && element.call_back_field != ''){
-            call_back_field =  element.call_back_field;
-          }
-          if(element.api_params_criteria && element.api_params_criteria != ''){
-            criteria =  element.api_params_criteria;
-          }
-          const staticModal = this.getPaylodWithCriteria(element.api_params,call_back_field,criteria,object?object:{});
-
-          staticModalGroup.push(staticModal);
-        }
-      });
-    }
-
-    if(tableField.length > 0){
-
-      tableField.forEach((element:any) => {
-        let call_back_field =  '';
-        let criteria = [];
-        if (element.api_params && element.api_params != '' && element.type != "typeahead") {
-          if(element.call_back_field && element.call_back_field != ''){
-            call_back_field =  element.call_back_field;
-          }
-          if(element.api_params_criteria && element.api_params_criteria != ''){
-            criteria =  element.api_params_criteria;
-          }
-          const staticModal = this.getPaylodWithCriteria(element.api_params,call_back_field,criteria,object?object:{},element.data_template);
-          if(element.api_params.indexOf("html_view") >= 0){
-            staticModal["data"]=object;
-          }
-          staticModalGroup.push(staticModal);
-        }
-        switch (element.type) {
-          case "list_of_fields":
-          case "group_of_fields":
-            if (element.list_of_fields && element.list_of_fields.length > 0) {
-              element.list_of_fields.forEach((data:any) => {
-                if(data && data != null){
-                  let call_back_field =  '';
-                  let criteria = [];
-                  if (data.api_params && data.api_params != '' && data.type != "typeahead") {
-
-                    if(data.call_back_field && data.call_back_field != ''){
-                      call_back_field =  data.call_back_field;
-                    }
-                    if(data.api_params_criteria && data.api_params_criteria != ''){
-                      criteria =  data.api_params_criteria;
-                    }
-                    const staticModalListOfFields = this.getPaylodWithCriteria(data.api_params,call_back_field,criteria,object?object:{},element.data_template);
-                    if(data.api_params.indexOf("html_view") >= 0){
-                      staticModalListOfFields["data"]=object;
-                    }
-                    staticModalGroup.push(staticModalListOfFields);
-                  }
-                }
-              });
-            }
-            break;
-            case "stepper":
-            if (element.list_of_fields && element.list_of_fields.length > 0) {
-              element.list_of_fields.forEach((step:any) => {
-                step.list_of_fields.forEach((data:any) => {
-                  let call_back_field =  '';
-                  let criteria = [];
-                  if (data.api_params && data.api_params != '' && data.type != "typeahead") {
-
-                    if(data.call_back_field && data.call_back_field != ''){
-                      call_back_field =  data.call_back_field;
-                    }
-                    if(data.api_params_criteria && data.api_params_criteria != ''){
-                      criteria =  data.api_params_criteria;
-                    }
-                    const staticModalListOfFields = this.getPaylodWithCriteria(data.api_params,call_back_field,criteria,object?object:{},element.data_template);
-                    if(data.api_params.indexOf("html_view") >= 0){
-                      staticModalListOfFields["data"]=object;
-                    }
-                    staticModalGroup.push(staticModalListOfFields);
-                  }
-                });
-              });
-            }
-            break;
-          default:
-            break;
-        }
-      });
-    }
-    return staticModalGroup;
   }
   getDivClass(field:any,fieldsLangth:any){
     const fields = {...field}
@@ -864,7 +107,6 @@ export class CommonFunctionService {
         }
     }
   }
-
   getFixedDivClass(field:any,fieldsLangth:any){
     const fields = {...field}
     if (!fields.type) {
@@ -874,7 +116,6 @@ export class CommonFunctionService {
       return fields.field_class;
     }
   }
-
   getButtonDivClass(field:any){
     const fields = {...field}
     if(fields.field_class && field.field_class != ''){
@@ -883,7 +124,6 @@ export class CommonFunctionService {
     return;
 
   }
-
   getConvertedString(ja:any, incomingTemplate:any){
     let template = "" + incomingTemplate;
     let reg = new RegExp("(\\[)(.*?)(\\])");
@@ -906,7 +146,6 @@ export class CommonFunctionService {
 
     return template;
   }
-
   getStringValue(details:any,ja:any){
     //ja -> object
     //deatils -> pattern
@@ -915,195 +154,6 @@ export class CommonFunctionService {
   }
 
 
-  getValueForGrid(field:any, object:any) {
-    let value:any = '';
-    let fieldName: any= '';
-    if (field) {
-      if(this.coreFunctionService.isNotBlank(field.display_name)){
-        fieldName= field.display_name;
-      }
-      else if(this.coreFunctionService.isNotBlank(field.field_name)){
-        fieldName= field.field_name;
-      }
-    }
-    if(fieldName !=''){
-      value= this.getObjectValue(fieldName, object)
-    }
-    if (!field.type) field.type = "Text";
-    let returnValue:any = '';
-    switch (field.type.toLowerCase()) {
-      case 'datetime':
-        if(value && value != ''){
-          if(this.storageService.checkPlatForm() == 'mobile'){
-            returnValue =  this.datePipe.transform(value, 'medium');
-          }else{
-            returnValue = this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
-          }
-        }
-        return returnValue
-      case 'date':
-        if(value && value != ''){
-          if(this.storageService.checkPlatForm() == 'mobile'){
-            returnValue =  this.datePipe.transform(value, 'mediumDate');
-          }else{
-            returnValue = this.datePipe.transform(value, 'dd/MM/yyyy');
-          }
-        }
-        return returnValue;
-      case 'time': return this.datePipe.transform(value, 'h:mm a');
-      case "boolean": return value ? "Yes" : "No";
-      case "currency": return this.CurrencyPipe.transform(value, 'INR');
-  	  case "dropdown": return value && value.name ? value.name : value;
-      case "typeahead": return value && value.name ? value.name : value;
-      case "info":
-        if (value && value != '') {
-          if(this.storageService.checkPlatForm() == 'mobile'){
-            return '<span class="material-symbols-outlined cursor-pointer">visibility</span>';
-          }else{
-            return '<i class="fa fa-eye cursor-pointer"></i>';
-          }
-        } else {
-          return '-';
-        }
-
-      case "html" :
-        if (value && value != '') {
-          return '<span class="material-icons cursor-pointer">preview</span>';
-        } else {
-          return '-';
-        }
-      case "file":
-        if (value && value != '') {
-          if(this.storageService.checkPlatForm() == 'mobile'){
-            return '<span class="material-symbols-outlined cursor-pointer">text_snippet</span>';
-          }else{
-            return '<span class="material-icons cursor-pointer">text_snippet</span>';
-          }
-        } else {
-          return '-';
-        }
-      case "template":
-        if (value && value != '') {
-          if(this.storageService.checkPlatForm() == 'mobile'){
-            return '<span class="material-symbols-outlined">description</span>';
-          }else{
-            return '<i class="fa fa-file cursor-pointer" aria-hidden="true"></i>';
-          }
-        } else {
-          return '-';
-        }
-      case "image":
-        return '<img src="data:image/jpg;base64,' + value + '" />';
-      case "icon":
-        if(this.storageService.checkPlatForm() == 'mobile'){
-          return '<span class="material-symbols-outlined cursor-pointer">' + field.field_class + '</span>';
-        }else{
-          return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';
-        }
-      case "download_file":
-        if (value && value != '') {
-          if(this.storageService.checkPlatForm() == 'mobile'){
-            return '<span class="material-symbols-outlined cursor-pointer">' + field.field_class + '</span>';
-          }else{
-            return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';
-          }
-        }else{
-          return '-';
-        }
-      case "trim_of_string":
-        if(value != undefined && value != null && value != ''){
-          if(typeof value == 'string'){
-            let stringObject = value.split('/');
-            if(stringObject.length > 0){
-              return stringObject[0]
-            }else{
-              return value;
-            }
-          }else{
-            return value;
-          }
-        }else{
-          return value;
-        }
-
-      case "color":
-        break;
-
-      case "pattern":
-        if(object != null){
-          return this.getConvertedString(object,field.field_name);
-        }
-      break;
-      case "chips":
-        if(this.coreFunctionService.isNotBlank(value) && this.isArray(value)){
-          let name = "";
-          for(let i=0 ;i<value.length; i++){
-            if(this.coreFunctionService.isNotBlank(value[i]['name'])){
-              name = name+', '+value[i]['name'];
-            }else{
-              name = name+', '+value[i];
-            }
-          }
-          return name.substring(2);;
-        }
-        return "-";
-      case "reference_names":
-        if(this.coreFunctionService.isNotBlank(value) && this.isArray(value)){
-          let name = '';
-          for(let i=0 ;i<value.length; i++){
-            if(this.coreFunctionService.isNotBlank(value[i]['name'])){
-              name = name+', '+value[i]['name'];
-            }
-          }
-          if(name.length > 1){
-            name = name.substring(2);
-          }
-          return name;
-        }else{
-          return "-";
-        }
-      default: return value;
-    }
-  }
-  getValueForGridTooltip(field:any, object:any) {
-    let value = '';
-    if (field.field_name != undefined && field.field_name != null && field.field_name != '') {
-      value = this.getObjectValue(field.field_name, object)
-    }
-    if (!field.type) field.type = "Text";
-    switch (field.type.toLowerCase()) {
-      case 'datetime': return this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
-      case 'date': return this.datePipe.transform(value, 'dd/MM/yyyy');
-      case 'time': return this.datePipe.transform(value, 'h:mm a');
-      case "boolean": return value ? "Yes" : "No";
-      case "currency": return this.CurrencyPipe.transform(value, 'INR');
-      case "info":
-      case "file":
-      case "template":
-      case "image":
-      case "icon":
-      case "html":
-          return '';
-      default: return value;
-    }
-  }
-  getTemData(tempName:any) {
-    const params = "form_template";
-    const criteria = ["name;eq;"+tempName+";STATIC"];
-    const payload = this.getPaylodWithCriteria(params,'',criteria,{});
-    // const getTemplates = {
-    //   crList: [{
-    //     "fName": "name",
-    //     "fValue": tempName,
-    //     "operator": "eq"
-    //   }],
-    //   key2: this.storageService.getAppId(),
-    //   refCode: this.getRefcode(),
-    //   log: this.storageService.getUserLog(),
-    //   value: "form_template"
-    // }
-    return payload;
-  }
   sanitizeObject(tableFields:any, formValue:any, validatField:any,formValueWithCust?:any) {
     for (let index = 0; index < tableFields.length; index++) {
       const element = tableFields[index];
@@ -1484,38 +534,38 @@ export class CommonFunctionService {
   }
 
 
-  getNetAmountWithPercent(total:number, percent:number) {
-    let percentAmount = 0;
-    let netAmount = 0;
-    percentAmount = total * percent / 100;
-    netAmount = total - percentAmount;
-    return { p_amount: percentAmount, net_amount: netAmount }
-  }
+  // getNetAmountWithPercent(total:number, percent:number) {
+  //   let percentAmount = 0;
+  //   let netAmount = 0;
+  //   percentAmount = total * percent / 100;
+  //   netAmount = total - percentAmount;
+  //   return { p_amount: percentAmount, net_amount: netAmount }
+  // }
 
-  claimAmountCalculation(field1:any, field2:any, field3:any) {
-    let total = 0;
-    if (field1 && field1 != "") {
-      total = total + field1
-    }
-    if (field2 && field2 != "") {
-      total = total + field2;
-    }
-    if (field3 && field3 != "") {
-      total = total + field3;
-    }
-    return total;
-  }
+  // claimAmountCalculation(field1:any, field2:any, field3:any) {
+  //   let total = 0;
+  //   if (field1 && field1 != "") {
+  //     total = total + field1
+  //   }
+  //   if (field2 && field2 != "") {
+  //     total = total + field2;
+  //   }
+  //   if (field3 && field3 != "") {
+  //     total = total + field3;
+  //   }
+  //   return total;
+  // }
 
-  array_move(arr:any, old_index:number, new_index:number) {
-    if (new_index >= arr.length) {
-      var k = new_index - arr.length + 1;
-      while (k--) {
-        arr.push(undefined);
-      }
-    }
-    arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
-    return arr; // for testing
-  };
+  // array_move(arr:any, old_index:number, new_index:number) {
+  //   if (new_index >= arr.length) {
+  //     var k = new_index - arr.length + 1;
+  //     while (k--) {
+  //       arr.push(undefined);
+  //     }
+  //   }
+  //   arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+  //   return arr; // for testing
+  // };
 
   openFileUpload(fieldName:any, modalName:any, formValue:any, fileData:any) {
     const alertData = {
@@ -1580,26 +630,8 @@ export class CommonFunctionService {
   // getTitlecase(value) {
   //   return this.titlecasePipe.transform(value);
   // }
-  previewModal(gridData:any, currentMenu:any, modalId:any) {
-    const getpreviewHtml = {
-      _id: gridData._id,
-      data: this.getPaylodWithCriteria(currentMenu.name, '', [], '')
-    }
-    this.apiService.GetPreviewHtml(getpreviewHtml);
-    const alertData = {
-      gridData: gridData,
-      currentPage: currentMenu.name
-    }
-    this.modalService.open(modalId, alertData);
-  }
-  preview(gridData:any, currentMenu:any, modalId:any) {
-    const getpreviewHtml = {
-      _id: gridData._id,
-      data: this.getPaylodWithCriteria(currentMenu.name, '', [], '')
-    }
-    getpreviewHtml.data['data'] = gridData;
-    this.apiService.GetPreviewHtml(getpreviewHtml);
-  }
+
+
 
   gotoHomePage() {
     const payload = {
@@ -1610,71 +642,15 @@ export class CommonFunctionService {
     }
     return payload;
   }
-  downloadPdf(data:any, currentMenu:any) {
-    let payloadData = {};
-    if (currentMenu != '') {
-      payloadData = this.getPaylodWithCriteria(currentMenu, '', [], '')
-    }
-    const getPdfData:any = {
-      _id: data._id,
-      data: payloadData,
-      responce: { responseType: "arraybuffer" }
-    }
-    let fileName = currentMenu;
-    fileName = fileName.charAt(0).toUpperCase() + fileName.slice(1)
-    const downloadPdfCheck = fileName + '-' + new Date().toLocaleDateString();
-    if (getPdfData._id && getPdfData._id != undefined && getPdfData._id != null && getPdfData._id != '') {
-      getPdfData.data['data'] = data;
-      this.apiService.GetPdfData(getPdfData);
-    }
-    return downloadPdfCheck;
-  }
-
-  getPdf(data:any,currentMenu:any) {
-    let payloadData = {};
-    if(currentMenu != ''){
-      payloadData = this.getPaylodWithCriteria(currentMenu, '', [], '')
-    }
-    const getFileData:any = {
-      _id: data._id,
-      data: payloadData,
-      responce: { responseType: "arraybuffer" }
-    }
-    let fileName = currentMenu;
-    fileName = fileName.charAt(0).toUpperCase() + fileName.slice(1)
-    const downloadPdfCheck = fileName + '-' + new Date().toLocaleDateString();
-    if(getFileData._id && getFileData._id != undefined && getFileData._id != null && getFileData._id != ''){
-      getFileData.data['data']=data;
-      this.apiService.GetFileData(getFileData);
-    }
-    return  downloadPdfCheck;
-  }
-
   download_file(payload:object){
     this.apiService.GetFileData(payload);
   }
-
   getQRCode(data:object){
     this.apiService.GetQr(data);
   }
-
   getAuditHistory(data:object){
     this.apiService.getAuditHistory(data);
   }
-
-  getFormForTds(data:any,currentMenu:any, object:any){
-    let payloadData:any = {};
-    if(currentMenu != ''){
-      payloadData = this.getPaylodWithCriteria(currentMenu, '', [], '')
-      payloadData['data']=object
-    }
-    const getFormData = {
-      _id : data._id,
-      data: payloadData
-    }
-    return getFormData;
-  }
-
   downloadFile(file:string) {
     const payload = {
       path: 'download',
@@ -1740,51 +716,6 @@ export class CommonFunctionService {
     }
      return data;
   }
-
-
-  checkCustmizedValuValidation(fields:any, value:any) {
-    let validate:any = [];
-    let response:any = {
-      status : false,
-      msg : ""
-    }
-    fields.forEach((element:any) => {
-      switch (element.type) {
-        case "grid_selection":
-        case "list_of_string":
-          if (element.is_mandatory) {
-            if (value[element.field_name] === undefined || value[element.field_name] === '' || value[element.field_name] === null || !this.isArray(value[element.field_name])) {
-              validate.push(element);
-            } else if (this.isArray(value[element.field_name])) {
-              if (value[element.field_name].length <= 0) {
-                validate.push(element);
-              }
-            }
-          }
-        break;
-        default:
-          validate = validate;
-      }
-    });
-    if (validate.length > 0) {
-      let fieldName = '';
-      validate.forEach((element:any) => {
-        if (fieldName == '') {
-          fieldName += element.label
-        } else {
-          fieldName += ', ' + element.label
-        }
-
-      });
-      response.msg = fieldName + ' Required.';
-      response.status = false;
-      // this.notificationService.notify('bg-danger', fieldName + ' Required.')
-    } else {
-      response.status = true;
-    }
-    return response;
-  }
-
   formSize(evt:any,fieldLangth:number){
     if(evt && evt.class && evt.class!= ''){
       return evt.class;
@@ -1798,70 +729,17 @@ export class CommonFunctionService {
     }
   }
 
-  price_after_disc_health_test(templateForm:any){
-    let templateValue = templateForm.getRawValue();
-    let discount = 0;
-    discount = templateValue.discount;
-  }
+  // price_after_disc_health_test(templateForm:any){
+  //   let templateValue = templateForm.getRawValue();
+  //   let discount = 0;
+  //   discount = templateValue.discount;
+  // }
 
-
-  getDataForGrid(page:any,tab:any,currentMenu:any,headElements:any,filterForm:any,selectContact:any){
-    let grid_api_params_criteria = [];
-    if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
-      this.itemNumOfGrid = tab.grid.grid_page_size;
-    }
-    if(this.isGridFieldExist(tab,"api_params_criteria")){
-      grid_api_params_criteria = tab.grid.api_params_criteria;
-    }
-    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
-    this.getfilterCrlist(headElements,filterForm).forEach((element: any) => {
-      data.crList.push(element);
-    });
-    if(selectContact != ''){
-      const tabFilterCrlist = {
-        "fName": 'account._id',
-        "fValue": selectContact,
-        "operator": 'eq'
-      }
-      data.crList.push(tabFilterCrlist);
-    }
-    const getFilterData = {
-      data: data,
-      path: null
-    }
-    return getFilterData;
-  }
-  setPageNoAndSize(payload:any,page:number){
-    payload['pageNo'] = page - 1;
-    payload['pageSize'] = this.itemNumOfGrid;
-    return payload;
-  }
-  getRealTimeGridData(currentMenu:any, object:any) {
-    let grid_api_params_criteria = [];
-    let page = 1;
-    let criteria = "_id;eq;" + object._id + ";STATIC";
-    grid_api_params_criteria.push(criteria);
-    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
-    const getFilterData = {
-      data: data,
-      path: null
-    }
-    this.apiService.getGridRunningData(getFilterData);
-  }
-  setPageNumverAndSize(payload:any,page:number,){
-    payload['pageNo'] = page - 1;
-    payload['pageSize'] = this.itemNumOfGrid;
-    return payload;
-  }
-  getPage(page: number,tab:any,currentMenu:string,headElements:object,filterForm:object,selectContact:any) {
-  return this.getDataForGrid(page,tab,currentMenu,headElements,filterForm,selectContact);
-  }
-  isGridFieldExist(tab:any,fieldName:any){
-    if(tab.grid && tab.grid[fieldName] && tab.grid[fieldName] != undefined && tab.grid[fieldName] != null && tab.grid[fieldName] != ''){
-    return true;
-    }
-    return false;
-  }
+  // setPageNumverAndSize(payload:any,page:number,){
+  //   payload['pageNo'] = page - 1;
+  //   payload['pageSize'] = this.itemNumOfGrid;
+  //   return payload;
+  // }
   getMatchingInList(list:any,IncomingData:any,existData:any){
     var validity = true;
     list.forEach((matchcriteria: any) => {
@@ -1874,8 +752,33 @@ export class CommonFunctionService {
     });
     return validity;
   }
-
-
+  getCorrectIndex(data:any, indx:number,field:any,gridData:any,filterValue:any){
+    let index;
+    if (field.matching_fields_for_grid_selection && field.matching_fields_for_grid_selection.length > 0) {
+      gridData.forEach((row:any, i:number) => {
+        var validity = true;
+        field.matching_fields_for_grid_selection.forEach((matchcriteria:any) => {
+          if (this.getObjectValue(matchcriteria, data) == this.getObjectValue(matchcriteria, row)) {
+            validity = validity && true;
+          }
+          else {
+            validity = validity && false;
+          }
+        });
+        if (validity == true) {
+          index = i;
+        }
+      });
+    }else if (data._id != undefined) {
+      index = this.getIndexInArrayById(gridData, data._id);
+    } else {
+      index = indx;
+    }
+    if(index && index != indx && filterValue == ''){
+      index = indx;
+    }
+    return index;
+  }
   getIndexInArrayById(array:any,id:any,key?:any){
     let index = -1;
     if(array && array.length > 0){
@@ -1901,97 +804,9 @@ export class CommonFunctionService {
     }
     return index;
   }
-
   openModal(id:any, data:any){
-  this.modalService.open(id, data);
+    this.modalService.open(id, data);
   }
-
-  checkDataAlreadyAddedInListOrNot(field:any,incomingData:any,alreadyDataAddedlist:any,i?:any){
-    if(field && field.type && field.type == "date"){
-      incomingData = ""+incomingData;
-    }
-    let checkStatus = {
-      status : false,
-      msg : ""
-    };
-    if(field && field.allowDuplicacy){
-      checkStatus.status = false;
-      return checkStatus;
-    }else{
-      let primary_key = field.field_name
-      let criteria = primary_key+"#eq#"+incomingData;
-      let primaryCriteriaList=[];
-      primaryCriteriaList.push(criteria);
-      if(field && field.primaryKeyCriteria && Array.isArray(field.primaryKeyCriteria) && field.primaryKeyCriteria.length > 0){
-        field.primaryKeyCriteria.forEach((criteria:any) => {
-          const crList = criteria.split("#");
-          const cr = crList[0]+"#"+crList[1]+"#"+incomingData;
-          primaryCriteriaList.push(cr);
-        });
-      }
-      if(alreadyDataAddedlist == undefined){
-        alreadyDataAddedlist = [];
-      }
-      let alreadyExist = false;
-      if(typeof incomingData == 'object'){
-        alreadyDataAddedlist.forEach((element:any) => {
-          if(element._id == incomingData._id){
-            alreadyExist =  true;
-          }
-        });
-      }
-      else if(typeof incomingData == 'string'){
-        for (let index = 0; index < alreadyDataAddedlist.length; index++) {
-          const element = alreadyDataAddedlist[index];
-          if(i == undefined || i == -1){
-            if(typeof element == 'string'){
-              if(element == incomingData){
-                alreadyExist =  true;
-              }
-            }else{
-              if(primaryCriteriaList && primaryCriteriaList.length > 0){
-                for (let index = 0; index < primaryCriteriaList.length; index++) {
-                  const cri = primaryCriteriaList[index];
-                  alreadyExist = this.checkIfCondition(cri,element,field.type);
-                  if(alreadyExist){
-                    const crList = cri.split("#");
-                    switch (crList[1]) {
-                      case "lte":
-                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is gretter then to "+crList[0]+". !!!";
-                        break;
-                      case "gte":
-                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is less then to "+crList[0]+". !!!";
-                        break;
-                      default:
-                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is already added. !!!";
-                        break;
-                    }
-                    break;
-                  }
-                }
-              }
-            }
-            if(alreadyExist){
-              break;
-            }
-          }else{
-            break;
-          }
-        };
-      }else{
-        alreadyExist =  false;
-      }
-      if(alreadyExist){
-        checkStatus.status = true;
-        return checkStatus;
-      }else{
-        checkStatus.status = false;
-        return checkStatus;
-      }
-    }
-
-  }
-
   getOperatorSymbol(operator:any){
     switch (operator) {
       case 'eq':
@@ -2001,36 +816,26 @@ export class CommonFunctionService {
     }
   }
 
-  checkDisableRowIf(field:string,formValue:string){
-    let check = false;
-    if(this.checkIfCondition(field,formValue)){
-      check = true;
-    }else{
-      check = false;
-    }
-    return check;
-  }
+  // getRouthQueryToRedirectUrl(){
+  //   const redirectUrl:any = this.storageService.getRedirectUrl();
+  //     let searchKey = '';
+  //     if(redirectUrl.indexOf('?') != -1 ){
+  //       searchKey = '?';
+  //     }
+  //     if(redirectUrl.indexOf('%') != -1){
+  //       searchKey = '%';
+  //     }
 
-  getRouthQueryToRedirectUrl(){
-    const redirectUrl:any = this.storageService.getRedirectUrl();
-      let searchKey = '';
-      if(redirectUrl.indexOf('?') != -1 ){
-        searchKey = '?';
-      }
-      if(redirectUrl.indexOf('%') != -1){
-        searchKey = '%';
-      }
-
-      let newUrlWithQuery = '';
-      if(searchKey != ''){
-        const index = redirectUrl.indexOf(searchKey);
-        const stringLength = redirectUrl.length;
-        const queryPrams = redirectUrl.substring(index,stringLength);
-        const newParam = queryPrams.replace('%3F','');
-        newUrlWithQuery = newParam.replace('%3D',':');
-      }
-      return {newUrlWithQuery};
-  }
+  //     let newUrlWithQuery = '';
+  //     if(searchKey != ''){
+  //       const index = redirectUrl.indexOf(searchKey);
+  //       const stringLength = redirectUrl.length;
+  //       const queryPrams = redirectUrl.substring(index,stringLength);
+  //       const newParam = queryPrams.replace('%3F','');
+  //       newUrlWithQuery = newParam.replace('%3D',':');
+  //     }
+  //     return {newUrlWithQuery};
+  // }
 
   getFormDataInMultiformCollection(multiformCollection:any,formValue:any,index?:any){
     let data:any = {};
@@ -2078,15 +883,7 @@ export class CommonFunctionService {
    return listOfObjects;
   }
 
-  getUserPrefrerence(user:any) {
-    let criteria = "userId._id;eq;"+user._id+";STATIC";
-    let myData = this.setPageNoAndSize(this.getPaylodWithCriteria("user_preference", "", [criteria], {}),1);
-    const payloadData = {
-      path: null,
-      data : myData
-    }
-    this.apiService.getFavouriteData(payloadData);
-  }
+
   updateUserPreference(data:object,fieldName:string,parent?:string){
     let payloadData = this.getUserPreferenceObj(data,fieldName,parent);
     let payload = {
@@ -2208,19 +1005,6 @@ export class CommonFunctionService {
 
      return obj;
    }
-  getUserNotification(pageNo:any){
-    let user = this.storageService.GetUserInfo();
-    const userId = user._id;
-    if(userId && userId != null && userId != ''){
-      const criteria:any = "userId._id;eq;"+userId+";STATIC";
-      const payload = this.setPageNoAndSize(this.getPaylodWithCriteria('user_notification','',[criteria],{}),pageNo);
-      const callPayload = {
-        "path" : null,
-        "data": payload
-      }
-      this.apiService.getUserNotification(callPayload);
-    }
-  }
   updateFieldInList(fieldName:any,list:any){
     let modifyList:any = [];
     if(list && list.length > 0){
@@ -2232,47 +1016,13 @@ export class CommonFunctionService {
     }
     return modifyList;
   }
-  modifiedGridColumns(gridColumns:any,object:any){
-    if(gridColumns.length > 0){
-      gridColumns.forEach((field:any) => {
-        if(this.coreFunctionService.isNotBlank(field.show_if)){
-          if(!this.showIf(field,object)){
-            field['display'] = false;
-          }else{
-            field['display'] = true;
-          }
-        }else{
-          field['display'] = true;
-        }
-      });
-    }
-    return gridColumns;
-  }
+  // manufactured_as_customer(templateForm: FormGroup) {
+  //   (<FormGroup>templateForm.controls["sample_details"]).controls["mfg_by"].patchValue(templateForm.value.account.name);
+  // }
 
-  getApplicationAllSettings() {
-    const payload1 = this.setPageNoAndSize(this.getPaylodWithCriteria("application_setting", "", [], {}), 1);
-    this.apiService.getAplicationsSetting(payload1);
-    const payload = this.setPageNoAndSize(this.getPaylodWithCriteria("application_theme_setting", "", [], {}), 1);
-    this.apiService.getAplicationsThemeSetting(payload);
-  }
-
-
-  manufactured_as_customer(templateForm: FormGroup) {
-    (<FormGroup>templateForm.controls["sample_details"]).controls["mfg_by"].patchValue(templateForm.value.account.name);
-  }
-
-  supplied_as_customer(templateForm: FormGroup) {
-    (<FormGroup>templateForm.controls["sample_details"]).controls["supplied_by"].patchValue(templateForm.value.account.name);
-  }
-  setValueInVieldsForChild(templateForm: FormGroup, field: any) {
-    (<FormGroup>templateForm.controls['total_amount']).addControl('discount_amount', new FormControl(''))
-    field.value.forEach((element:any) => {
-      (<FormGroup>templateForm.controls[field.field]).controls[element.field].patchValue(element.value);
-    });
-    return templateForm;
-  }
-
-
+  // supplied_as_customer(templateForm: FormGroup) {
+  //   (<FormGroup>templateForm.controls["sample_details"]).controls["supplied_by"].patchValue(templateForm.value.account.name);
+  // }
 
   funModeTravelChange(value:any){
 
@@ -2285,9 +1035,6 @@ export class CommonFunctionService {
     }
     return obj;
   }
-
-
-
   print(data:any): void {
     let popupWin;
     popupWin = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');
@@ -2329,34 +1076,34 @@ export class CommonFunctionService {
     return donotResetFieldLists;
   }
 
-  modifyFileSetValue(files:any){
-    let fileName = '';
-    let fileLength = files.length;
-    let file = files[0];
-    if(fileLength == 1 && (file.fileName || file.rollName)){
-      fileName = file.fileName || file.rollName;
-    }else if(fileLength > 1){
-      fileName = fileLength + " Files";
-    }
-    return fileName;
-  }
-  modifyUploadFiles(files:any){
-    const fileList:any = [];
-    if(files && files.length > 0){
-      files.forEach((element:any) => {
-        if(element._id){
-          fileList.push(element)
-        }else{
-          if(!element.uploadData){
-            fileList.push({uploadData:[element]});
-          }else{
-            fileList.push(element);
-          }
-        }
-      });
-    }
-    return fileList;
-  }
+  // modifyFileSetValue(files:any){
+  //   let fileName = '';
+  //   let fileLength = files.length;
+  //   let file = files[0];
+  //   if(fileLength == 1 && (file.fileName || file.rollName)){
+  //     fileName = file.fileName || file.rollName;
+  //   }else if(fileLength > 1){
+  //     fileName = fileLength + " Files";
+  //   }
+  //   return fileName;
+  // }
+  // modifyUploadFiles(files:any){
+  //   const fileList:any = [];
+  //   if(files && files.length > 0){
+  //     files.forEach((element:any) => {
+  //       if(element._id){
+  //         fileList.push(element)
+  //       }else{
+  //         if(!element.uploadData){
+  //           fileList.push({uploadData:[element]});
+  //         }else{
+  //           fileList.push(element);
+  //         }
+  //       }
+  //     });
+  //   }
+  //   return fileList;
+  // }
   getFirstCharOfString(char:any){
     if(this.coreFunctionService.isNotBlank(char)){
       return char.charAt(0)

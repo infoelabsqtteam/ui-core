@@ -1,3 +1,4 @@
+import { StorageService } from './../storage/storage.service';
 import { Injectable } from '@angular/core';
 import { FormGroup, Validators } from '@angular/forms';
 import { CommonFunctionService } from '../common-utils/common-function.service';
@@ -8,7 +9,8 @@ import { CommonFunctionService } from '../common-utils/common-function.service';
 export class CheckIfService {
 
   constructor(
-    private commonFunctionService:CommonFunctionService
+    private commonFunctionService:CommonFunctionService,
+    private storageService:StorageService
   ) { }
   checkIsDisable(parent:any,chield:any,updateMode:boolean,formValue:any,templateForm:FormGroup){
     let responce = {
@@ -16,7 +18,7 @@ export class CheckIfService {
       templateForm:templateForm
     }
     if(parent == ''){
-      responce.tobedesabled = this.commonFunctionService.isDisable(chield,updateMode,formValue)
+      responce.tobedesabled = this.isDisable(chield,updateMode,formValue)
       if(responce.tobedesabled){
         if(!responce.templateForm.controls[chield.field_name].disabled){
           responce.templateForm.controls[chield.field_name].disable()
@@ -27,7 +29,7 @@ export class CheckIfService {
         }
       }
     }else{
-      responce.tobedesabled = this.commonFunctionService.isDisable(chield,updateMode,formValue)
+      responce.tobedesabled = this.isDisable(chield,updateMode,formValue)
       if(responce.tobedesabled){
         (<FormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].disable()
       }else{
@@ -42,7 +44,7 @@ export class CheckIfService {
       templateForm:templateForm
     }
     if(parent == ''){
-      responce.tobedesabled = this.commonFunctionService.isMendetory(chield,formValue)
+      responce.tobedesabled = this.isMendetory(chield,formValue)
       if(responce.tobedesabled){
         if(responce.templateForm.controls[chield.field_name].status == 'VALID'){
           responce.templateForm.controls[chield.field_name].setValidators([Validators.required]);
@@ -55,7 +57,7 @@ export class CheckIfService {
         }
       }
     }else{
-      responce.tobedesabled = this.commonFunctionService.isMendetory(chield,formValue)
+      responce.tobedesabled = this.isMendetory(chield,formValue)
       if(responce.tobedesabled){
         if((<FormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].status == 'VALID'){
           (<FormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].setValidators([Validators.required]);
@@ -78,7 +80,7 @@ export class CheckIfService {
       for (let index = 0; index < fieldValue.length; index++) {
         const value = fieldValue[index];
         formValue[parent] = value;
-        if(this.commonFunctionService.showIf(field,formValue)){
+        if(this.showIf(field,formValue)){
           check = 1;
           break;
         }
@@ -255,7 +257,7 @@ export class CheckIfService {
             msg : ""
           };
           if(list && list.length > 0){
-            alreadyAdded = this.commonFunctionService.checkDataAlreadyAddedInListOrNot(element,primary_key_field_value,list,i);
+            alreadyAdded = this.checkDataAlreadyAddedInListOrNot(element,primary_key_field_value,list,i);
           }
           if(alreadyAdded && alreadyAdded.status){
             checkDublic.status = true;
@@ -273,6 +275,444 @@ export class CheckIfService {
       }
     }
     return checkDublic;
+  }
+  isGridFieldExist(tab:any,fieldName:any){
+    if(tab.grid && tab.grid[fieldName] && tab.grid[fieldName] != undefined && tab.grid[fieldName] != null && tab.grid[fieldName] != ''){
+    return true;
+    }
+    return false;
+  }
+  checkShowIf(field:any,selectedRow:any,formValue:any){
+    const  objectc = selectedRow?selectedRow:{}
+    const object = JSON.parse(JSON.stringify(objectc));
+    if(formValue && typeof formValue == 'object' && Object.keys(formValue).length > 0){
+      Object.keys(formValue).forEach(key => {
+        object[key] = formValue[key];
+      })
+    }
+    const display = this.showIf(field,object);
+    const modifiedField = JSON.parse(JSON.stringify(field));
+    modifiedField['display'] = display;
+    field = modifiedField;
+    return display;
+  }
+  showIf(field:any, formValue:any) {
+    if (field.show_if && field.show_if != null && field.show_if != '') {
+      const showIf = field.show_if.split(';')
+      let checkIf = true;
+      for (let index = 0; index < showIf.length; index++) {
+        checkIf = this.checkIfConditionForArrayListValue(showIf[index], formValue);
+        if (!checkIf) {
+          return;
+        }
+      }
+      if (checkIf) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
+  }
+  checkIfConditionForArrayListValue(data:any, formValue:any){
+    let condition = []
+    condition = data.split('#');
+    if (condition.length == 4 && condition[3] != 'dynamic' && condition[3] != 'STATIC') {
+      let check = "";
+      let checkList = [];
+      let setValue = formValue ? this.commonFunctionService.getObjectValue(condition[0], formValue) : "";
+      if(setValue && setValue.length > 0){
+        for (let index = 0; index < setValue.length; index++) {
+          const element = setValue[index];
+          let value = this.commonFunctionService.getObjectValue(condition[3],element);
+          if(value && value != ''){
+            check = check + value + "#";
+            for (let index = 0; index < condition.length; index++) {
+              const conditons = condition[index];
+              if(index == 1){
+                check = check + conditons + '#';
+              }else if(index == 2){
+                check = check + conditons + '#STATIC';
+              }
+            }
+            checkList.push(check);
+            check = "";
+          }else{
+            return false;
+          }
+        }
+      }else{
+        return false;
+      }
+      if(checkList && checkList.length > 0){
+        for (let index = 0; index < checkList.length; index++) {
+          const condition = checkList[index];
+          let result = this.checkIfCondition(condition,formValue);
+          if(result){
+            return true;
+          }
+        }
+        return false;
+      }else{
+        return false;
+      }
+    }else{
+      return this.checkIfCondition(data,formValue);
+    }
+
+  }
+
+
+  isDisable(tableField:any, updateMode:any, formValue:any) {
+    if (tableField.is_disabled) {
+      return true;
+    } else {
+      if (tableField.disable_if && tableField.disable_if != '') {
+        return this.checkIfCondition(tableField.disable_if, formValue)
+      }
+
+      if (updateMode) {
+        if (tableField.disable_on_update != undefined && tableField.disable_on_update) {
+          return this.checkAddUpdateIf(tableField,'can_update_if');
+        } else {
+          return false;
+        }
+      } else {
+        if (tableField.disable_on_add != undefined && tableField.disable_on_add) {
+          return this.checkAddUpdateIf(tableField,'can_add_if');
+        }else{
+          return false;
+        }
+      }
+    }
+  }
+  is_check_role(id: any) {
+    const userInfo = this.storageService.GetUserInfo();
+    let check = 0;
+    if (userInfo.roles && userInfo.roles != null && userInfo.roles != "" && this.commonFunctionService.isArray(userInfo.roles) && userInfo.roles.length > 0) {
+      for (let index = 0; index < userInfo.roles.length; index++) {
+        const element = userInfo.roles[index];
+        if (element._id == id) {
+          check = 1;
+          break;
+        } else {
+          check = 0;
+        }
+      }
+    } else {
+      check = 0;
+    }
+    if(check == 1){
+      return true;
+    }else{
+      return false;
+    }
+  }
+  isMendetory(tableField:any, formValue:any) {
+    if (tableField.is_mandatory) {
+      return true;
+    } else {
+      if (tableField.mandatory_if && tableField.mandatory_if != '') {
+        return this.checkIfCondition(tableField.mandatory_if, formValue)
+      }else {
+        return false;
+      }
+    }
+  }
+
+  checkIfCondition(data:any, formValue:any,datatype?:any) {
+    let condition = []
+    condition = data.split('#')
+    if (condition.length >= 2) {
+      if(condition[3] != null && condition[3] != "" && condition[3] == 'dynamic'){
+        condition[2] = this.commonFunctionService.getObjectValue(condition[2], formValue)+"";
+      }
+      let setValue:any = "";
+      if(condition.length > 3 && condition[3] == 'STATIC'){
+        setValue = condition[0];
+      }else{
+        setValue = formValue ? this.commonFunctionService.getObjectValue(condition[0], formValue) : "";
+      }
+      if (setValue === undefined || setValue === "") {
+        setValue = "";
+      } else {
+        setValue = setValue + "";
+      }
+      if(datatype){
+        switch (datatype) {
+          case "date":
+            setValue = this.commonFunctionService.dateFormat(setValue);
+            condition[2] = this.commonFunctionService.dateFormat(condition[2]);
+            break;
+          default:
+            break;
+        }
+      }
+      switch (condition[1]) {
+        case 'eq':
+        case 'equal':
+          if (condition.length > 2) {
+            //console.log('setValue');
+            return setValue === condition[2];
+          } else {
+            return JSON.parse(setValue);
+          }
+        case 'in':
+          if ((condition[2].split(":")).includes(setValue)) {
+            return true;
+          } else {
+            return false;
+          }
+          case 'nin':
+            if (!(condition[2].split(":")).includes(setValue)) {
+              return true;
+            } else {
+              return false;
+            }
+
+
+        case 'gte':
+          return parseFloat(setValue) >= parseFloat(condition[2]);
+        case 'lte':
+          return parseFloat(setValue) <= parseFloat(condition[2]);
+        case 'exists':
+          if (setValue != null && setValue != undefined && setValue != '' && setValue != 'null') {
+            return true;
+          } else {
+            return false;
+          }
+        case 'notexist':
+          if (setValue == null || setValue == undefined || setValue == '' || setValue == 'null') {
+            return true;
+          } else {
+            return false;
+          }
+        case "neq":
+        case "notequal":
+          if (condition.length > 2) {
+            //console.log('setValue');
+            return !(setValue === condition[2]);
+          } else {
+            return !JSON.parse(setValue);
+          }
+        default:
+          return false;
+      }
+    } else {
+      return true;
+    }
+  }
+
+  checkAddUpdateIf(tableField:any,fieldName:any){
+    let fieldValue = tableField[fieldName];
+    if (fieldValue != undefined && fieldValue.has_role != null && fieldValue.has_role != undefined && this.commonFunctionService.isArray(fieldValue.has_role) && fieldValue.has_role.length > 0) {
+      let check = 0;
+      for (let index = 0; index < fieldValue.has_role.length; index++) {
+        const element = fieldValue.has_role[index];
+        if (this.is_check_role(element._id)) {
+          check = 1;
+          break;
+        } else {
+          check = 0;
+        }
+      }
+      if(check == 1){
+        return false;
+      }else{
+        return true;
+      }
+    } else {
+      return true;
+    }
+  }
+  checkDisableRowIf(field:string,formValue:string){
+    let check = false;
+    if(this.checkIfCondition(field,formValue)){
+      check = true;
+    }else{
+      check = false;
+    }
+    return check;
+  }
+  checkRowIf(data:any,field:any){
+    let check = false;
+    if(data.selected || field.checkDisableRowIf){
+      let condition = '';
+      if(field.disableRowIf && field.disableRowIf != ''){
+        condition = field.disableRowIf;
+      }
+      if(condition != ''){
+        if(this.checkDisableRowIf(condition,data)){
+          check = true;
+        }else{
+          check = false;
+        }
+      }
+    }
+    return check;
+  }
+  checkDisableInRow(editedColumns:any,row:any){
+    for (let index = 0; index < editedColumns.length; index++) {
+      const column = editedColumns[index];
+      row[column.field_name+"_disabled"] = this.isDisableRow(column,row);
+    }
+  }
+
+  isDisableRow(field:any, data:any) {
+    const updateMode = false;
+    if (field.is_disabled) {
+      return true;
+    }
+    if(data.disabled){
+      return data.disabled;
+    }
+    if (field.etc_fields && field.etc_fields.disable_if && field.etc_fields.disable_if != '') {
+      return this.isDisable(field.etc_fields, updateMode, data);
+    }
+    return false;
+  }
+  isDisableRuntime(column:any, data:any,i:number,gridData:any,field:any,filterData:any) {
+    const updateMode = false;
+    if (column.is_disabled) {
+      return true;
+    }
+    if(data.disabled){
+      return data.disabled;
+    }
+    if (column.etc_fields && column.etc_fields.disable_if && column.etc_fields.disable_if != '') {
+      let indx:any = this.commonFunctionService.getCorrectIndex(data,i,field,gridData,filterData);
+      data = gridData[indx];
+      return this.isDisable(field.etc_fields, updateMode, data);
+    }
+    return false;
+  }
+  checkDataAlreadyAddedInListOrNot(field:any,incomingData:any,alreadyDataAddedlist:any,i?:any){
+    if(field && field.type && field.type == "date"){
+      incomingData = ""+incomingData;
+    }
+    let checkStatus = {
+      status : false,
+      msg : ""
+    };
+    if(field && field.allowDuplicacy){
+      checkStatus.status = false;
+      return checkStatus;
+    }else{
+      let primary_key = field.field_name
+      let criteria = primary_key+"#eq#"+incomingData;
+      let primaryCriteriaList=[];
+      primaryCriteriaList.push(criteria);
+      if(field && field.primaryKeyCriteria && Array.isArray(field.primaryKeyCriteria) && field.primaryKeyCriteria.length > 0){
+        field.primaryKeyCriteria.forEach((criteria:any) => {
+          const crList = criteria.split("#");
+          const cr = crList[0]+"#"+crList[1]+"#"+incomingData;
+          primaryCriteriaList.push(cr);
+        });
+      }
+      if(alreadyDataAddedlist == undefined){
+        alreadyDataAddedlist = [];
+      }
+      let alreadyExist = false;
+      if(typeof incomingData == 'object'){
+        alreadyDataAddedlist.forEach((element:any) => {
+          if(element._id == incomingData._id){
+            alreadyExist =  true;
+          }
+        });
+      }
+      else if(typeof incomingData == 'string'){
+        for (let index = 0; index < alreadyDataAddedlist.length; index++) {
+          const element = alreadyDataAddedlist[index];
+          if(i == undefined || i == -1){
+            if(typeof element == 'string'){
+              if(element == incomingData){
+                alreadyExist =  true;
+              }
+            }else{
+              if(primaryCriteriaList && primaryCriteriaList.length > 0){
+                for (let index = 0; index < primaryCriteriaList.length; index++) {
+                  const cri = primaryCriteriaList[index];
+                  alreadyExist = this.checkIfCondition(cri,element,field.type);
+                  if(alreadyExist){
+                    const crList = cri.split("#");
+                    switch (crList[1]) {
+                      case "lte":
+                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is gretter then to "+crList[0]+". !!!";
+                        break;
+                      case "gte":
+                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is less then to "+crList[0]+". !!!";
+                        break;
+                      default:
+                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is already added. !!!";
+                        break;
+                    }
+                    break;
+                  }
+                }
+              }
+            }
+            if(alreadyExist){
+              break;
+            }
+          }else{
+            break;
+          }
+        };
+      }else{
+        alreadyExist =  false;
+      }
+      if(alreadyExist){
+        checkStatus.status = true;
+        return checkStatus;
+      }else{
+        checkStatus.status = false;
+        return checkStatus;
+      }
+    }
+
+  }
+  checkCustmizedValuValidation(fields:any, value:any) {
+    let validate:any = [];
+    let response:any = {
+      status : false,
+      msg : ""
+    }
+    fields.forEach((element:any) => {
+      switch (element.type) {
+        case "grid_selection":
+        case "list_of_string":
+          if (element.is_mandatory) {
+            if (value[element.field_name] === undefined || value[element.field_name] === '' || value[element.field_name] === null || !this.commonFunctionService.isArray(value[element.field_name])) {
+              validate.push(element);
+            } else if (this.commonFunctionService.isArray(value[element.field_name])) {
+              if (value[element.field_name].length <= 0) {
+                validate.push(element);
+              }
+            }
+          }
+        break;
+        default:
+          validate = validate;
+      }
+    });
+    if (validate.length > 0) {
+      let fieldName = '';
+      validate.forEach((element:any) => {
+        if (fieldName == '') {
+          fieldName += element.label
+        } else {
+          fieldName += ', ' + element.label
+        }
+
+      });
+      response.msg = fieldName + ' Required.';
+      response.status = false;
+      // this.notificationService.notify('bg-danger', fieldName + ' Required.')
+    } else {
+      response.status = true;
+    }
+    return response;
   }
 
 }
