@@ -1,3 +1,5 @@
+import { ApiCallService } from './../../api/api-call/api-call.service';
+import { GridCommonFunctionService } from './../../grid/grid-common-function/grid-common-function.service';
 import { ApiService } from './../../api/api.service';
 import { Injectable } from '@angular/core';
 import { CommonFunctionService } from '../../common-utils/common-function.service';
@@ -13,7 +15,9 @@ export class MultipleFormService {
     private commonFunctionService:CommonFunctionService,
     private coreFunctionService:CoreFunctionService,
     private apiService:ApiService,
-    private checkIfService:CheckIfService
+    private checkIfService:CheckIfService,
+    private gridCommonFunctionService:GridCommonFunctionService,
+    private apiCallService:ApiCallService
   ) { }
 
 
@@ -81,8 +85,8 @@ export class MultipleFormService {
         const params = child.api_params;
         if(params && params != ''){
           const criteria = ["_id;eq;"+fieldValue._id+";STATIC"]
-          const crList = this.commonFunctionService.getCriteriaList(criteria,{});
-          const payload = this.commonFunctionService.getDataForGrid(1,{},{'name':params},[],{},'');
+          const crList = this.apiCallService.getCriteriaList(criteria,{});
+          const payload = this.apiCallService.getDataForGrid(1,{},{'name':params},[],{},'');
           payload.data.crList = crList;
           //this.apiService.getGridData(payload);
           result.updateAddNew = true;
@@ -247,15 +251,15 @@ export class MultipleFormService {
   }
 
   getDataForNextForm(reqParams:string,reqCriteria:any) {
-    const request = this.commonFunctionService.getDataForGrid(1, {}, { 'name': reqParams }, [], {}, '');
-    const crList = this.commonFunctionService.getCriteriaList(reqCriteria, {});
+    const request = this.apiCallService.getDataForGrid(1, {}, { 'name': reqParams }, [], {}, '');
+    const crList = this.apiCallService.getCriteriaList(reqCriteria, {});
     request.data.crList = crList;
     this.apiService.getNextFormData(request);
   }
   getNextFormById(id: string) {
     const params = "form";
     const criteria = ["_id;eq;" + id + ";STATIC"];
-    const payload = this.commonFunctionService.getPaylodWithCriteria(params, '', criteria, {});
+    const payload = this.apiCallService.getPaylodWithCriteria(params, '', criteria, {});
     this.apiService.GetNestedForm(payload);
   }
 

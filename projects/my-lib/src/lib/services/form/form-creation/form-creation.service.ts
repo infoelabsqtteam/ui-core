@@ -1,8 +1,11 @@
+import { ApiCallService } from './../../api/api-call/api-call.service';
 import { Injectable } from '@angular/core';
 import { CommonFunctionService } from '../../common-utils/common-function.service';
 import { EnvService } from '../../env/env.service';
-import { FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { StorageService } from '../../storage/storage.service';
+import { CustomvalidationService } from '../../customvalidation/customvalidation.service';
+import { CheckIfService } from '../../check-if/check-if.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +18,11 @@ export class FormCreationService {
   constructor(
     private commonFunctionService:CommonFunctionService,
     private envService:EnvService,
-    private storageService:StorageService
+    private storageService:StorageService,
+    private formBuilder: FormBuilder,
+    private customvalidationService:CustomvalidationService,
+    private apiCallService:ApiCallService,
+    private checkifService:CheckIfService
   ) {
       const currentYear = new Date().getFullYear();
       this.minDate = new Date(currentYear - 100, 0, 1);
@@ -117,6 +124,93 @@ export class FormCreationService {
     return responce;
 
   }
+  createFormControl(forControl:any, field:any, object:any, type:string) {
+    let disabled = field.is_disabled ? true : ((field.disable_if != undefined && field.disable_if != '') ? true : false);
+    switch (type) {
+      case "list":
+        forControl[field.field_name] = this.formBuilder.array(object, this.validator(field))
+        break;
+        case 'checkbox':
+          forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
+          break;
+      case "text":
+        switch (field.type) {
+          case "gst_number":
+            forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
+            break;
+          case "api":
+            switch (field.api_call_name) {
+              case "gst_number":
+                forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
+                break;
+              default:
+                forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
+                break;
+            }
+              forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
+              break;
+          case "typeahead":
+            switch (field.datatype) {
+              case 'object':
+                forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidData.bind(this.customvalidationService))
+                break;
+              default:
+                forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
+                break;
+            }
+            break;
+          default:
+            forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
+            break;
+        }
+        break;
+      case "group":
+        forControl[field.field_name] = this.formBuilder.group(object)
+        break;
+      default:
+        break;
+    }
+  }
+  validator(field:any) {
+    const validator = []
+    if (field.is_mandatory != undefined && field.is_mandatory) {
+      switch (field.type) {
+        case "grid_selection":
+        case "list_of_string":
+          break;
+        case "typeahead":
+          if (field.datatype != 'list_of_object' && field.datatype != 'chips') {
+            validator.push(Validators.required)
+          }
+          break;
+        case 'checkbox':
+          validator.push(Validators.requiredTrue)
+          break;
+        case "email":
+          validator.push(Validators.required)
+          validator.push(Validators.email);
+          break;
+        default:
+          validator.push(Validators.required)
+          break;
+      }
+    }else{
+      switch (field.type){
+        case "email":
+          validator.push(Validators.email);
+          break;
+        default:
+          break;
+      }
+    }
+    if (field.min_length != undefined && field.min_length != null && field.min_length != '' && Number(field.min_length) && field.min_length > 0) {
+      validator.push(Validators.minLength(field.min_length))
+    }
+    if(field.max_length != undefined && field.max_length != null && field.max_length != '' && Number(field.max_length) && field.max_length > 0){
+      validator.push(Validators.maxLength(field.max_length))
+    }
+    return validator;
+  }
   setNewForm(tableFields:any,formFieldButtons:any,form:any,elements:any,selectedRowIndex:number){
     let responce:any = {
       calculationFieldList:[],
@@ -146,7 +240,7 @@ export class FormCreationService {
       if(element.type == 'pdf_view'){
         if(selectedRowIndex && selectedRowIndex != -1 && elements && elements.length > 0){
           const object = elements[selectedRowIndex];
-          responce.staticModal.push(this.commonFunctionService.getPaylodWithCriteria(element.onchange_api_params,element.onchange_call_back_field,element.onchange_api_params_criteria,object));
+          responce.staticModal.push(this.apiCallService.getPaylodWithCriteria(element.onchange_api_params,element.onchange_call_back_field,element.onchange_api_params_criteria,object));
         }
         responce.editorTypeFieldList.push(element);
       }
@@ -157,11 +251,11 @@ export class FormCreationService {
       if(element.field_name && element.field_name != ''){
         switch (element.type) {
           case "list_of_checkbox":
-            this.commonFunctionService.createFormControl(responce.forControl, element, [], "list")
+            this.createFormControl(responce.forControl, element, [], "list")
             responce.checkBoxFieldListValue.push(element);
             break;
           case "checkbox":
-            this.commonFunctionService.createFormControl(responce.forControl, element, false, "checkbox")
+            this.createFormControl(responce.forControl, element, false, "checkbox")
             break;
           case "date":
             let currentYear = new Date().getFullYear();
@@ -196,7 +290,7 @@ export class FormCreationService {
             }
             element['minDate'] = this.minDate
             element['maxDate'] = this.maxDate;
-            this.commonFunctionService.createFormControl(responce.forControl, element, value, "text")
+            this.createFormControl(responce.forControl, element, value, "text")
             break;
           case "daterange":
             const date_range = {};
@@ -206,10 +300,10 @@ export class FormCreationService {
             ]
             if (list_of_dates.length > 0) {
               list_of_dates.forEach((data) => {
-                this.commonFunctionService.createFormControl(date_range, data, '', "text")
+                this.createFormControl(date_range, data, '', "text")
               });
             }
-            this.commonFunctionService.createFormControl(responce.forControl, element, date_range, "group")
+            this.createFormControl(responce.forControl, element, date_range, "group")
             break;
           case "list_of_fields":
           case "group_of_fields":
@@ -253,11 +347,11 @@ export class FormCreationService {
                     }
                     switch (data.type) {
                       case "list_of_checkbox":
-                        this.commonFunctionService.createFormControl(list_of_fields, modifyData, [], "list")
+                        this.createFormControl(list_of_fields, modifyData, [], "list")
                         responce.checkBoxFieldListValue.push(modifyData);
                         break;
                       case "checkbox":
-                        this.commonFunctionService.createFormControl(list_of_fields, modifyData, false, "checkbox")
+                        this.createFormControl(list_of_fields, modifyData, false, "checkbox")
                         break;
                       case "date":
                         let currentYear = new Date().getFullYear();
@@ -288,10 +382,10 @@ export class FormCreationService {
                         }
                         data['minDate'] = this.minDate
                         data['maxDate'] = this.maxDate;
-                        this.commonFunctionService.createFormControl(list_of_fields, modifyData, '', "text")
+                        this.createFormControl(list_of_fields, modifyData, '', "text")
                         break;
                       default:
-                        this.commonFunctionService.createFormControl(list_of_fields, modifyData, '', "text")
+                        this.createFormControl(list_of_fields, modifyData, '', "text")
                         break;
                     }
                   }
@@ -299,7 +393,7 @@ export class FormCreationService {
                 }
               }
             }
-            this.commonFunctionService.createFormControl(responce.forControl, element, list_of_fields, "group")
+            this.createFormControl(responce.forControl, element, list_of_fields, "group")
             // if(element.type == 'list_of_fields'){
             //   this.list_of_fields.push(element);
             // }
@@ -308,7 +402,7 @@ export class FormCreationService {
           //   const field = {
           //     field_name : 'html_view_1'
           //   }
-          //   this.commonFunctionService.createFormControl(forControl, element, '', "text")
+          //   this.createFormControl(forControl, element, '', "text")
           //   break;
           case "stepper":
             if(element.list_of_fields && element.list_of_fields.length > 0) {
@@ -335,14 +429,14 @@ export class FormCreationService {
                       responce.calculationFieldList.push(element);
                     }
 
-                    this.commonFunctionService.createFormControl(stepper_of_fields, modifyData, '', "text")
+                    this.createFormControl(stepper_of_fields, modifyData, '', "text")
                     if(data.tree_view_object && data.tree_view_object.field_name != ""){
                       let treeModifyData = JSON.parse(JSON.stringify(data.tree_view_object));
                       treeModifyData.is_mandatory=false;
-                      this.commonFunctionService.createFormControl(stepper_of_fields, treeModifyData , '', "text")
+                      this.createFormControl(stepper_of_fields, treeModifyData , '', "text")
                     }
                   });
-                  this.commonFunctionService.createFormControl(responce.forControl, step, stepper_of_fields, "group")
+                  this.createFormControl(responce.forControl, step, stepper_of_fields, "group")
                 }
               });
               responce.isStepper = true;
@@ -351,12 +445,12 @@ export class FormCreationService {
           case "pdf_view" :
             if(selectedRowIndex && selectedRowIndex != -1 && elements && elements.length > 0){
               const object = elements[selectedRowIndex];
-              responce.staticModal.push(this.commonFunctionService.getPaylodWithCriteria(element.onchange_api_params,element.onchange_call_back_field,element.onchange_api_params_criteria,object));
+              responce.staticModal.push(this.apiCallService.getPaylodWithCriteria(element.onchange_api_params,element.onchange_call_back_field,element.onchange_api_params_criteria,object));
             }
             break;
           case "input_with_uploadfile":
             element.is_disabled = true;
-            this.commonFunctionService.createFormControl(responce.forControl, element, '', "text")
+            this.createFormControl(responce.forControl, element, '', "text")
             break;
           case "grid_selection":
             if(element && element.gridColumns && element.gridColumns.length > 0){
@@ -378,26 +472,26 @@ export class FormCreationService {
               responce.buttonIfList.push(element);
             }
             element['showButton'] = this.checkGridSelectionButtonCondition(element,'add',{},{});
-            this.commonFunctionService.createFormControl(responce.forControl, element, '', "text");
+            this.createFormControl(responce.forControl, element, '', "text");
             break;
           case "tree_view":
             // this.treeControl[element.field_name] = new FlatTreeControl<TodoItemFlatNode>(this.getLevel, this.isExpandable);
             // this.dataSource[element.field_name] = new MatTreeFlatDataSource(this.treeControl[element.field_name], this.treeFlattener);
-            this.commonFunctionService.createFormControl(responce.forControl, element, '', "text");
+            this.createFormControl(responce.forControl, element, '', "text");
             break;
           default:
             if(element.defaultValue && element.defaultValue != null && element.defaultValue != ''){
               const value = element.defaultValue;
-              this.commonFunctionService.createFormControl(responce.forControl, element, value, "text");
+              this.createFormControl(responce.forControl, element, value, "text");
             }else{
-              this.commonFunctionService.createFormControl(responce.forControl, element, '', "text");
+              this.createFormControl(responce.forControl, element, '', "text");
             }
             break;
         }
         if(element.tree_view_object && element.tree_view_object.field_name != ""){
           let treeModifyData = JSON.parse(JSON.stringify(element.tree_view_object));
           treeModifyData.is_mandatory=false;
-          this.commonFunctionService.createFormControl(responce.forControl, treeModifyData , '', "text")
+          this.createFormControl(responce.forControl, treeModifyData , '', "text")
         }
       }
       //show if handling
@@ -427,7 +521,7 @@ export class FormCreationService {
         if(element.field_name && element.field_name != ''){
           switch (element.type) {
             case "dropdown":
-              this.commonFunctionService.createFormControl(responce.forControl, element, '', "text")
+              this.createFormControl(responce.forControl, element, '', "text")
               break;
             default:
               break;
@@ -538,7 +632,7 @@ export class FormCreationService {
           templateForm.controls['account'].setValue(account);
           //this.templateForm.get('account').setValue(account);
           if (element.onchange_api_params && element.onchange_call_back_field && !element.do_not_auto_trigger_on_edit) {
-            payload = this.commonFunctionService.getPaylodWithCriteria(element.onchange_api_params, element.onchange_call_back_field, element.onchange_api_params_criteria, formValueWithCustomData)
+            payload = this.apiCallService.getPaylodWithCriteria(element.onchange_api_params, element.onchange_call_back_field, element.onchange_api_params_criteria, formValueWithCustomData)
             if(element.onchange_api_params.indexOf("FORM_GROUP") >= 0 || element.onchange_api_params.indexOf("QTMP") >= 0){
               payload["data"]=formValueWithCustomData;
             }
@@ -549,7 +643,7 @@ export class FormCreationService {
           templateForm.controls['contact'].setValue(contact);
           //this.templateForm.get('contact').setValue(contact);
           if (element.onchange_api_params && element.onchange_call_back_field && !element.do_not_auto_trigger_on_edit) {
-            payload = this.commonFunctionService.getPaylodWithCriteria(element.onchange_api_params, element.onchange_call_back_field, element.onchange_api_params_criteria, formValueWithCustomData)
+            payload = this.apiCallService.getPaylodWithCriteria(element.onchange_api_params, element.onchange_call_back_field, element.onchange_api_params_criteria, formValueWithCustomData)
             if(element.onchange_api_params.indexOf("FORM_GROUP") >= 0 || element.onchange_api_params.indexOf("QTMP") >= 0){
               payload["data"]=formValueWithCustomData;
             }
@@ -565,7 +659,7 @@ export class FormCreationService {
                   (<FormGroup>templateForm.controls[fieldName]).controls['account'].setValue(account);
                   //this.templateForm.get(stepData.field_name).get('account').setValue(account);
                   if (data.onchange_api_params && data.onchange_call_back_field && !data.do_not_auto_trigger_on_edit) {
-                    payload = this.commonFunctionService.getPaylodWithCriteria(data.onchange_api_params, data.onchange_call_back_field, data.onchange_api_params_criteria, formValueWithCustomData)
+                    payload = this.apiCallService.getPaylodWithCriteria(data.onchange_api_params, data.onchange_call_back_field, data.onchange_api_params_criteria, formValueWithCustomData)
                     if(data.onchange_api_params.indexOf("FORM_GROUP") >= 0 || data.onchange_api_params.indexOf("QTMP") >= 0){
                       payload["data"]=formValueWithCustomData;
                     }
@@ -575,7 +669,7 @@ export class FormCreationService {
                 if(data.field_name == 'contact'){
                   (<FormGroup>templateForm.controls[fieldName]).controls['contact'].setValue(contact);
                   if (data.onchange_api_params && data.onchange_call_back_field && !data.do_not_auto_trigger_on_edit) {
-                    payload = this.commonFunctionService.getPaylodWithCriteria(data.onchange_api_params, data.onchange_call_back_field, data.onchange_api_params_criteria, formValueWithCustomData)
+                    payload = this.apiCallService.getPaylodWithCriteria(data.onchange_api_params, data.onchange_call_back_field, data.onchange_api_params_criteria, formValueWithCustomData)
                     if(data.onchange_api_params.indexOf("FORM_GROUP") >= 0 || data.onchange_api_params.indexOf("QTMP") >= 0){
                       payload["data"]=formValueWithCustomData;
                     }
@@ -597,7 +691,7 @@ export class FormCreationService {
         if(field && field.addNewButtonIf && field.addNewButtonIf != ''){
           let modifyedField:any = {};
           modifyedField['show_if'] = field.addNewButtonIf;
-          check = this.commonFunctionService.checkShowIf(modifyedField,selectedRow,formValue);
+          check = this.checkifService.checkShowIf(modifyedField,selectedRow,formValue);
         }
         break;
       default:

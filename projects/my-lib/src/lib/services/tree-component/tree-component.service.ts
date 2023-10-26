@@ -1,3 +1,4 @@
+import { CheckIfService } from './../check-if/check-if.service';
 import { Injectable } from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import { CommonFunctionService } from '../common-utils/common-function.service';
@@ -14,7 +15,8 @@ export class TreeComponentService {
   }
 
   constructor(
-    private commonfunctionService:CommonFunctionService
+    private commonfunctionService:CommonFunctionService,
+    private checkIfService:CheckIfService
   ) {
   }
   /**
@@ -193,7 +195,7 @@ export class TreeComponentService {
           }
           selectNode.select = true;
           let groupList:any = [];
-          let check = this.commonfunctionService.checkDataAlreadyAddedInListOrNot({"field_name":'_id'},selectNode._id,groupList);
+          let check = this.checkIfService.checkDataAlreadyAddedInListOrNot({"field_name":'_id'},selectNode._id,groupList);
           if(!check.status){
             groupList.push(selectNode);
           }
@@ -209,14 +211,14 @@ export class TreeComponentService {
       let parentIndex = this.commonfunctionService.getIndexInArrayById(allNodes,selectNode.pId,'reference._id');
       if(parentIndex != -1){
         let parentNode = allNodes[parentIndex];
-        let check = this.commonfunctionService.checkDataAlreadyAddedInListOrNot({"field_name":'_id'},parentNode._id,groupList);
+        let check = this.checkIfService.checkDataAlreadyAddedInListOrNot({"field_name":'_id'},parentNode._id,groupList);
         if(!check.status){
           groupList.push(parentNode);
         }
         this.findChildToParentNode(allNodes,parentNode,groupList,selectedNodesWithParent);
       }
     }else{
-      let check = this.commonfunctionService.checkDataAlreadyAddedInListOrNot({"field_name":'_id'},selectNode._id,groupList);
+      let check = this.checkIfService.checkDataAlreadyAddedInListOrNot({"field_name":'_id'},selectNode._id,groupList);
       if(!check.status){
         groupList.push(selectNode);
       }
@@ -227,7 +229,7 @@ export class TreeComponentService {
     let sortedData = groupList.sort((a:any,b:any) =>  a.level - b.level);
     if(sortedData && sortedData.length > 0){
       sortedData.forEach((data:any) => {
-        let check = this.commonfunctionService.checkDataAlreadyAddedInListOrNot({"field_name":'_id'},data._id,selectedNodesWithParent);
+        let check = this.checkIfService.checkDataAlreadyAddedInListOrNot({"field_name":'_id'},data._id,selectedNodesWithParent);
         if(check.status){
           let existDataIndex = this.commonfunctionService.getIndexInArrayById(selectedNodesWithParent,data._id);
           let object = selectedNodesWithParent[existDataIndex];
