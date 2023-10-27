@@ -198,6 +198,13 @@ export class StorageService {
       return {};
     }
   }
+  GetUserReference() {
+    let user = this.GetUserInfo();
+    let userRef:any = {};
+    userRef['_id'] = user['_id'];
+    userRef['name'] = user['name'];
+    return userRef;
+  }
   GetPermission() {
     const obj = JSON.parse(<any>localStorage.getItem(this.USER_KEY));
     if(obj && obj.permission){
