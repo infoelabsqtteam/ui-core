@@ -1,3 +1,4 @@
+import { ApiCallService } from './../api/api-call/api-call.service';
 import { Injectable, QueryList } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import { CommonFunctionService } from '../../services/common-utils/common-function.service';
@@ -14,6 +15,7 @@ export class LimsCalculationsService {
     private commonFunctionService: CommonFunctionService,
     private coreFunctionService: CoreFunctionService,
     private notificationService: NotificationService,
+    private apiCallService:ApiCallService
   ) { }
 
 
@@ -164,7 +166,7 @@ export class LimsCalculationsService {
 
   calculation_of_script_for_tds(object:any, field: any) {
     const staticModal = []
-    staticModal.push(this.commonFunctionService.getPaylodWithCriteria('QTMP:CALCULATION_SCRIPT', field.onchange_call_back_field, field.onchange_api_params_criteria, object));
+    staticModal.push(this.apiCallService.getPaylodWithCriteria('QTMP:CALCULATION_SCRIPT', field.onchange_call_back_field, field.onchange_api_params_criteria, object));
     staticModal[0]['data'] = object;
     return staticModal;
   }
@@ -875,7 +877,7 @@ export class LimsCalculationsService {
     if (this.coreFunctionService.isNotBlank(parentObjectValue)) {
       if (this.coreFunctionService.isNotBlank(parentObjectValue[calculate_on_field.field_name])){
           taxable_amount = parentObjectValue[calculate_on_field.field_name];
-      }   
+      }
     }
     templateValue = this.update_invoice_totatl(templateValue, gross_amount, discount_amount, discount_percent, net_amount, surcharge, taxable_amount);
     return templateValue;
@@ -1394,7 +1396,14 @@ export class LimsCalculationsService {
         { field: 'discount_amount', value: discount_amount },
       ]
     }
-    return this.commonFunctionService.setValueInVieldsForChild(templateForm, fieldWithValue);
+    return this.setValueInVieldsForChild(templateForm, fieldWithValue);
+  }
+  setValueInVieldsForChild(templateForm: FormGroup, field: any) {
+    (<FormGroup>templateForm.controls['total_amount']).addControl('discount_amount', new FormControl(''))
+    field.value.forEach((element:any) => {
+      (<FormGroup>templateForm.controls[field.field]).controls[element.field].patchValue(element.value);
+    });
+    return templateForm;
   }
   calculateAdditionalCost(obj:any){
     let list = obj['additional_cost'];

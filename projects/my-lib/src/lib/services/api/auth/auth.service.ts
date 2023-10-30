@@ -1,3 +1,4 @@
+import { ApiCallService } from './../../api/api-call/api-call.service';
 import { Injectable,OnInit} from '@angular/core';
 import { EnvService } from '../../env/env.service';
 import { HttpClient } from '@angular/common/http';
@@ -26,7 +27,8 @@ export class AuthService implements OnInit{
     private encryptionService:EncryptionService,
     private commonFunctionService:CommonFunctionService,
     private coreFunctionService:CoreFunctionService,
-    private authDataShareService: AuthDataShareService
+    private authDataShareService: AuthDataShareService,
+    private apiCallService:ApiCallService
     ) { }
 
 
@@ -61,7 +63,7 @@ export class AuthService implements OnInit{
     this.apiService.resetTempData();
     this.apiService.resetGridData();
     this.envService.setRequestType('PUBLIC');
-    this.commonFunctionService.getApplicationAllSettings();
+    this.apiCallService.getApplicationAllSettings();
   }
   logOutRedirection(){
     if (this.envService.checkRedirectionUrl()) {
@@ -89,11 +91,11 @@ export class AuthService implements OnInit{
           this.storageService.SetUserInfo(modifyData);
           this.storageService.GetUserInfo();
           this.envService.setRequestType('PRIVATE');
-          this.commonFunctionService.getApplicationAllSettings();
+          this.apiCallService.getApplicationAllSettings();
           this.authDataShareService.restSettingModule('logged_in');
           this.apiService.gitVersion('');
-          this.commonFunctionService.getUserPrefrerence(respData.user);
-          this.commonFunctionService.getUserNotification(1);
+          this.apiCallService.getUserPrefrerence(respData.user);
+          this.apiCallService.getUserNotification(1);
           this.redirectionWithMenuType(loginRedirect);
         } else {
             this.envService.setRequestType('PUBLIC');
