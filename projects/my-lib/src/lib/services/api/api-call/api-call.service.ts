@@ -370,7 +370,7 @@ export class ApiCallService {
                     {
                       "fName": fieldName,
                       "fValue": this.getValueForDotFieldName(value,fieldName),
-                      "operator": this.getOperator()
+                      "operator": this.storageService.getDefaultSearchOperator()
                     }
                   )
                 }
@@ -404,7 +404,7 @@ export class ApiCallService {
                     {
                       "fName": fieldName,
                       "fValue": this.getValueForDotFieldName(value,fieldName),
-                      "operator": this.getOperator()
+                      "operator": this.storageService.getDefaultSearchOperator()
                     }
                   )
                 }
@@ -421,7 +421,7 @@ export class ApiCallService {
                     {
                       "fName": fieldName,
                       "fValue": this.commonFunctionService.getddnDisplayVal(value),
-                      "operator": this.getOperator()
+                      "operator": this.storageService.getDefaultSearchOperator()
                     }
                   )
                 }
@@ -439,7 +439,7 @@ export class ApiCallService {
                     {
                       "fName": fieldName+".name",
                       "fValue": this.commonFunctionService.getddnDisplayVal(value),
-                      "operator": this.getOperator()
+                      "operator": this.storageService.getDefaultSearchOperator()
                     }
                   )
                 }
@@ -523,16 +523,7 @@ export class ApiCallService {
     }
     return crValue;
   }
-  getOperator() {
-    let defaultOperator = this.storageService.getApplicationSetting().defaultSearchOperatorInGrid;
-    let operator = "";
-    if(defaultOperator && defaultOperator != null && defaultOperator != "") {
-     operator = defaultOperator
-    }else {
-     operator = "stwic";
-    }
-    return operator;
- }
+
  getUserPrefrerence(user:any) {
     let criteria = "userId._id;eq;"+user._id+";STATIC";
     let myData = this.setPageNoAndSize(this.getPaylodWithCriteria("user_preference", "", [criteria], {}),1);
