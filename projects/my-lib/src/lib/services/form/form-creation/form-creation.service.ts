@@ -814,9 +814,9 @@ export class FormCreationService {
   updateCustomizedValue(target: any[], index: number, value: any) {
     if (index !== null && index >= 0) {
         target[index] = value;
-        index=-1;
     } else {
         target.push(value);
     }
+    return target
   }
 }
