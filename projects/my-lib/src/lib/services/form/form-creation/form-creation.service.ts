@@ -811,34 +811,5 @@ export class FormCreationService {
     });
     return donotResetFieldLists;
   }
-  updateCustomizedValue(target: any[], index: number, value: any) {
-    if (index !== null && index >= 0) {
-        target[index] = value;
-    } else {
-        target.push(value);
-    }
-    return target
-  }
 
-
-
-  editListOfString(parentfield: any,field: any,index: number,custmizedFormValue: any,templateFormControl: any,templateForm: any ) {
-    if (field.type === 'list_of_string') {
-      const selectedListofStringIndex = index;
-      const custmizedKey = parentfield ? this.commonFunctionService.custmizedKey(parentfield): null;
-
-      if (parentfield) {
-        const selectedValue = custmizedFormValue[custmizedKey][field.field_name][index];
-        templateFormControl[parentfield.field_name]['controls'][field.field_name].setValue(selectedValue);
-      } else {
-        const custmizedFormValueClone = Object.assign([],custmizedFormValue[field.field_name]);
-        const selectedValue = custmizedFormValueClone[index];
-        templateForm.controls[field.field_name].setValue(selectedValue);
-      }
-
-      return selectedListofStringIndex;
-    }
-
-    return null;
-  }
 }
