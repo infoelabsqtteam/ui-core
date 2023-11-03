@@ -1,8 +1,8 @@
 export const serverHostList = [
   {"clientEndpoint": "localhost", "serverEndpoint": "http://localhost:8104"},
-  {"clientEndpoint": "sit.e-labs.ai", "serverEndpoint": "https://sitserverelabs.e-labs.ai"},
-  {"clientEndpoint": "dev.e-labs.ai", "serverEndpoint": "https://devserverelabs.e-labs.ai"}, 
-  {"clientEndpoint": "uat.e-labs.ai", "serverEndpoint": "https://uatserverelabs.e-labs.ai"},  
+  {"clientCode": "ELABS-ELABS01-SIT", "clientEndpoint": "sit.e-labs.ai", "serverEndpoint": "https://sitserverelabs.e-labs.ai"},
+  {"clientCode": "ELABS-ELABS01-DEV", "clientEndpoint": "dev.e-labs.ai", "serverEndpoint": "https://devserverelabs.e-labs.ai"}, 
+  {"clientCode": "ELABS-ELABS01-UAT", "clientEndpoint": "uat.e-labs.ai", "serverEndpoint": "https://uatserverelabs.e-labs.ai"},  
   {"clientCode": "SANS-SANS01-SIT", "clientEndpoint": "sit-sanskar.e-labs.ai", "serverEndpoint": "https://sitsanskarserver.e-labs.ai"},
   {"clientCode": "SANS-SANS01", "clientEndpoint": "lims-sanskar.e-labs.ai", "serverEndpoint": "https://prodsanskarserver.e-labs.ai"},  
   {"clientEndpoint": "hardgoodslabs.e-labs.ai", "serverEndpoint": "https://serverhardgoodlabs.e-labs.ai"},

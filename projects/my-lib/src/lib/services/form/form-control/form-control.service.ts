@@ -583,4 +583,49 @@ export class FormControlService {
     });
     return result.templateForm;
   }
+
+
+  updateCustomizedValue(custmizedFormValue: any, index: number, value: any) {
+    let response = {
+      custmizedFormValue: custmizedFormValue,
+      selectedListofStringIndex: index
+    }
+    if (response.selectedListofStringIndex !== null && response.selectedListofStringIndex >= 0) {
+      response.custmizedFormValue[response.selectedListofStringIndex] = value;
+    } else {
+      response.custmizedFormValue.push(value);
+    }
+    return response
+  }
+
+  editListOfString(parentfield: any,field: any,index: number,custmizedFormValue: any, templateForm: FormGroup ) {
+    let response = {
+      templateForm: templateForm,
+      selectedListofStringIndex: index
+    }
+    let type = field.type;
+    let fieldName = field.field_name
+    switch(type){
+      case 'list_of_string':
+        const custmizedFormValueClone = Object.assign([],custmizedFormValue);
+        if (parentfield) {
+          const custmizedKey = parentfield ? this.commonFunctionService.custmizedKey(parentfield): null;
+          const selectedValue = custmizedFormValueClone[custmizedKey][fieldName][index];
+          ( <FormGroup>response.templateForm.controls[parentfield.field_name]).controls[fieldName].setValue(selectedValue)
+        } else {
+          const selectedValue = custmizedFormValueClone[fieldName][index];
+          response.templateForm.controls[fieldName].setValue(selectedValue)
+        }
+
+      break;
+      default:
+        break;
+    }
+    return response;
+  }
+
+
+
+
+
 }
