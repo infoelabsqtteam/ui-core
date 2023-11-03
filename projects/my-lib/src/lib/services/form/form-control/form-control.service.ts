@@ -592,6 +592,7 @@ export class FormControlService {
     }
     if (response.selectedListofStringIndex !== null && response.selectedListofStringIndex >= 0) {
       response.custmizedFormValue[response.selectedListofStringIndex] = value;
+      response.selectedListofStringIndex = -1;
     } else {
       response.custmizedFormValue.push(value);
     }
