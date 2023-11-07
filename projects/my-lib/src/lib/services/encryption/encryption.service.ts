@@ -11,4 +11,8 @@ export class EncryptionService {
     return btoa(JSON.stringify(obj));
   }
 
+  decryptRequest(obj:any) {
+    return atob(obj);
+  }
+
 }
