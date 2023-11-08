@@ -180,6 +180,7 @@ export class FormControlService {
         break;
       case "file":
       case "input_with_uploadfile":
+      case "file_for_s3":
         if(object != null && object != undefined){
           responce.dataListForUpload[fieldName] = JSON.parse(JSON.stringify(object));
           const value = this.fileHandlerService.modifyFileSetValue(object);
