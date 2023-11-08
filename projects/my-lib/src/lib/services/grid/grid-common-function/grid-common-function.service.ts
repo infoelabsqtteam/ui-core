@@ -589,5 +589,12 @@ constructor(
     }
   }
 
+  getNoOfItems(grid:any, defaultNoOfItem:any) {
+    if(grid && grid.details && grid.details.numberOfItems) {
+      defaultNoOfItem = grid.details.numberOfItems;
+    }
+    return defaultNoOfItem;
+  }
+
 
 }

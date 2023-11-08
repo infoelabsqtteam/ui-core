@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, tap, switchMap } from 'rxjs/operators';
 import { StorageTokenStatus } from '../../shared/enums/storage-token-status.enum';
 import { PLATFORM_NAME } from '../../shared/platform';
+import { Common } from '../../shared/enums/common.enum';
 
 
 
@@ -197,6 +198,13 @@ export class StorageService {
     }else{
       return {};
     }
+  }
+  GetUserReference() {
+    let user = this.GetUserInfo();
+    let userRef:any = {};
+    userRef['_id'] = user['_id'];
+    userRef['name'] = user['name'];
+    return userRef;
   }
   GetPermission() {
     const obj = JSON.parse(<any>localStorage.getItem(this.USER_KEY));
@@ -605,4 +613,29 @@ export class StorageService {
     return platForm;
   }
 
+  getDefaultNumOfItem() {
+    let itemNumOfGrid = Common.ITEM_NUM_OF_GRID;
+    let defaultSettings = this.getApplicationDefaultSettings();
+    if(defaultSettings && defaultSettings.defaultItemNoOfGrid && defaultSettings.defaultItemNoOfGrid != "" && defaultSettings.defaultItemNoOfGrid > 0) {
+      itemNumOfGrid = defaultSettings.defaultItemNoOfGrid;
+    }
+    return itemNumOfGrid
+  }
+
+  getApplicationDefaultSettings(){
+    let applicationSetting = this.getApplicationSetting();
+    return applicationSetting.defaultApplicationSettings;
+  }
+
+
+
+  getDefaultSearchOperator() {
+    let defaultSearchOperator = Common.DEFAULT_OPERATOR;
+    let defaultSettings = this.getApplicationDefaultSettings();
+    if(defaultSettings && defaultSettings.defaultSearchOperatorInGrid && defaultSettings.defaultSearchOperatorInGrid != "" && defaultSettings.defaultSearchOperatorInGrid > 0) {
+      defaultSearchOperator = defaultSettings.defaultSearchOperatorInGrid;
+    }
+    return defaultSearchOperator;
+  }
+  
 }
