@@ -118,7 +118,7 @@ export class FileHandlerService {
   }
   removeAttachedDataFromList(parent:any,child:any,index:any,dataListForUpload:any){
     let fieldName = child.field_name;
-    if(parent != ''){
+    if(parent != '' && parent != undefined){
       let custmisedKey = this.commonFunctionService.custmizedKey(parent);
       dataListForUpload[custmisedKey][fieldName].splice(index,1);
 

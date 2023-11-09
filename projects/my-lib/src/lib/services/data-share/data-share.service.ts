@@ -39,6 +39,7 @@ export class DataShareService {
   productData:Subject<any> = new Subject<any>();
   testParameters:Subject<any> = new Subject<any>();
   exportExcelLink:Subject<any> = new Subject<any>();
+  exportCVSLink:Subject<any> = new Subject<any>();
   getProductList:Subject<any> = new Subject<any>();
   previewHtml:Subject<any> = new Subject<any>();
   updateProductBranch:Subject<any> = new Subject<any>();
@@ -214,6 +215,9 @@ export class DataShareService {
   }
   setExportExcelLink(responce:any){
     this.exportExcelLink.next(responce);
+  }
+  setExportCVSLink(responce:any){
+    this.exportCVSLink.next(responce);
   }
   setProductList(responce:any){
     this.getProductList.next(responce)
