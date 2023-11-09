@@ -715,4 +715,21 @@ export class CheckIfService {
     return response;
   }
 
+  checkCallGridData(ObjectValue:any,gridDisable:boolean){
+    let check = false;
+    if(gridDisable){
+      let list = Object.values(ObjectValue);
+      for (let index = 0; index < list.length; index++) {
+        const val = list[index];
+        if(val != '') {
+          check = true;
+          break;
+        }      
+      }
+    }else {
+      check = true;
+    }
+    return check;
+  }
+
 }

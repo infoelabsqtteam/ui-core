@@ -260,7 +260,12 @@ export class FormValueService {
               }
             });
           }else{
-            modifyFormValue[key] = this.fileHandlerService.modifyUploadFiles(dataListForUpload[key]);
+            let uploadFileType = tableFields.filter((field:any)=> field.type == 'file_for_s3')
+                if(uploadFileType.length >0){
+                  modifyFormValue[key] = dataListForUpload[key];
+                }else{
+                  modifyFormValue[key] = this.fileHandlerService.modifyUploadFiles(dataListForUpload[key]);
+                }
           }
 
         }
