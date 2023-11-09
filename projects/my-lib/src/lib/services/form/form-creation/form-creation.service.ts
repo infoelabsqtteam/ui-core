@@ -604,84 +604,86 @@ export class FormCreationService {
     return responce;
   }
   updateSelectContact(selectContact:any,tabFilterData:any,tableFields:any,templateForm:FormGroup,formValueWithCustomData:any,staticModal:any){
-    let selectContactObject = selectContact;
-    let account={};
-    let contact={};
-    let payload:any = {};
-    tabFilterData.forEach((element:any) => {
-      if(element && element._id){
-        if(element._id == selectContact){
-          selectContactObject = element;
+    if(selectContact != '' && tabFilterData && tabFilterData.length > 0 && tableFields && tableFields.length > 0){
+      let selectContactObject = selectContact;
+      let account={};
+      let contact={};
+      let payload:any = {};
+      tabFilterData.forEach((element:any) => {
+        if(element && element._id){
+          if(element._id == selectContact){
+            selectContactObject = element;
+          }
+        }
+      });
+      if(selectContactObject && selectContactObject['_id']){
+        contact = {
+          "_id":selectContactObject['_id'],
+          "name":selectContactObject['name'],
+          "code":selectContactObject['serialId']
+        }
+        if(selectContactObject['lead']){
+          account = selectContactObject['lead'];
         }
       }
-    });
-    if(selectContactObject && selectContactObject['_id']){
-      contact = {
-        "_id":selectContactObject['_id'],
-        "name":selectContactObject['name'],
-        "code":selectContactObject['serialId']
-      }
-      if(selectContactObject['lead']){
-        account = selectContactObject['lead'];
-      }
+      tableFields.forEach((element:any) => {
+        if(element && element.field_name && element.field_name != ''){
+          let fieldName = element.field_name;
+          if(fieldName == 'account'){
+            templateForm.controls['account'].setValue(account);
+            //this.templateForm.get('account').setValue(account);
+            if (element.onchange_api_params && element.onchange_call_back_field && !element.do_not_auto_trigger_on_edit) {
+              payload = this.apiCallService.getPaylodWithCriteria(element.onchange_api_params, element.onchange_call_back_field, element.onchange_api_params_criteria, formValueWithCustomData)
+              if(element.onchange_api_params.indexOf("FORM_GROUP") >= 0 || element.onchange_api_params.indexOf("QTMP") >= 0){
+                payload["data"]=formValueWithCustomData;
+              }
+              staticModal.push(payload);
+            }
+          }
+          if(element.field_name == 'contact'){
+            templateForm.controls['contact'].setValue(contact);
+            //this.templateForm.get('contact').setValue(contact);
+            if (element.onchange_api_params && element.onchange_call_back_field && !element.do_not_auto_trigger_on_edit) {
+              payload = this.apiCallService.getPaylodWithCriteria(element.onchange_api_params, element.onchange_call_back_field, element.onchange_api_params_criteria, formValueWithCustomData)
+              if(element.onchange_api_params.indexOf("FORM_GROUP") >= 0 || element.onchange_api_params.indexOf("QTMP") >= 0){
+                payload["data"]=formValueWithCustomData;
+              }
+              staticModal.push(payload);
+            }
+          }
+          if(element.type == 'stepper' && element.list_of_fields && element.list_of_fields.length > 0){
+            element.list_of_fields.forEach((stepData:any) => {
+              if(stepData && stepData.list_of_fields && stepData.list_of_fields.length > 0){
+                stepData.list_of_fields.forEach((data:any) => {
+                  let fieldName = stepData.field_name;
+                  if(data.field_name == 'account'){
+                    (<FormGroup>templateForm.controls[fieldName]).controls['account'].setValue(account);
+                    //this.templateForm.get(stepData.field_name).get('account').setValue(account);
+                    if (data.onchange_api_params && data.onchange_call_back_field && !data.do_not_auto_trigger_on_edit) {
+                      payload = this.apiCallService.getPaylodWithCriteria(data.onchange_api_params, data.onchange_call_back_field, data.onchange_api_params_criteria, formValueWithCustomData)
+                      if(data.onchange_api_params.indexOf("FORM_GROUP") >= 0 || data.onchange_api_params.indexOf("QTMP") >= 0){
+                        payload["data"]=formValueWithCustomData;
+                      }
+                      staticModal.push(payload);
+                    }
+                  }
+                  if(data.field_name == 'contact'){
+                    (<FormGroup>templateForm.controls[fieldName]).controls['contact'].setValue(contact);
+                    if (data.onchange_api_params && data.onchange_call_back_field && !data.do_not_auto_trigger_on_edit) {
+                      payload = this.apiCallService.getPaylodWithCriteria(data.onchange_api_params, data.onchange_call_back_field, data.onchange_api_params_criteria, formValueWithCustomData)
+                      if(data.onchange_api_params.indexOf("FORM_GROUP") >= 0 || data.onchange_api_params.indexOf("QTMP") >= 0){
+                        payload["data"]=formValueWithCustomData;
+                      }
+                      staticModal.push(payload);
+                    }
+                  }
+                });
+              }
+            });
+          }
+        }
+      });
     }
-    tableFields.forEach((element:any) => {
-      if(element && element.field_name && element.field_name != ''){
-        let fieldName = element.field_name;
-        if(fieldName == 'account'){
-          templateForm.controls['account'].setValue(account);
-          //this.templateForm.get('account').setValue(account);
-          if (element.onchange_api_params && element.onchange_call_back_field && !element.do_not_auto_trigger_on_edit) {
-            payload = this.apiCallService.getPaylodWithCriteria(element.onchange_api_params, element.onchange_call_back_field, element.onchange_api_params_criteria, formValueWithCustomData)
-            if(element.onchange_api_params.indexOf("FORM_GROUP") >= 0 || element.onchange_api_params.indexOf("QTMP") >= 0){
-              payload["data"]=formValueWithCustomData;
-            }
-            staticModal.push(payload);
-          }
-        }
-        if(element.field_name == 'contact'){
-          templateForm.controls['contact'].setValue(contact);
-          //this.templateForm.get('contact').setValue(contact);
-          if (element.onchange_api_params && element.onchange_call_back_field && !element.do_not_auto_trigger_on_edit) {
-            payload = this.apiCallService.getPaylodWithCriteria(element.onchange_api_params, element.onchange_call_back_field, element.onchange_api_params_criteria, formValueWithCustomData)
-            if(element.onchange_api_params.indexOf("FORM_GROUP") >= 0 || element.onchange_api_params.indexOf("QTMP") >= 0){
-              payload["data"]=formValueWithCustomData;
-            }
-            staticModal.push(payload);
-          }
-        }
-        if(element.type == 'stepper' && element.list_of_fields && element.list_of_fields.length > 0){
-          element.list_of_fields.forEach((stepData:any) => {
-            if(stepData && stepData.list_of_fields && stepData.list_of_fields.length > 0){
-              stepData.list_of_fields.forEach((data:any) => {
-                let fieldName = stepData.field_name;
-                if(data.field_name == 'account'){
-                  (<FormGroup>templateForm.controls[fieldName]).controls['account'].setValue(account);
-                  //this.templateForm.get(stepData.field_name).get('account').setValue(account);
-                  if (data.onchange_api_params && data.onchange_call_back_field && !data.do_not_auto_trigger_on_edit) {
-                    payload = this.apiCallService.getPaylodWithCriteria(data.onchange_api_params, data.onchange_call_back_field, data.onchange_api_params_criteria, formValueWithCustomData)
-                    if(data.onchange_api_params.indexOf("FORM_GROUP") >= 0 || data.onchange_api_params.indexOf("QTMP") >= 0){
-                      payload["data"]=formValueWithCustomData;
-                    }
-                    staticModal.push(payload);
-                  }
-                }
-                if(data.field_name == 'contact'){
-                  (<FormGroup>templateForm.controls[fieldName]).controls['contact'].setValue(contact);
-                  if (data.onchange_api_params && data.onchange_call_back_field && !data.do_not_auto_trigger_on_edit) {
-                    payload = this.apiCallService.getPaylodWithCriteria(data.onchange_api_params, data.onchange_call_back_field, data.onchange_api_params_criteria, formValueWithCustomData)
-                    if(data.onchange_api_params.indexOf("FORM_GROUP") >= 0 || data.onchange_api_params.indexOf("QTMP") >= 0){
-                      payload["data"]=formValueWithCustomData;
-                    }
-                    staticModal.push(payload);
-                  }
-                }
-              });
-            }
-          });
-        }
-      }
-    });
     return staticModal;
   }
   checkGridSelectionButtonCondition(field:any,button:any,selectedRow:any,formValue:any){
