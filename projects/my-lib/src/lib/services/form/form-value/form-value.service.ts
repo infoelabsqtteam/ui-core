@@ -159,42 +159,44 @@ export class FormValueService {
       });
     }
     if(check){
-      Object.keys(custmizedFormValue).forEach(key => {
-        if (updateMode || complete_object_payload_mode) {
-          if(custmizedFormValue[key] && custmizedFormValue[key] != null && !Array.isArray(custmizedFormValue[key]) && typeof custmizedFormValue[key] === "object"){
-            tableFields.forEach((element:any) => {
-              if(element.field_name == key){
-                if(element.datatype && element.datatype != null && element.datatype == 'key_value'){
-                  selectedRow[key] = custmizedFormValue[key];
-                }else{
-                  Object.keys(custmizedFormValue[key]).forEach(child =>{
-                    selectedRow[key][child] = custmizedFormValue[key][child];
-                  })
+      if(custmizedFormValue && Object.keys(custmizedFormValue).length > 0){
+        Object.keys(custmizedFormValue).forEach(key => {
+          if (updateMode || complete_object_payload_mode) {
+            if(custmizedFormValue[key] && custmizedFormValue[key] != null && !Array.isArray(custmizedFormValue[key]) && typeof custmizedFormValue[key] === "object"){
+              tableFields.forEach((element:any) => {
+                if(element.field_name == key){
+                  if(element.datatype && element.datatype != null && element.datatype == 'key_value'){
+                    selectedRow[key] = custmizedFormValue[key];
+                  }else{
+                    Object.keys(custmizedFormValue[key]).forEach(child =>{
+                      selectedRow[key][child] = custmizedFormValue[key][child];
+                    })
+                  }
                 }
-              }
-            });
-          }else{
-              selectedRow[key] = custmizedFormValue[key];
-          }
-        } else {
-          if(custmizedFormValue[key] && custmizedFormValue[key] != null && !Array.isArray(custmizedFormValue[key]) && typeof custmizedFormValue[key] === "object"){
-            tableFields.forEach((element:any) => {
-              if(element.field_name == key){
-                if(element.datatype && element.datatype != null && element.datatype == 'key_value'){
-                  modifyFormValue[key] = custmizedFormValue[key];
-                }else{
-                  Object.keys(custmizedFormValue[key]).forEach(child =>{
-                    modifyFormValue[key][child] = custmizedFormValue[key][child];
-                  })
+              });
+            }else{
+                selectedRow[key] = custmizedFormValue[key];
+            }
+          } else {
+            if(custmizedFormValue[key] && custmizedFormValue[key] != null && !Array.isArray(custmizedFormValue[key]) && typeof custmizedFormValue[key] === "object"){
+              tableFields.forEach((element:any) => {
+                if(element.field_name == key){
+                  if(element.datatype && element.datatype != null && element.datatype == 'key_value'){
+                    modifyFormValue[key] = custmizedFormValue[key];
+                  }else{
+                    Object.keys(custmizedFormValue[key]).forEach(child =>{
+                      modifyFormValue[key][child] = custmizedFormValue[key][child];
+                    })
+                  }
                 }
-              }
-            });
-          }else{
-            modifyFormValue[key] = custmizedFormValue[key];
-          }
+              });
+            }else{
+              modifyFormValue[key] = custmizedFormValue[key];
+            }
 
-        }
-      })
+          }
+        })
+      }
       if (checkBoxFieldListValue.length > 0 && Object.keys(staticData).length > 0) {
         checkBoxFieldListValue.forEach((element:any) => {
           if (staticData[element.ddn_field]) {
@@ -237,39 +239,41 @@ export class FormValueService {
           }
         });
       }
-      Object.keys(dataListForUpload).forEach(key => {
-        if (updateMode || complete_object_payload_mode) {
-          if(dataListForUpload[key] && dataListForUpload[key] != null && !Array.isArray(dataListForUpload[key]) && typeof dataListForUpload[key] === "object"){
-            tableFields.forEach((element:any) => {
-              if(element.field_name == key){
-                Object.keys(dataListForUpload[key]).forEach(child =>{
-                  selectedRow[key][child] = this.fileHandlerService.modifyUploadFiles(dataListForUpload[key][child]);
-                })
-              }
-            });
-          }else{
-              selectedRow[key] = this.fileHandlerService.modifyUploadFiles(dataListForUpload[key]);
-          }
-        } else {
-          if(dataListForUpload[key] && dataListForUpload[key] != null && !Array.isArray(dataListForUpload[key]) && typeof dataListForUpload[key] === "object"){
-            tableFields.forEach((element:any) => {
-              if(element.field_name == key){
-                Object.keys(dataListForUpload[key]).forEach(child =>{
-                  modifyFormValue[key][child] = this.fileHandlerService.modifyUploadFiles(dataListForUpload[key][child]);
-                })
-              }
-            });
-          }else{
-            let uploadFileType = tableFields.filter((field:any)=> field.type == 'file_for_s3')
-                if(uploadFileType.length >0){
-                  modifyFormValue[key] = dataListForUpload[key];
-                }else{
-                  modifyFormValue[key] = this.fileHandlerService.modifyUploadFiles(dataListForUpload[key]);
+      if(dataListForUpload && Object.keys(dataListForUpload).length > 0){
+        Object.keys(dataListForUpload).forEach(key => {
+          if (updateMode || complete_object_payload_mode) {
+            if(dataListForUpload[key] && dataListForUpload[key] != null && !Array.isArray(dataListForUpload[key]) && typeof dataListForUpload[key] === "object"){
+              tableFields.forEach((element:any) => {
+                if(element.field_name == key){
+                  Object.keys(dataListForUpload[key]).forEach(child =>{
+                    selectedRow[key][child] = this.fileHandlerService.modifyUploadFiles(dataListForUpload[key][child]);
+                  })
                 }
-          }
+              });
+            }else{
+                selectedRow[key] = this.fileHandlerService.modifyUploadFiles(dataListForUpload[key]);
+            }
+          } else {
+            if(dataListForUpload[key] && dataListForUpload[key] != null && !Array.isArray(dataListForUpload[key]) && typeof dataListForUpload[key] === "object"){
+              tableFields.forEach((element:any) => {
+                if(element.field_name == key){
+                  Object.keys(dataListForUpload[key]).forEach(child =>{
+                    modifyFormValue[key][child] = this.fileHandlerService.modifyUploadFiles(dataListForUpload[key][child]);
+                  })
+                }
+              });
+            }else{
+              let uploadFileType = tableFields.filter((field:any)=> field.type == 'file_for_s3')
+                  if(uploadFileType.length >0){
+                    modifyFormValue[key] = dataListForUpload[key];
+                  }else{
+                    modifyFormValue[key] = this.fileHandlerService.modifyUploadFiles(dataListForUpload[key]);
+                  }
+            }
 
-        }
-      })
+          }
+        })
+      }
     }
     if(selectContact != '' && selectContact != undefined){
       let selectContactObject:any = {}
