@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
-import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
-import { CommonFunctionService } from '../common-utils/common-function.service';
-import { FileHandlerService } from '../fileHandler/file-handler.service';
+import { CoreFunctionService } from '../../common-utils/core-function/core-function.service';
+import { CommonFunctionService } from '../../common-utils/common-function.service';
+import { FileHandlerService } from '../../fileHandler/file-handler.service';
+import { CheckIfService } from '../../check-if/check-if.service';
+import { StorageService } from '../../storage/storage.service';
+import { DatePipe,CurrencyPipe } from '@angular/common';
 @Injectable({
   providedIn: 'root'
 })
@@ -10,7 +13,11 @@ export class GridCommonFunctionService {
 constructor(
   private CommonFunctionService:CommonFunctionService,
   private coreFunctionService:CoreFunctionService,
-  private fileHandlerService: FileHandlerService
+  private fileHandlerService: FileHandlerService,
+  private checkIfService:CheckIfService,
+  private storageService:StorageService,
+  private datePipe: DatePipe,
+  private CurrencyPipe: CurrencyPipe,
 ) { }
   modifyGridData(gridData:any,gridColumns:any,field:any,editableGridColumns:any,typegrapyCriteriaList:any){
     let modifiedData = [];
@@ -25,15 +32,15 @@ constructor(
   }
   rowModify(row:any,field:any,gridColumns:any,editableGridColumns:any,typegrapyCriteriaList:any){
     let modifyRow = JSON.parse(JSON.stringify(row));
-    modifyRow["disabled"] = this.checkRowIf(row,field);
+    modifyRow["disabled"] = this.checkIfService.checkRowIf(row,field);
     for (let j = 0; j < gridColumns.length; j++) {
       const column = gridColumns[j];
       if(!column.editable || editableGridColumns.length == 0){
-        modifyRow[column.field_name] = this.CommonFunctionService.getValueForGrid(column,row);
+        modifyRow[column.field_name] = this.getValueForGrid(column,row);
       }
-      modifyRow[column.field_name+"_tooltip"] = this.CommonFunctionService.getValueForGridTooltip(column,row);
+      modifyRow[column.field_name+"_tooltip"] = this.getValueForGridTooltip(column,row);
       if(column.editable){
-        modifyRow[column.field_name+"_disabled"] = this.isDisable(column,row); 
+        modifyRow[column.field_name+"_disabled"] = this.checkIfService.isDisableRow(column,row);
         if(column.type == 'file' && editableGridColumns.length > 0) {
           if(row && row[column.field_name] && this.CommonFunctionService.isArray(row[column.field_name]) && row[column.field_name].length > 0) {
             modifyRow[column.field_name] = this.fileHandlerService.modifyUploadFiles(row[column.field_name]);
@@ -56,57 +63,7 @@ constructor(
     }
     return modifyRow;
   }
-  checkDisableInRow(editedColumns:any,row:any){
-    for (let index = 0; index < editedColumns.length; index++) {
-      const column = editedColumns[index];
-      row[column.field_name+"_disabled"] = this.isDisable(column,row);
-    }
-  }
-  checkRowIf(data:any,field:any){
-    let check = false;
-    if(data.selected || field.checkDisableRowIf){
-      let condition = '';
-      if(field.disableRowIf && field.disableRowIf != ''){
-        condition = field.disableRowIf;
-      }
-      if(condition != ''){
-        if(this.CommonFunctionService.checkDisableRowIf(condition,data)){
-          check = true;
-        }else{
-          check = false;
-        }
-      }
-    }
-    return check;
-  }
-  isDisable(field:any, data:any) {
-    const updateMode = false;
-    if (field.is_disabled) {
-      return true;
-    }
-    if(data.disabled){
-      return data.disabled;
-    }
-    if (field.etc_fields && field.etc_fields.disable_if && field.etc_fields.disable_if != '') {
-      return this.CommonFunctionService.isDisable(field.etc_fields, updateMode, data);
-    }
-    return false;
-  }
-  isDisableRuntime(column:any, data:any,i:number,gridData:any,field:any,filterData:any) {
-    const updateMode = false;
-    if (column.is_disabled) {
-      return true;
-    }
-    if(data.disabled){
-      return data.disabled;
-    }
-    if (column.etc_fields && column.etc_fields.disable_if && column.etc_fields.disable_if != '') {
-      let indx:any = this.getCorrectIndex(data,i,field,gridData,filterData);
-      data = gridData[indx];
-      return this.CommonFunctionService.isDisable(field.etc_fields, updateMode, data);
-    }
-    return false;
-  }
+
   getListByKeyValueToList(list:any,key:string,value:any){
     let getlist = [];
     for (let i = 0; i < list.length; i++) {
@@ -124,7 +81,7 @@ constructor(
       for (let i = 0; i < modifyGridColumns.length; i++) {
         const field = modifyGridColumns[i];
         if (this.coreFunctionService.isNotBlank(field.show_if)) {
-          if (!this.CommonFunctionService.showIf(field, parentObject)) {
+          if (!this.checkIfService.showIf(field, parentObject)) {
             field['display'] = false;
           } else {
             field['display'] = true;
@@ -180,33 +137,7 @@ constructor(
     }
     return gridSelectedData;
   }
-  getCorrectIndex(data:any, indx:number,field:any,gridData:any,filterValue:any){
-    let index;
-    if (field.matching_fields_for_grid_selection && field.matching_fields_for_grid_selection.length > 0) {
-      gridData.forEach((row:any, i:number) => {
-        var validity = true;
-        field.matching_fields_for_grid_selection.forEach((matchcriteria:any) => {
-          if (this.CommonFunctionService.getObjectValue(matchcriteria, data) == this.CommonFunctionService.getObjectValue(matchcriteria, row)) {
-            validity = validity && true;
-          }
-          else {
-            validity = validity && false;
-          }
-        });
-        if (validity == true) {
-          index = i;
-        }
-      });
-    }else if (data._id != undefined) {
-      index = this.CommonFunctionService.getIndexInArrayById(gridData, data._id);
-    } else {
-      index = indx;
-    }
-    if(index && index != indx && filterValue == ''){
-      index = indx;
-    }
-    return index;
-  }
+
   applyOnGridFilter(field:any) {
     if (field && field.etc_fields && field.etc_fields.on_grid_filter === 'false') {
       return false;
@@ -219,47 +150,6 @@ constructor(
     }
     return "Search Parameter ...";
   }
-  checkDataAlreadyAddedInListOrNot(primary_key:string,incomingData:any,alreadyDataAddedlist:any){
-    if(alreadyDataAddedlist == undefined){
-      alreadyDataAddedlist = [];
-    }
-    let alreadyExist = "false";
-    if(typeof incomingData == 'object'){
-      alreadyDataAddedlist.forEach((element:any) => {
-        if(element._id == incomingData._id){
-          alreadyExist =  "true";
-        }
-      });
-    }
-    else if(typeof incomingData == 'string'){
-      alreadyDataAddedlist.forEach((element: string) => {
-        if(typeof element == 'string'){
-          if(element == incomingData){
-            alreadyExist =  "true";
-          }
-        }else{
-          if(element[primary_key] == incomingData){
-            alreadyExist =  "true";
-          }
-        }
-
-      });
-    }else{
-      alreadyExist =  "false";
-    }
-    if(alreadyExist == "true"){
-      return true;
-    }else{
-      return false;
-    }
-  }
-  // fieldButtonLabel(field){
-  //   if(field && field.grid_selection_button_label != null && field.grid_selection_button_label != ''){
-  //     return field.grid_selection_button_label;
-  //   }else{
-  //     return field.label;
-  //   }
-  // }
   modifyTableFields(tablefields:any){
 
   }
@@ -366,14 +256,14 @@ constructor(
         if (item.display_name && item.display_name != "") {
           value = this.CommonFunctionService.getObjectValue(item.display_name, listOfField);
         } else {
-          value = this.CommonFunctionService.getValueForGrid(item,listOfField);
+          value = this.getValueForGrid(item,listOfField);
         }
         return value ? "Yes" : "No";
       default:
         if (item.display_name && item.display_name != "") {
           return this.CommonFunctionService.getObjectValue(item.display_name, listOfField);
         } else {
-          return this.CommonFunctionService.getValueForGrid(item,listOfField);
+          return this.getValueForGrid(item,listOfField);
         }
     }
 
@@ -385,7 +275,7 @@ constructor(
         if(field.disableRowIfOnlySelection){
           return true;
         }else{
-          return !this.CommonFunctionService.checkDisableRowIf(condition,data);
+          return !this.checkIfService.checkDisableRowIf(condition,data);
         }
       }
     }
@@ -403,7 +293,7 @@ constructor(
         for (let j = 0; j < crList.length; j++) {
           const child = crList[j];
           let modify = child.replaceAll(';', "#");
-          if(!this.CommonFunctionService.checkIfConditionForArrayListValue(modify,object)){
+          if(!this.checkIfService.checkIfConditionForArrayListValue(modify,object)){
             childConditionsMatched = false;
             break;
           }else{
@@ -433,5 +323,278 @@ constructor(
     }
     return background;
   }
+  modifiedGridColumns(gridColumns:any,selectedRow:any,formValue:any){
+    if(gridColumns.length > 0){
+      gridColumns.forEach((field:any) => {
+        if(this.coreFunctionService.isNotBlank(field.show_if)){
+          if(!this.checkIfService.checkShowIf(field,selectedRow,formValue)){
+            field['display'] = false;
+          }else{
+            field['display'] = true;
+          }
+        }else{
+          field['display'] = true;
+        }
+      });
+    }
+    return gridColumns;
+  }
+  checkGridSelectionMendetory(gridSelectionMendetoryList:any,selectedRow:any,formValue:any,custmizedFormValue:any){
+    let validation = {
+      'status' : true,
+      'msg' : ''
+    }
+    if(gridSelectionMendetoryList && gridSelectionMendetoryList.length > 0){
+      let check = 0;
+      gridSelectionMendetoryList.forEach((field:any) => {
+        let data:any = [];
+        if(custmizedFormValue[field.field_name]){
+          data = custmizedFormValue[field.field_name];
+        }
+        if(field.mendetory_fields && field.mendetory_fields.length > 0){
+          field.mendetory_fields = this.modifiedGridColumns(field.mendetory_fields,selectedRow,formValue)
+          if(data && data.length > 0){
+            field.mendetory_fields.forEach((mField:any) => {
+              const fieldName = mField.field_name;
+              if(mField.display){
+                data.forEach((row:any) => {
+                  if(row && row[fieldName] == undefined || row[fieldName] == '' || row[fieldName] == null){
+                    if(validation.msg == ''){
+                      validation.msg = mField.label + ' of ' + field.label+' is required.';
+                    }
+                    check = 1;
+                  }
+                });
+              }
+            });
+          }
+        }
+      });
+      if(check != 0){
+        validation.status = false;
+        return validation;
+      }else{
+        return validation
+      }
+    }else{
+      return validation;
+    }
+  }
+
+  getGridSelectedData(data:any,field:any){
+    let responce:any ={
+      gridSelectedData:[],
+      customEntryData:[]
+    }
+    if(data && data.length > 0 && field.add_new_enabled){
+      data.forEach((grid:any) => {
+        if(grid && grid.customEntry){
+          responce.customEntryData[field.field_name].push(grid);
+        }else{
+          responce.gridSelectedData.push(grid);
+        }
+      });
+    }else {
+      responce.gridSelectedData = data;
+    }
+    return responce;
+  }
+  getModifiedGridColumns(gridColumns:any,object:any){
+    if(gridColumns.length > 0){
+      gridColumns.forEach((field:any) => {
+        if(this.coreFunctionService.isNotBlank(field.show_if)){
+          if(!this.checkIfService.showIf(field,object)){
+            field['display'] = false;
+          }else{
+            field['display'] = true;
+          }
+        }else{
+          field['display'] = true;
+        }
+      });
+    }
+    return gridColumns;
+  }
+
+  getValueForGrid(field:any, object:any) {
+    let value:any = '';
+    let fieldName: any= '';
+    if (field) {
+      if(this.coreFunctionService.isNotBlank(field.display_name)){
+        fieldName= field.display_name;
+      }
+      else if(this.coreFunctionService.isNotBlank(field.field_name)){
+        fieldName= field.field_name;
+      }
+    }
+    if(fieldName !=''){
+      value= this.CommonFunctionService.getObjectValue(fieldName, object)
+    }
+    if (!field.type) field.type = "Text";
+    let returnValue:any = '';
+    switch (field.type.toLowerCase()) {
+      case 'datetime':
+        if(value && value != ''){
+          if(this.storageService.checkPlatForm() == 'mobile'){
+            returnValue =  this.datePipe.transform(value, 'medium');
+          }else{
+            returnValue = this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
+          }
+        }
+        return returnValue
+      case 'date':
+        if(value && value != ''){
+          if(this.storageService.checkPlatForm() == 'mobile'){
+            returnValue =  this.datePipe.transform(value, 'mediumDate');
+          }else{
+            returnValue = this.datePipe.transform(value, 'dd/MM/yyyy');
+          }
+        }
+        return returnValue;
+      case 'time': return this.datePipe.transform(value, 'h:mm a');
+      case "boolean": return value ? "Yes" : "No";
+      case "currency": return this.CurrencyPipe.transform(value, 'INR');
+  	  case "dropdown": return value && value.name ? value.name : value;
+      case "typeahead": return value && value.name ? value.name : value;
+      case "info":
+        if (value && value != '') {
+          if(this.storageService.checkPlatForm() == 'mobile'){
+            return '<span class="material-symbols-outlined cursor-pointer">visibility</span>';
+          }else{
+            return '<i class="fa fa-eye cursor-pointer"></i>';
+          }
+        } else {
+          return '-';
+        }
+
+      case "html" :
+        if (value && value != '') {
+          return '<span class="material-icons cursor-pointer">preview</span>';
+        } else {
+          return '-';
+        }
+      case "file":
+        if (value && value != '') {
+          if(this.storageService.checkPlatForm() == 'mobile'){
+            return '<span class="material-symbols-outlined cursor-pointer">text_snippet</span>';
+          }else{
+            return '<span class="material-icons cursor-pointer">text_snippet</span>';
+          }
+        } else {
+          return '-';
+        }
+      case "template":
+        if (value && value != '') {
+          if(this.storageService.checkPlatForm() == 'mobile'){
+            return '<span class="material-symbols-outlined">description</span>';
+          }else{
+            return '<i class="fa fa-file cursor-pointer" aria-hidden="true"></i>';
+          }
+        } else {
+          return '-';
+        }
+      case "image":
+        return '<img src="data:image/jpg;base64,' + value + '" />';
+      case "icon":
+        if(this.storageService.checkPlatForm() == 'mobile'){
+          return '<span class="material-symbols-outlined cursor-pointer">' + field.field_class + '</span>';
+        }else{
+          return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';
+        }
+      case "download_file":
+        if (value && value != '') {
+          if(this.storageService.checkPlatForm() == 'mobile'){
+            return '<span class="material-symbols-outlined cursor-pointer">' + field.field_class + '</span>';
+          }else{
+            return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';
+          }
+        }else{
+          return '-';
+        }
+      case "trim_of_string":
+        if(value != undefined && value != null && value != ''){
+          if(typeof value == 'string'){
+            let stringObject = value.split('/');
+            if(stringObject.length > 0){
+              return stringObject[0]
+            }else{
+              return value;
+            }
+          }else{
+            return value;
+          }
+        }else{
+          return value;
+        }
+
+      case "color":
+        break;
+
+      case "pattern":
+        if(object != null){
+          return this.CommonFunctionService.getConvertedString(object,field.field_name);
+        }
+      break;
+      case "chips":
+        if(this.coreFunctionService.isNotBlank(value) && this.CommonFunctionService.isArray(value)){
+          let name = "";
+          for(let i=0 ;i<value.length; i++){
+            if(this.coreFunctionService.isNotBlank(value[i]['name'])){
+              name = name+', '+value[i]['name'];
+            }else{
+              name = name+', '+value[i];
+            }
+          }
+          return name.substring(2);;
+        }
+        return "-";
+      case "reference_names":
+        if(this.coreFunctionService.isNotBlank(value) && this.CommonFunctionService.isArray(value)){
+          let name = '';
+          for(let i=0 ;i<value.length; i++){
+            if(this.coreFunctionService.isNotBlank(value[i]['name'])){
+              name = name+', '+value[i]['name'];
+            }
+          }
+          if(name.length > 1){
+            name = name.substring(2);
+          }
+          return name;
+        }else{
+          return "-";
+        }
+      default: return value;
+    }
+  }
+  getValueForGridTooltip(field:any, object:any) {
+    let value = '';
+    if (field.field_name != undefined && field.field_name != null && field.field_name != '') {
+      value = this.CommonFunctionService.getObjectValue(field.field_name, object)
+    }
+    if (!field.type) field.type = "Text";
+    switch (field.type.toLowerCase()) {
+      case 'datetime': return this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
+      case 'date': return this.datePipe.transform(value, 'dd/MM/yyyy');
+      case 'time': return this.datePipe.transform(value, 'h:mm a');
+      case "boolean": return value ? "Yes" : "No";
+      case "currency": return this.CurrencyPipe.transform(value, 'INR');
+      case "info":
+      case "file":
+      case "template":
+      case "image":
+      case "icon":
+      case "html":
+          return '';
+      default: return value;
+    }
+  }
+
+  getNoOfItems(grid:any, defaultNoOfItem:any) {
+    if(grid && grid.details && grid.details.numberOfItems) {
+      defaultNoOfItem = grid.details.numberOfItems;
+    }
+    return defaultNoOfItem;
+  }
+
 
 }

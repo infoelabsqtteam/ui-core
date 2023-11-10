@@ -144,9 +144,12 @@ constructor(
       menu['indexs'] = defaultMenuIndexs;
       if(defaultMenuIndexs.defaultSubmenuIndex > -1){
           defaultMenu = menuList[defaultMenuIndexs.defaultmenuIndex].submenu[defaultMenuIndexs.defaultSubmenuIndex];
+          defaultMenu['child'] = true;
       }else{
           defaultMenu = menuList[defaultMenuIndexs.defaultmenuIndex];
+          defaultMenu['child'] = false;
       }
+      defaultMenu['menuIndex'] = defaultMenuIndexs.defaultmenuIndex;
       menu['menu'] = defaultMenu;
       // if(defaultMenu.display){
 
