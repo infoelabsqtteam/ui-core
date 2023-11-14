@@ -5,6 +5,7 @@ import { FileHandlerService } from '../../fileHandler/file-handler.service';
 import { CheckIfService } from '../../check-if/check-if.service';
 import { StorageService } from '../../storage/storage.service';
 import { DatePipe,CurrencyPipe } from '@angular/common';
+import { DataShareService } from '../../data-share/data-share.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -18,6 +19,7 @@ constructor(
   private storageService:StorageService,
   private datePipe: DatePipe,
   private CurrencyPipe: CurrencyPipe,
+  private dataShareService: DataShareService
 ) { }
   modifyGridData(gridData:any,gridColumns:any,field:any,editableGridColumns:any,typegrapyCriteriaList:any){
     let modifiedData = [];
@@ -594,6 +596,21 @@ constructor(
       defaultNoOfItem = grid.details.numberOfItems;
     }
     return defaultNoOfItem;
+  }
+
+
+  setOldTabCount(tab:any) {
+    let dataCount:any = {};  
+    let count:any = {};    
+    let totalDataCount:any = {};
+    const currentTabName = this.storageService.GetActiveMenu()['name'];        
+    const key = currentTabName+"_"+tab.name;
+    totalDataCount = this.dataShareService.getGridCountData();
+    let oldDataSize = totalDataCount[key];
+    count[key] = oldDataSize;
+    dataCount['count'] = count;
+    dataCount['gridCountData'] = totalDataCount;
+    this.dataShareService.shareGridCountData(dataCount);
   }
 
 
