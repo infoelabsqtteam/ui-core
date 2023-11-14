@@ -533,7 +533,9 @@ export class FormControlService {
     if(tree_view_object && tree_view_object.field_name != ""){
       let editeTreeModifyData = JSON.parse(JSON.stringify(tree_view_object));
       const object = responce.selectedRow[editeTreeModifyData.field_name];
-      responce.templateForm.controls[editeTreeModifyData.field_name].setValue(object)
+      if(object){
+        responce.templateForm.controls[editeTreeModifyData.field_name].setValue(object)
+      }
     }
   }
   setCheckboxFileListValue(checkBoxFieldListValue:any,templateForm:FormGroup,staticData:any,selectedRow:any,updateMode:boolean) {
