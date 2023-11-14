@@ -103,9 +103,9 @@ export class DataShareService {
   getStatiData(){
     return this.setStaticData;
   }
-  shareGridCountData(gridCountData:any){
-    this.gridCountData.next(gridCountData);
-    this.setGridCountData = gridCountData;
+  shareGridCountData(responce:any){
+    this.gridCountData.next(responce.count);
+    this.setGridCountData = responce.gridCountData;
   }
   getGridCountData(){
     return this.setGridCountData;

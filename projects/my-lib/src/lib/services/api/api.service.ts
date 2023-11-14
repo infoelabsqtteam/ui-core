@@ -114,15 +114,20 @@ gridCountDataCall(payload:object){
 
 setGridCountData(data:any){
   const gridCountData:any = this.dataShareService.getGridCountData();
+  const count:any = {};
+  const dataCount:any = {};
   if(data.length > 0){
     data.forEach((element:any) => {
-      gridCountData[element.field] = element.data_size
+      gridCountData[element.field] = element.data_size;
+      count[element.field] = element.data_size;
     });
   }
-  this.dataShareService.shareGridCountData(gridCountData);
+  dataCount['gridCountData'] = gridCountData;
+  dataCount['count'] = count;
+  this.dataShareService.shareGridCountData(dataCount);
 }
 resetGridCountAllData(){
-  this.dataShareService.shareGridCountData({})
+  this.dataShareService.shareGridCountData({ count: {}, gridCountData: {}})
 }
 getGridData(payload:any){
   let api = this.envService.getApi('GET_GRID_DATA');
