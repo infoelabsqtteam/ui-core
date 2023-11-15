@@ -1,6 +1,6 @@
 import { StorageService } from './../storage/storage.service';
 import { Injectable } from '@angular/core';
-import { FormGroup, Validators } from '@angular/forms';
+import { UntypedFormGroup, Validators } from '@angular/forms';
 import { CommonFunctionService } from '../common-utils/common-function.service';
 
 @Injectable({
@@ -12,7 +12,7 @@ export class CheckIfService {
     private commonFunctionService:CommonFunctionService,
     private storageService:StorageService
   ) { }
-  checkIsDisable(parent:any,chield:any,updateMode:boolean,formValue:any,templateForm:FormGroup){
+  checkIsDisable(parent:any,chield:any,updateMode:boolean,formValue:any,templateForm:UntypedFormGroup){
     let responce = {
       tobedesabled:'',
       templateForm:templateForm
@@ -31,14 +31,14 @@ export class CheckIfService {
     }else{
       responce.tobedesabled = this.isDisable(chield,updateMode,formValue)
       if(responce.tobedesabled){
-        (<FormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].disable()
+        (<UntypedFormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].disable()
       }else{
-        (<FormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].enable()
+        (<UntypedFormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].enable()
       }
     }
     return responce;
   }
-  checkIsMendetory(parent:any,chield:any,formValue:any,templateForm:FormGroup){
+  checkIsMendetory(parent:any,chield:any,formValue:any,templateForm:UntypedFormGroup){
     let responce = {
       tobedesabled:'',
       templateForm:templateForm
@@ -59,14 +59,14 @@ export class CheckIfService {
     }else{
       responce.tobedesabled = this.isMendetory(chield,formValue)
       if(responce.tobedesabled){
-        if((<FormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].status == 'VALID'){
-          (<FormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].setValidators([Validators.required]);
-          (<FormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].updateValueAndValidity();
+        if((<UntypedFormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].status == 'VALID'){
+          (<UntypedFormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].setValidators([Validators.required]);
+          (<UntypedFormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].updateValueAndValidity();
         }
       }else{
-        if((<FormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].status == 'INVALID'){
-          (<FormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].clearValidators();
-          (<FormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].updateValueAndValidity();
+        if((<UntypedFormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].status == 'INVALID'){
+          (<UntypedFormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].clearValidators();
+          (<UntypedFormGroup>responce.templateForm.controls[parent]).controls[chield.field_name].updateValueAndValidity();
         }
       }
     }
@@ -124,7 +124,7 @@ export class CheckIfService {
     }
     return check;
   }
-  checkDublicateOnForm(fields:any,value:any,list:any,i:any,showIfFieldList:any,custmizedFormValue:any,templateForm:FormGroup,parent?:any){
+  checkDublicateOnForm(fields:any,value:any,list:any,i:any,showIfFieldList:any,custmizedFormValue:any,templateForm:UntypedFormGroup,parent?:any){
     let checkDublic = {
       status : false,
       msg : ""

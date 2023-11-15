@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CommonFunctionService } from '../common-utils/common-function.service';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -85,9 +85,9 @@ export class FileHandlerService {
           responce.tableFields[parentIndex].list_of_fields[curIndex]['tooltipMsg'] = tooltipMsg;
         }
 
-        (<FormGroup>responce.templateForm.controls[curFileUploadFieldparentfield.field_name]).controls[curFieldName].setValue(fileName);
+        (<UntypedFormGroup>responce.templateForm.controls[curFileUploadFieldparentfield.field_name]).controls[curFieldName].setValue(fileName);
       }else{
-        (<FormGroup>responce.templateForm.controls[curFileUploadFieldparentfield.field_name]).controls[curFieldName].setValue('');
+        (<UntypedFormGroup>responce.templateForm.controls[curFileUploadFieldparentfield.field_name]).controls[curFieldName].setValue('');
         if(curFileUploadField.type == 'input_with_uploadfile'){
           responce.tableFields[parentIndex].list_of_fields[curIndex]['tooltipMsg'] = '';
         }

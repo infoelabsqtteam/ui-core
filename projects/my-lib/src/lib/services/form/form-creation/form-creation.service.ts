@@ -2,7 +2,7 @@ import { ApiCallService } from './../../api/api-call/api-call.service';
 import { Injectable } from '@angular/core';
 import { CommonFunctionService } from '../../common-utils/common-function.service';
 import { EnvService } from '../../env/env.service';
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, UntypedFormControl, Validators } from '@angular/forms';
 import { StorageService } from '../../storage/storage.service';
 import { CustomvalidationService } from '../../customvalidation/customvalidation.service';
 import { CheckIfService } from '../../check-if/check-if.service';
@@ -19,7 +19,7 @@ export class FormCreationService {
     private commonFunctionService:CommonFunctionService,
     private envService:EnvService,
     private storageService:StorageService,
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private customvalidationService:CustomvalidationService,
     private apiCallService:ApiCallService,
     private checkifService:CheckIfService
@@ -131,36 +131,36 @@ export class FormCreationService {
         forControl[field.field_name] = this.formBuilder.array(object, this.validator(field))
         break;
         case 'checkbox':
-          forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
+          forControl[field.field_name] = new UntypedFormControl({ value: object, disabled: disabled }, this.validator(field))
           break;
       case "text":
         switch (field.type) {
           case "gst_number":
-            forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
+            forControl[field.field_name] = new UntypedFormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
             break;
           case "api":
             switch (field.api_call_name) {
               case "gst_number":
-                forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
+                forControl[field.field_name] = new UntypedFormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
                 break;
               default:
-                forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
+                forControl[field.field_name] = new UntypedFormControl({ value: object, disabled: disabled }, this.validator(field))
                 break;
             }
-              forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
+              forControl[field.field_name] = new UntypedFormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidGSTNumber.bind(this.customvalidationService))
               break;
           case "typeahead":
             switch (field.datatype) {
               case 'object':
-                forControl[field.field_name] = new FormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidData.bind(this.customvalidationService))
+                forControl[field.field_name] = new UntypedFormControl({ value: object, disabled: disabled },this.validator(field),this.customvalidationService.isValidData.bind(this.customvalidationService))
                 break;
               default:
-                forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
+                forControl[field.field_name] = new UntypedFormControl({ value: object, disabled: disabled }, this.validator(field))
                 break;
             }
             break;
           default:
-            forControl[field.field_name] = new FormControl({ value: object, disabled: disabled }, this.validator(field))
+            forControl[field.field_name] = new UntypedFormControl({ value: object, disabled: disabled }, this.validator(field))
             break;
         }
         break;
@@ -603,7 +603,7 @@ export class FormCreationService {
     });
     return responce;
   }
-  updateSelectContact(selectContact:any,tabFilterData:any,tableFields:any,templateForm:FormGroup,formValueWithCustomData:any,staticModal:any){
+  updateSelectContact(selectContact:any,tabFilterData:any,tableFields:any,templateForm:UntypedFormGroup,formValueWithCustomData:any,staticModal:any){
     if(selectContact != '' && tabFilterData && tabFilterData.length > 0 && tableFields && tableFields.length > 0){
       let selectContactObject = selectContact;
       let account={};
@@ -657,7 +657,7 @@ export class FormCreationService {
                 stepData.list_of_fields.forEach((data:any) => {
                   let fieldName = stepData.field_name;
                   if(data.field_name == 'account'){
-                    (<FormGroup>templateForm.controls[fieldName]).controls['account'].setValue(account);
+                    (<UntypedFormGroup>templateForm.controls[fieldName]).controls['account'].setValue(account);
                     //this.templateForm.get(stepData.field_name).get('account').setValue(account);
                     if (data.onchange_api_params && data.onchange_call_back_field && !data.do_not_auto_trigger_on_edit) {
                       payload = this.apiCallService.getPaylodWithCriteria(data.onchange_api_params, data.onchange_call_back_field, data.onchange_api_params_criteria, formValueWithCustomData)
@@ -668,7 +668,7 @@ export class FormCreationService {
                     }
                   }
                   if(data.field_name == 'contact'){
-                    (<FormGroup>templateForm.controls[fieldName]).controls['contact'].setValue(contact);
+                    (<UntypedFormGroup>templateForm.controls[fieldName]).controls['contact'].setValue(contact);
                     if (data.onchange_api_params && data.onchange_call_back_field && !data.do_not_auto_trigger_on_edit) {
                       payload = this.apiCallService.getPaylodWithCriteria(data.onchange_api_params, data.onchange_call_back_field, data.onchange_api_params_criteria, formValueWithCustomData)
                       if(data.onchange_api_params.indexOf("FORM_GROUP") >= 0 || data.onchange_api_params.indexOf("QTMP") >= 0){
@@ -721,7 +721,7 @@ export class FormCreationService {
     }
     return value;
   }
-  getFocusField(previousFormFocusField:any,tableFields:any,templateForm:FormGroup,focusFieldParent:any,checkFormFieldAutfocus:any){
+  getFocusField(previousFormFocusField:any,tableFields:any,templateForm:UntypedFormGroup,focusFieldParent:any,checkFormFieldAutfocus:any){
     let responce:any={
       checkFormFieldAutfocus:checkFormFieldAutfocus,
       previousFormFocusField:previousFormFocusField,
@@ -760,7 +760,7 @@ export class FormCreationService {
     }
     return responce;
   }
-  focusField(parent:any,key:any,templateForm:FormGroup,focusFieldParent:any,checkFormFieldAutfocus:any,previousFormFocusField:any,responce:any){
+  focusField(parent:any,key:any,templateForm:UntypedFormGroup,focusFieldParent:any,checkFormFieldAutfocus:any,previousFormFocusField:any,responce:any){
     responce.id = key._id + "_" + key.field_name;
     let field:any = {};
     if(parent == ''){
@@ -769,7 +769,7 @@ export class FormCreationService {
       }
     }
     if(parent != ""){
-      field = (<FormGroup>templateForm.controls[parent.field_name]).controls[key.field_name];
+      field = (<UntypedFormGroup>templateForm.controls[parent.field_name]).controls[key.field_name];
     }else{
       field = templateForm.controls[key.field_name];
     }
