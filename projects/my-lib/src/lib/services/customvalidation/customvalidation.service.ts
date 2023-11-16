@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { DataShareService } from '../data-share/data-share.service';
 
 @Injectable({
@@ -53,7 +53,7 @@ export class CustomvalidationService {
     return check;
   }
   checkDates(endDate: string, startDate: string) {
-    return (formGroup: FormGroup) => {
+    return (formGroup: UntypedFormGroup) => {
       const startDateControl = formGroup.controls[startDate];
       const endDateControl = formGroup.controls[endDate];
       const date1 =new Date(startDateControl.value);
@@ -67,7 +67,7 @@ export class CustomvalidationService {
  }
 
   MatchPassword(password: any, confirmPassword: any) {
-    return (formGroup: FormGroup):any => {
+    return (formGroup: UntypedFormGroup):any => {
       const passwordControl = formGroup.controls[password];
       const confirmPasswordControl = formGroup.controls[confirmPassword];
 
