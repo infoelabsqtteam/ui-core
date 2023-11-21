@@ -951,7 +951,7 @@ export class CommonFunctionService {
               }
             }
           }else{
-            fieldData.splice(matchIndex);
+            fieldData.splice(matchIndex, 1);
           }
         }else{
           if(parent != ''){
