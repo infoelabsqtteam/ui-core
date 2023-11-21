@@ -645,9 +645,9 @@ export class ApiCallService {
     return downloadPdfCheck;
   }
   getTemData(tempName:any) {
-    const params = "form_template";
-    const criteria = ["name;eq;"+tempName+";STATIC"];
-    const payload = this.getPaylodWithCriteria(params,'',criteria,{});
+    //const params = "form_template";
+    //const criteria = ["name;eq;"+tempName+";STATIC"];
+    //const payload = this.getPaylodWithCriteria(params,'',criteria,{});
     // const getTemplates = {
     //   crList: [{
     //     "fName": "name",
@@ -659,6 +659,13 @@ export class ApiCallService {
     //   log: this.storageService.getUserLog(),
     //   value: "form_template"
     // }
+    const payload = this.getTempPayload(tempName,'eq');
+    return payload;
+  }
+  getTempPayload(value:any,operator:string){
+    const params = "form_template";
+    const criteria = ["name;"+operator+";"+value+";STATIC"];
+    const payload = this.getPaylodWithCriteria(params,'',criteria,{});
     return payload;
   }
   setPageNoAndSize(payload:any,page:number){

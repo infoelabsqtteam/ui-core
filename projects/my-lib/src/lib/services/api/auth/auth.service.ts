@@ -95,7 +95,12 @@ export class AuthService implements OnInit{
           this.authDataShareService.restSettingModule('logged_in');
           this.apiService.gitVersion('');
           this.apiCallService.getUserPrefrerence(respData.user);
-          this.apiCallService.getUserNotification(1);
+          this.apiCallService.getUserNotification(1);let list = modifyData.menuList;
+          if(list && list.length > 0){
+            let value = this.coreFunctionService.convertListToColonString(list,'text');
+            let payload = this.apiCallService.getTempPayload(value,'in');
+            this.apiService.GetAllTemplate(payload);
+          }
           this.redirectionWithMenuType(loginRedirect);
         } else {
             this.envService.setRequestType('PUBLIC');

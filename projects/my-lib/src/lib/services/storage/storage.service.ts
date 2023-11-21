@@ -1,3 +1,4 @@
+import { EncryptionService } from './../encryption/encryption.service';
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
@@ -42,11 +43,13 @@ export class StorageService {
   MODIFY_MODULES:any = 'MODIFY_MODULES';
   appName:any;
   CLIENT_NAME:any = 'CLIENT_NAME';
+  ALL_TEMPLATE:any = 'allTemplates';
 
 
   constructor(
     private http: HttpClient,
     @Inject('env') private env:any,
+    private encryptionService:EncryptionService
     ) { }
 
   load(): Observable<any>{
@@ -637,5 +640,23 @@ export class StorageService {
     }
     return defaultSearchOperator;
   }
-  
+  storeAllTemplate(data:any){
+    let encryptData = this.encryptionService.encryptRequest(data);
+    console.log(encryptData);
+    localStorage.setItem(this.ALL_TEMPLATE,encryptData);
+  }
+  getAllTemplateList(){
+    let allTemplate = localStorage.getItem(this.ALL_TEMPLATE);
+    return this.encryptionService.decryptRequest(allTemplate);
+  }
+  getTemplate(tempName:string){
+    let templateList:any = this.getAllTemplateList();
+    console.log(templateList);
+    if(templateList && templateList[tempName]){
+      return templateList[tempName];
+    }else{
+      return null;
+    }
+  }
+
 }
