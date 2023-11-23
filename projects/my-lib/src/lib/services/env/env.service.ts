@@ -162,7 +162,7 @@ export class EnvService {
     {'propertyName':'--activebg','key':'active_bg_color'},
     {'propertyName':'--popupHeaderBg','key':'popup_header_bg'},
     {'propertyName':'--formLabelBg','key':'form_label_bg'},
-    {'propertyName':'--fontColor','key':'font_color'}
+    {'propertyName':'--fontColor','key':'txtColor'}
   ]
   setThemeSetting(settingObj:any) {
     this.themeSettingList.forEach(Object => {
