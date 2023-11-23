@@ -198,7 +198,7 @@ GetTempData(payload:any){
   let name = this.coreFunctionService.getTempNameFromPayload(payload);
   let template = this.stroageService.getTemplate(name);
   if(template){
-    this.dataShareService.shareTempData(template);
+    this.dataShareService.shareTempData([template]);
   }else{
     let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
     this.http.post(api, payload).subscribe(

@@ -99,6 +99,7 @@ export class AuthService implements OnInit{
           if(list && list.length > 0){
             let value = this.coreFunctionService.convertListToColonString(list,'text');
             let payload = this.apiCallService.getTempPayload(value,'in');
+            payload['pageSize'] = 200;
             this.apiService.GetAllTemplate(payload);
           }
           this.redirectionWithMenuType(loginRedirect);

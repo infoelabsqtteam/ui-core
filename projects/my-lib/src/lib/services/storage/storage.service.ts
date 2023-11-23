@@ -43,7 +43,7 @@ export class StorageService {
   MODIFY_MODULES:any = 'MODIFY_MODULES';
   appName:any;
   CLIENT_NAME:any = 'CLIENT_NAME';
-  ALL_TEMPLATE:any = 'allTemplates';
+  ALL_TEMPLATE:any = 'ALL_TEMPLATE';
 
 
   constructor(
@@ -641,13 +641,15 @@ export class StorageService {
     return defaultSearchOperator;
   }
   storeAllTemplate(data:any){
-    let encryptData = this.encryptionService.encryptRequest(data);
-    console.log(encryptData);
-    localStorage.setItem(this.ALL_TEMPLATE,encryptData);
+    // let encryptData = this.encryptionService.encryptRequest(data);
+    // console.log(encryptData);
+    localStorage.setItem(this.ALL_TEMPLATE,JSON.stringify(data));
   }
   getAllTemplateList(){
-    let allTemplate = localStorage.getItem(this.ALL_TEMPLATE);
-    return this.encryptionService.decryptRequest(allTemplate);
+    //let allTemplate = localStorage.getItem(this.ALL_TEMPLATE);
+    const obj:any = JSON.parse(<any>localStorage.getItem(this.ALL_TEMPLATE));
+    //return this.encryptionService.decryptRequest(allTemplate);
+    return obj;
   }
   getTemplate(tempName:string){
     let templateList:any = this.getAllTemplateList();
