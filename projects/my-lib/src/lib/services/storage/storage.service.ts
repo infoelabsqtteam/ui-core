@@ -44,6 +44,7 @@ export class StorageService {
   appName:any;
   CLIENT_NAME:any = 'CLIENT_NAME';
   ALL_TEMPLATE:any = 'ALL_TEMPLATE';
+  TEMPLATE_INDEX:any = "TEMPLATE_INDEX";
 
 
   constructor(
@@ -643,7 +644,41 @@ export class StorageService {
   storeAllTemplate(data:any){
     // let encryptData = this.encryptionService.encryptRequest(data);
     // console.log(encryptData);
-    localStorage.setItem(this.ALL_TEMPLATE,JSON.stringify(data));
+    let modifiedList = this.modifyTemplateList(data);
+    if(modifiedList){
+      localStorage.setItem(this.ALL_TEMPLATE,JSON.stringify(modifiedList.templatList));
+      localStorage.setItem(this.TEMPLATE_INDEX,JSON.stringify(modifiedList.templateIndexList));
+    }
+  }
+  modifyTemplateList(obj:any){
+    let list:any = {};
+    let indexList:any = [];
+    let oldList = this.getAllTemplateList();
+    let allIndexList = JSON.parse(<any>localStorage.getItem(this.TEMPLATE_INDEX));
+    if(allIndexList && allIndexList.length > 0){
+      indexList = allIndexList;
+    }
+    if(oldList && Object.keys(oldList).length > 0){
+      if(Object.keys(oldList).length >= 30){
+        let keyName = indexList[0];
+        delete (oldList[keyName]);
+        indexList.splice(0,1);
+      }
+      list = oldList;
+    }else{
+      list = {};
+    }
+    if(obj && obj){
+      Object.keys(obj).forEach(key => {
+        list[key] = obj[key];
+        indexList.push(key);
+      })
+    }
+    let responce = {
+      templatList : list,
+      templateIndexList:indexList
+    }
+    return responce;
   }
   getAllTemplateList(){
     //let allTemplate = localStorage.getItem(this.ALL_TEMPLATE);
@@ -653,7 +688,7 @@ export class StorageService {
   }
   getTemplate(tempName:string){
     let templateList:any = this.getAllTemplateList();
-    console.log(templateList);
+    //console.log(templateList);
     if(templateList && templateList[tempName]){
       return templateList[tempName];
     }else{

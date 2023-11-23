@@ -203,7 +203,9 @@ GetTempData(payload:any){
     let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
     this.http.post(api, payload).subscribe(
       (respData) => {
-          this.dataShareService.shareTempData(respData)
+          this.dataShareService.shareTempData(respData);
+          let preparedTempList = this.coreFunctionService.prepareTemplate(respData);
+          this.stroageService.storeAllTemplate(preparedTempList)
         },
       (error) => {
           console.log(error);
@@ -211,20 +213,20 @@ GetTempData(payload:any){
     )
   }
 }
-GetAllTemplate(payload:any){
-  let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
-  this.http.post(api, payload).subscribe(
-    (respData:any) => {
-        if(respData && respData.length > 0){
-          let preparedTempList = this.coreFunctionService.prepareTemplate(respData);
-          this.stroageService.storeAllTemplate(preparedTempList)
-        }
-      },
-    (error) => {
-        console.log(error);
-      }
-  )
-}
+// GetAllTemplate(payload:any){
+//   let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
+//   this.http.post(api, payload).subscribe(
+//     (respData:any) => {
+//         if(respData && respData.length > 0){
+//           let preparedTempList = this.coreFunctionService.prepareTemplate(respData);
+//           this.stroageService.storeAllTemplate(preparedTempList)
+//         }
+//       },
+//     (error) => {
+//         console.log(error);
+//       }
+//   )
+// }
 resetTempData(){
   this.dataShareService.shareTempData([])
 }
