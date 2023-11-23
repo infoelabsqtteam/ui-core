@@ -54,9 +54,9 @@ export class DownloadService {
       data['key'] = userInfo.refCode;
       data['key3']=gridName;
       const value = filterForm.getRawValue();
-      const filtewCrlist = this.apiCallService.getfilterCrlist(headElements,value);
-      if(filtewCrlist.length > 0){
-        filtewCrlist.forEach((element: any) => {
+      const filterCrlist = this.apiCallService.getfilterCrlist(headElements,value);
+      if(filterCrlist.length > 0){
+        filterCrlist.forEach((element: any) => {
           data.crList.push(element);
         });
       }
