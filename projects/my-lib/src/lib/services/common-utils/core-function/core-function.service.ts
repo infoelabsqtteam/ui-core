@@ -153,4 +153,10 @@ export class CoreFunctionService {
     }
     return value;
   }
+  getJsonSizeInKilobyte(obj:any){
+    const bytes = new TextEncoder().encode(JSON.stringify(obj)).length;
+    const kiloBytes = (bytes / 1024).toFixed(2);
+    //const megaBytes = kiloBytes / 1024;
+    return Number(kiloBytes);
+  }
 }

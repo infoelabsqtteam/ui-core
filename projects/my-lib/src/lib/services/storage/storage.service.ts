@@ -1,3 +1,4 @@
+import { CoreFunctionService } from './../common-utils/core-function/core-function.service';
 import { EncryptionService } from './../encryption/encryption.service';
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -50,7 +51,8 @@ export class StorageService {
   constructor(
     private http: HttpClient,
     @Inject('env') private env:any,
-    private encryptionService:EncryptionService
+    private encryptionService:EncryptionService,
+    private coreFunctionService:CoreFunctionService
     ) { }
 
   load(): Observable<any>{
@@ -659,7 +661,9 @@ export class StorageService {
       indexList = allIndexList;
     }
     if(oldList && Object.keys(oldList).length > 0){
-      if(Object.keys(oldList).length >= 30){
+      let size:number = this.coreFunctionService.getJsonSizeInKilobyte(oldList);
+      console.log(size);
+      if(size >= 1024){
         let keyName = indexList[0];
         delete (oldList[keyName]);
         indexList.splice(0,1);
