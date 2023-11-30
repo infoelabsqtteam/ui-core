@@ -19,7 +19,6 @@ export class CoreFunctionService {
     let utvn:any = {};
     let modules:any = [];
     let permissionList = {};
-    //let menuNameList:any = [];
     if(permissions && Object.keys(permissions).length > 0){
       Object.keys(permissions).forEach((mokey,i) => {
         let moduleObj:any = {};
@@ -46,7 +45,6 @@ export class CoreFunctionService {
                     let submenu = submenuMap[smkey];
                     if(submenu && submenu.details){
                       submenuObj = submenu.details;
-                      //menuNameList.push(submenuObj.name);
                     }
                     this.setTabOrPermission(submenu,permissionList);
                     submenuList.push(submenuObj);
@@ -54,7 +52,6 @@ export class CoreFunctionService {
                 }
               }else{
                 this.setTabOrPermission(menu,permissionList);
-                //menuNameList.push(menuobj.name);
               }
               if(submenuList && submenuList.length > 0){
                 menuobj['submenu'] = this.sortMenu(submenuList);
@@ -76,7 +73,6 @@ export class CoreFunctionService {
     utvn['modules'] = modules;
     utvn['permission'] = permissionList;
     utvn['user'] = user;
-    //utvn['menuList'] = menuNameList;
     return utvn;
   }
   setTabOrPermission(menu:any,permissionList:any){
