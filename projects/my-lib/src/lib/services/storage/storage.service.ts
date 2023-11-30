@@ -662,7 +662,7 @@ export class StorageService {
     }
     if(oldList && Object.keys(oldList).length > 0){
       let size:number = this.coreFunctionService.getJsonSizeInKilobyte(oldList);
-      console.log(size);
+      // console.log(size);
       if(size >= 1024){
         let keyName = indexList[0];
         delete (oldList[keyName]);
