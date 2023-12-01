@@ -442,20 +442,22 @@ export class CommonFunctionService {
   }
 
 
-   getDateInStringFunction(templateValue:any){
-  //var froD = templateValue.getFromDate;
-  const fromDate = templateValue['fromDate'];
-  const  months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  var monthNumber = templateValue.fromDate.toDate().getMonth()
-  var monthName = months[monthNumber];
-  let year = templateValue.fromDate.toDate().getFullYear();
-  let result = {
-    "labelName": monthName+'-'+year
+  getDateInStringFunction(templateValue:any){
+    let result:any = {}
+    let monthNumber:any;
+    let monthName:any;
+    let year: any;
+    const fromDate = templateValue['fromDate'];    
+    if(fromDate && fromDate != "") {
+      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      monthNumber = fromDate.toDate().getMonth()
+      monthName = months[monthNumber];
+      year = fromDate.toDate().getFullYear();
+      let label = monthName+'-'+year;
+      result['labelName'] = label;
+    }   
+    return result;
   }
-
-  return result;
-
-}
 
 
   populatefields(value:any, populate_fields:any,field:any,multipleFormCollection?:any) {
