@@ -638,7 +638,7 @@ export class StorageService {
   getDefaultSearchOperator() {
     let defaultSearchOperator = Common.DEFAULT_OPERATOR;
     let defaultSettings = this.getApplicationDefaultSettings();
-    if(defaultSettings && defaultSettings.defaultSearchOperatorInGrid && defaultSettings.defaultSearchOperatorInGrid != "" && defaultSettings.defaultSearchOperatorInGrid > 0) {
+    if(defaultSettings && defaultSettings.defaultSearchOperatorInGrid && defaultSettings.defaultSearchOperatorInGrid != "") {
       defaultSearchOperator = defaultSettings.defaultSearchOperatorInGrid;
     }
     return defaultSearchOperator;
