@@ -417,12 +417,82 @@ export class CommonFunctionService {
         default:
           break;
       }
+      if(typeof formValue[element.field_name] == 'string'){
+        formValue[element.field_name] = this.coreFunctionService.removeSpaceFromString(formValue[element.field_name]);
+      }
     }
     if(validatField){
       return true;
     }else{
       return formValue;
     }
+  }
+  sanitizeValueFromFields(fields:any,value:any,validation:any,valueWithCust?:any){
+    if(fields && fields.length > 0){
+      for (let index = 0; index < fields.length; index++) {
+        const element = fields[index];
+        if(element.type != 'list_of_fields' && element.type != 'group_of_fields'){
+          switch (element.datatype) {
+            case "list_of_object":
+            case "list_of_object_with_popup":
+            case "chips":
+            case "chips_with_mask":
+              if(validation){
+                if(value[element.field_name] != "" && value[element.field_name] != null &&  !this.isArray(value[element.field_name])){
+                  return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
+                }else if(this.applicableForValidation(element) && !this.isArray(valueWithCust[element.field_name]) && valueWithCust[element.field_name].length <= 0){
+                  return {'msg':'Please Enter '+ element.label + '. !!!'}
+                }
+              }else if (value[element.field_name] == "" && !this.isArray(value[element.field_name])) {
+                value[element.field_name] = null;
+              }
+              break;
+            case "object":
+              if(validation){
+                if(value[element.field_name] != "" && value[element.field_name] != null && typeof value[element.field_name] != 'object'){
+                  return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
+                }else if(this.applicableForValidation(element) && typeof value[element.field_name] != 'object'){
+                  return {'msg':'Please Enter '+ element.label + '. !!!'}
+                }
+              }else if (value[element.field_name] == "" && typeof value[element.field_name] != 'object') {
+                value[element.field_name] = null;
+              }
+              break;
+            case "number":
+              if (!Number(value[element.field_name])) {
+                value[element.field_name] = 0;
+              }
+              if(this.applicableForValidation(element) && value[element.field_name]<=0){
+                return {'msg':' ' +element.label + ' should be greater than 0. !!!'}
+              }
+              break
+            default:
+              break;
+          }
+        }
+        switch (element.type) {
+          case "list_of_string":
+            if(validation){
+              if(value[element.field_name] != "" && value[element.field_name] != null){
+                return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
+              }else if(this.applicableForValidation(element) && !this.isArray(valueWithCust[element.field_name]) && valueWithCust[element.field_name].length > 0){
+                return {'msg':'Please Enter '+ element.label + '. !!!'}
+              }
+            }else if (value[element.field_name] == "" && !this.isArray(value[element.field_name])) {
+              value[element.field_name] = null;
+            }
+            break;
+          case "file":
+            if (value[element.field_name] == "") {
+              value[element.field_name] = null;
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    return null;
   }
 
   applicableForValidation(field:any){
@@ -447,7 +517,7 @@ export class CommonFunctionService {
     let monthNumber:any;
     let monthName:any;
     let year: any;
-    const fromDate = templateValue['fromDate'];    
+    const fromDate = templateValue['fromDate'];
     if(fromDate && fromDate != "") {
       const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       monthNumber = fromDate.toDate().getMonth()
@@ -455,7 +525,7 @@ export class CommonFunctionService {
       year = fromDate.toDate().getFullYear();
       let label = monthName+'-'+year;
       result['labelName'] = label;
-    }   
+    }
     return result;
   }
 

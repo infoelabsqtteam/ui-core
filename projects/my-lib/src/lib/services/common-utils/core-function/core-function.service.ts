@@ -155,4 +155,7 @@ export class CoreFunctionService {
     //const megaBytes = kiloBytes / 1024;
     return Number(kiloBytes);
   }
+  removeSpaceFromString(str:string){
+    return str.trim();
+  }
 }
