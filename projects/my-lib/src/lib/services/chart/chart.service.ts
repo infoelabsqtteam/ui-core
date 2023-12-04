@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Injectable,EventEmitter } from '@angular/core';
+import { json2csv } from 'json-2-csv';
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +36,9 @@ export class ChartService {
         });
       }
       if(DataList && DataList.length > 0){
-        blobUrl = this.downloadFile(DataList);
+        //blobUrl = this.downloadFile(DataList);
+        let csvData = json2csv(DataList);
+        blobUrl = this.createBlobUrl(csvData);
       }
     });
     return {
@@ -54,8 +57,10 @@ export class ChartService {
     );
     csv.unshift(header.join(','));
     const csvArray = csv.join('\r\n');
-    const blob = new Blob([csvArray], { type: 'text/csv' });
-    return  blob;
+    return  this.createBlobUrl(csvArray);
+  }
+  createBlobUrl(value:any){
+    return new Blob([value], { type: 'text/csv' });
   }
   downlodBlobData(blob:any,fileName:string){
     const a = document.createElement('a');
