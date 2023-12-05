@@ -583,9 +583,9 @@ export class CommonFunctionService {
     const fromDate = templateValue['fromDate'];
     if(fromDate && fromDate != "") {
       const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      monthNumber = fromDate.toDate().getMonth()
+      monthNumber = new Date(fromDate).getMonth();
       monthName = months[monthNumber];
-      year = fromDate.toDate().getFullYear();
+      year = new Date(fromDate).getFullYear();
       let label = monthName+'-'+year;
       result['labelName'] = label;
     }
