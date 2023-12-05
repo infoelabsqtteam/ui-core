@@ -514,7 +514,7 @@ export class CommonFunctionService {
     let monthName:any;
     let year: any;
     const fromDate = templateValue['fromDate'];
-    if(fromDate && fromDate != "") {
+      if(fromDate && fromDate != "") {
       const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       monthNumber = new Date(fromDate).getMonth();
       monthName = months[monthNumber];
