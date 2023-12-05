@@ -158,45 +158,48 @@ export class CommonFunctionService {
     for (let index = 0; index < tableFields.length; index++) {
       const element = tableFields[index];
       if(element.type != 'list_of_fields' && element.type != 'group_of_fields'){
-        switch (element.datatype) {
-          case "list_of_object":
-          case "list_of_object_with_popup":
-          case "chips":
-          case "chips_with_mask":
-            if(validatField){
-              if(formValue[element.field_name] != "" && formValue[element.field_name] != null &&  !this.isArray(formValue[element.field_name])){
-                return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
-              }else if(this.applicableForValidation(element) && !this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length <= 0){
-                return {'msg':'Please Enter '+ element.label + '. !!!'}
+        if(element && element.datatype){
+          switch (element.datatype.toLowerCase()) {
+            case "list_of_object":
+            case "list_of_object_with_popup":
+            case "chips":
+            case "chips_with_mask":
+              if(validatField){
+                if(formValue[element.field_name] != "" && formValue[element.field_name] != null &&  !this.isArray(formValue[element.field_name])){
+                  return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
+                }else if(this.applicableForValidation(element) && !this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length <= 0){
+                  return {'msg':'Please Enter '+ element.label + '. !!!'}
+                }
+              }else if (formValue[element.field_name] == "" || !this.isArray(formValue[element.field_name])) {
+                formValue[element.field_name] = null;
               }
-            }else if (formValue[element.field_name] == "" && !this.isArray(formValue[element.field_name])) {
-              formValue[element.field_name] = null;
-            }
-            break;
-          case "object":
-            if(validatField){
-              if(formValue[element.field_name] != "" && formValue[element.field_name] != null && typeof formValue[element.field_name] != 'object'){
-                return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
-              }else if(this.applicableForValidation(element) && typeof formValue[element.field_name] != 'object'){
-                return {'msg':'Please Enter '+ element.label + '. !!!'}
+              break;
+            case "object":
+              if(validatField){
+                if(formValue[element.field_name] != "" && formValue[element.field_name] != null && typeof formValue[element.field_name] != 'object'){
+                  return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
+                }else if(this.applicableForValidation(element) && typeof formValue[element.field_name] != 'object'){
+                  return {'msg':'Please Enter '+ element.label + '. !!!'}
+                }
+              }else if (formValue[element.field_name] == "" || typeof formValue[element.field_name] != 'object') {
+                formValue[element.field_name] = null;
               }
-            }else if (formValue[element.field_name] == "" && typeof formValue[element.field_name] != 'object') {
-              formValue[element.field_name] = null;
-            }
-            break;
-          case "number":
-            if (!Number(formValue[element.field_name])) {
-              formValue[element.field_name] = 0;
-            }
-            if(this.applicableForValidation(element) && formValue[element.field_name]<=0){
-              return {'msg':' ' +element.label + ' should be greater than 0. !!!'}
-            }
-            break
-          default:
-            break;
+              break;
+            case "number":
+              if(validatField){
+                if(this.applicableForValidation(element) && formValue[element.field_name]<=0){
+                  return {'msg':' ' +element.label + ' should be greater than 0. !!!'}
+                }
+              }else if (!Number(formValue[element.field_name])) {
+                formValue[element.field_name] = 0;
+              }
+              break
+            default:
+              break;
+          }
         }
       }
-      switch (element.type) {
+      switch (element.type.toLowerCase()) {
         case "list_of_string":
           if(validatField){
             if(formValue[element.field_name] != "" && formValue[element.field_name] != null){
@@ -204,13 +207,24 @@ export class CommonFunctionService {
             }else if(this.applicableForValidation(element) && !this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length > 0){
               return {'msg':'Please Enter '+ element.label + '. !!!'}
             }
-          }else if (formValue[element.field_name] == "" && !this.isArray(formValue[element.field_name])) {
+          }else if (formValue[element.field_name] == "" || !this.isArray(formValue[element.field_name])) {
             formValue[element.field_name] = null;
           }
           break;
         case "file":
-          if (formValue[element.field_name] == "") {
-            formValue[element.field_name] = null;
+          if(!validatField){
+            if (formValue[element.field_name] == "") {
+              formValue[element.field_name] = null;
+            }
+          }
+          break;
+        case "text":
+          if(!validatField){
+            if (formValue[element.field_name] == "" || formValue[element.field_name] == undefined) {
+              formValue[element.field_name] = null;
+            }else if(typeof formValue[element.field_name] == "string"){
+              formValue[element.field_name] = this.coreFunctionService.removeSpaceFromString(formValue[element.field_name]);
+            }
           }
           break;
         case "list_of_fields":
@@ -248,52 +262,79 @@ export class CommonFunctionService {
               if(element.list_of_fields && element.list_of_fields){
                 for (let j = 0; j < element.list_of_fields.length; j++) {
                   const data = element.list_of_fields[j];
-                  switch (data.datatype) {
-                    case "list_of_object":
-                    case "chips":
-                    case "chips_with_mask":
-                      if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
-                        formValue[element.field_name].forEach((fiedlList: any) => {
-                          if (fiedlList[data.field_name] == "" && !this.isArray(fiedlList[data.field_name])) {
-                            fiedlList[data.field_name] = null;
-                          }
-                        });
-                      }
-                      break;
-                    case "object":
-                      if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
-                        formValue[element.field_name].forEach((fiedlList: any) => {
-                          if (fiedlList[data.field_name] == "" && typeof fiedlList[data.field_name] != 'object') {
-                            fiedlList[data.field_name] = null;
-                          }
-                        });
-                      }
-                      break;
-                    case "number":
-                      if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
-                        formValue[element.field_name].forEach((fiedlList: any) => {
-                          if (!Number(fiedlList[data.field_name])) {
-                            fiedlList[data.field_name] = 0;
-                          }
-
-                        });
-                      }
-                      break;
-                    default:
-                      break;
+                  if(data && data.datatype){
+                    switch (data.datatype.toLowerCase()) {
+                      case "list_of_object":
+                      case "chips":
+                      case "chips_with_mask":
+                        if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                          formValue[element.field_name].forEach((fiedlList: any) => {
+                            if (fiedlList[data.field_name] == "" || !this.isArray(fiedlList[data.field_name])) {
+                              fiedlList[data.field_name] = null;
+                            }
+                          });
+                        }
+                        break;
+                      case "object":
+                        if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                          formValue[element.field_name].forEach((fiedlList: any) => {
+                            if (fiedlList[data.field_name] == "" || typeof fiedlList[data.field_name] != 'object') {
+                              fiedlList[data.field_name] = null;
+                            }
+                          });
+                        }
+                        break;
+                      case "number":
+                        if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                          formValue[element.field_name].forEach((fiedlList: any) => {
+                            if (!Number(fiedlList[data.field_name])) {
+                              fiedlList[data.field_name] = 0;
+                            }
+                          });
+                        }
+                        break;
+                      default:
+                        break;
+                    }
                   }
-                  switch (data.type) {
+                  switch (data.type.toLowerCase()) {
                     case "list_of_string":
                       if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
                         formValue[element.field_name].forEach((fiedlList: any) => {
-                          if (fiedlList[data.field_name] == "" && !this.isArray(fiedlList[data.field_name])) {
+                          if (fiedlList[data.field_name] == "" || !this.isArray(fiedlList[data.field_name])) {
                             fiedlList[data.field_name] = null;
                           }
                         });
                       }
                       break;
-
+                    case "file":
+                      if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                        formValue[element.field_name].forEach((fiedlList: any) => {
+                          if (fiedlList[data.field_name] == "" || fiedlList[data.field_name] == undefined) {
+                            fiedlList[data.field_name] = null;
+                          }
+                        });
+                      }
+                      break;
+                    case "text":
+                      if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                        formValue[element.field_name].forEach((fiedlList: any) => {
+                          if (fiedlList[data.field_name] == "" || fiedlList[data.field_name] == undefined) {
+                            fiedlList[data.field_name] = null;
+                          }else if(typeof fiedlList[data.field_name] == "string"){
+                            fiedlList[data.field_name] = this.coreFunctionService.removeSpaceFromString(fiedlList[data.field_name]);
+                          }
+                        });
+                      }
+                      break;
                     default:
+                      if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                        formValue[element.field_name].forEach((fiedlList: any) => {
+                          if (fiedlList[data.field_name] == "" || fiedlList[data.field_name] == undefined) {
+                            fiedlList[data.field_name] = null;
+                          }
+                        });
+                      }
                       break;
                   }
                 }
@@ -304,40 +345,42 @@ export class CommonFunctionService {
         case "group_of_fields":
           for (let j = 0; j < element.list_of_fields.length; j++) {
           const data = element.list_of_fields[j];
-            switch (data.datatype) {
-              case "list_of_object":
-              case "chips":
-              case "chips_with_mask":
-                if(validatField){
-                  if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
-                    return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
-                  }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
-                    return {'msg':'Please Enter '+ data.label + '. !!!'}
-                  }
-                }else if (formValue[element.field_name][data.field_name] == "" && !this.isArray(formValue[element.field_name][data.field_name])) {
+            if(data && data.datatype){
+              switch (data.datatype.toLowerCase()) {
+                case "list_of_object":
+                case "chips":
+                case "chips_with_mask":
+                  if(validatField){
+                    if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
+                      return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
+                    }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
+                      return {'msg':'Please Enter '+ data.label + '. !!!'}
+                    }
+                  }else if (formValue[element.field_name][data.field_name] == "" || !this.isArray(formValue[element.field_name][data.field_name])) {
+                      formValue[element.field_name][data.field_name] = null;
+                    }
+                  break;
+                case "object":
+                  if(validatField){
+                    if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
+                      return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
+                    }else if(this.applicableForValidation(data) && typeof formValue[element.field_name][data.field_name] != 'object'){
+                      return {'msg':'Please Enter '+ data.label + '. !!!'}
+                    }
+                  }else if (formValue[element.field_name][data.field_name] == "" || typeof formValue[element.field_name][data.field_name] != 'object') {
                     formValue[element.field_name][data.field_name] = null;
                   }
-                break;
-              case "object":
-                if(validatField){
-                  if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
-                    return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
-                  }else if(this.applicableForValidation(data) && typeof formValue[element.field_name][data.field_name] != 'object'){
-                    return {'msg':'Please Enter '+ data.label + '. !!!'}
+                  break;
+                case "number":
+                  if (!Number(formValue[element.field_name][data.field_name])) {
+                    formValue[element.field_name][data.field_name] = 0;
                   }
-                }else if (formValue[element.field_name][data.field_name] == "" && typeof formValue[element.field_name][data.field_name] != 'object') {
-                  formValue[element.field_name][data.field_name] = null;
-                }
-                break;
-              case "number":
-                if (!Number(formValue[element.field_name][data.field_name])) {
-                  formValue[element.field_name][data.field_name] = 0;
-                }
-                break;
-              default:
-                break;
+                  break;
+                default:
+                  break;
+              }
             }
-            switch (data.type) {
+            switch (data.type.toLowerCase()) {
               case "list_of_string":
                 if(validatField){
                   if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
@@ -345,12 +388,30 @@ export class CommonFunctionService {
                   }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
                     return {'msg':'Please Enter '+ data.label + '. !!!'}
                   }
-                }else if (formValue[element.field_name][data.field_name] == "" && !this.isArray(formValue[element.field_name][data.field_name])) {
+                }else if (formValue[element.field_name][data.field_name] == "" || !this.isArray(formValue[element.field_name][data.field_name])) {
                   formValue[element.field_name][data.field_name] = null;
                 }
                 break;
-
+              case "file":
+                if(!validatField){
+                  if (formValue[element.field_name][data.field_name] == "" || formValue[element.field_name][data.field_name] == undefined) {
+                    formValue[element.field_name][data.field_name] = null;
+                  }
+                }
+                break;
+              case "text":
+                if(!validatField){
+                  if (formValue[element.field_name][data.field_name] == "" || formValue[element.field_name][data.field_name] == undefined) {
+                    formValue[element.field_name][data.field_name] = null;
+                  }else if(typeof formValue[element.field_name][data.field_name] == "string"){
+                    formValue[element.field_name][data.field_name] = this.coreFunctionService.removeSpaceFromString(formValue[element.field_name][data.field_name]);
+                  }
+                }
+                break;
               default:
+                if (formValue[element.field_name][data.field_name] == "" || formValue[element.field_name][data.field_name] == undefined) {
+                  formValue[element.field_name][data.field_name] = null;
+                }
                 break;
             }
           }
@@ -415,10 +476,12 @@ export class CommonFunctionService {
           }
           break;
         default:
+          if(validatField){
+
+          }else if (formValue[element.field_name] == "" || formValue[element.field_name] == undefined) {
+            formValue[element.field_name] = null;
+          }
           break;
-      }
-      if(typeof formValue[element.field_name] == 'string'){
-        formValue[element.field_name] = this.coreFunctionService.removeSpaceFromString(formValue[element.field_name]);
       }
     }
     if(validatField){
