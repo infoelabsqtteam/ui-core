@@ -104,7 +104,7 @@ constructor(
       return column.width;
     } else {
       if (listOfGridFieldName.length > 8) {
-        return '150px';
+        return '100%';
       } else {
         return '';
       }
