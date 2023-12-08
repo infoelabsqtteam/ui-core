@@ -102,13 +102,15 @@ constructor(
   getGridColumnWidth(column:any,listOfGridFieldName:any) {
     if (column.width && column.width != '0') {
       return column.width;
-    } else {
-      if (listOfGridFieldName.length > 8) {
-        return '100%';
-      } else {
+    } 
+    // else {
+    //   if (listOfGridFieldName.length > 8) {
+    //     return '150px';
+    //   } 
+      else {
         return '';
       }
-    }
+    // }
   }
   updateGridDataToModifiedData(grid_row_selection:any,gridData:any,modifiedGridData:any,listOfGridFieldName:any){
     let gridSelectedData:any = [];
