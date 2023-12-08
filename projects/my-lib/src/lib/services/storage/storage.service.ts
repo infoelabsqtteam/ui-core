@@ -1,3 +1,5 @@
+import { CoreFunctionService } from './../common-utils/core-function/core-function.service';
+import { EncryptionService } from './../encryption/encryption.service';
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
@@ -42,11 +44,15 @@ export class StorageService {
   MODIFY_MODULES:any = 'MODIFY_MODULES';
   appName:any;
   CLIENT_NAME:any = 'CLIENT_NAME';
+  ALL_TEMPLATE:any = 'ALL_TEMPLATE';
+  TEMPLATE_INDEX:any = "TEMPLATE_INDEX";
 
 
   constructor(
     private http: HttpClient,
     @Inject('env') private env:any,
+    private encryptionService:EncryptionService,
+    private coreFunctionService:CoreFunctionService
     ) { }
 
   load(): Observable<any>{
@@ -335,209 +341,209 @@ export class StorageService {
         })
       );
   }
-  setPackaging(cartData:any) {
-    switch (cartData.type) {
-      case 'TAB': this.packDetails.packing = 'Packing : 1 strip (' + cartData.packing + ' Tablets Each)';
-        this.packDetails.unit = 'Strip(s)';
-        break;
-      case 'SYP': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Syrup Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'LOT': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Lotion Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'INJ': this.packDetails.packing = 'Packing : 1 Vial (' + cartData.packing + ' Injection Each)';
-        this.packDetails.unit = 'Vial(s)';
-        break;
-      case 'POWD': this.packDetails.packing = 'Packing : 1 Box (' + cartData.packing + ' Powder Each)';
-        this.packDetails.unit = 'Box(es)';
-        break;
-      case 'CAP': this.packDetails.packing = 'Packing : 1 strip (' + cartData.packing + ' Capsule Each)';
-        this.packDetails.unit = 'Strip(s)';
-        break;
-      case 'SACH': this.packDetails.packing = 'Packing : 1 Packet (' + cartData.packing + ' Sachet Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'INH': this.packDetails.packing = 'Packing : 1 Box (' + cartData.packing + ' Inhaler Each)';
-        this.packDetails.unit = 'Box(es)';
-        break;
-      case 'ROTO': this.packDetails.packing = 'Packing : 1 Box (' + cartData.packing + ' Redicaps Each)';
-        this.packDetails.unit = 'Box(es)';
-        break;
-      case 'E/DR': this.packDetails.packing = 'Packing : 1 Packet (' + cartData.packing + ' Eye Drop Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'EDRP': this.packDetails.packing = 'Packing : 1 Packet (' + cartData.packing + ' Eye Drop Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'OINT': this.packDetails.packing = 'Packing : 1 Tube (' + cartData.packing + ' Ointment Each)';
-        this.packDetails.unit = 'Tube(s)';
-        break;
-      case 'OIL': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'SOAP': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Pack(s)';
-        break;
-      case 'FWSH': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Pack(s)';
-        break;
-      case 'DRP': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Pack(s)';
-        break;
-      case 'JELY': this.packDetails.packing = 'Packing : 1 Packet (' + cartData.packing + ' Jelly Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'CREM': this.packDetails.packing = 'Packing : 1 Tube (' + cartData.packing + ' Cream Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'CRTG': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'CONER': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'CHRN': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'FLOS': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'DIAP': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'DRES': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'DRNK': this.packDetails.packing = 'Packing :1 Bottle (' + cartData.packing + ' Bottle each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'DSYP': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'DPO': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'ENM': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'EXP': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'EOINT': this.packDetails.packing = 'Packing : 1 Tube (' + cartData.packing + ' Ointment Each)';
-        this.packDetails.unit = 'Tube(s)';
-        break;
-      case 'GEL': this.packDetails.packing = 'Packing : 1 Tube (' + cartData.packing + ' Gel Each)';
-        this.packDetails.unit = 'Gel(s)';
-        break;
-      case 'GRGL': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'GMTR': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'HAISER': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'HWSH': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'INFN': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'VWASH': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'JAR': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'JUIC': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'KIT': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Kit Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'LBALM': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'LQD': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'MPNT': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'MWSH': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'NDRP': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'NIPLE': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'ODRPS': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'PKT': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'PFS': this.packDetails.packing = 'Packing : 1 Syringe (' + cartData.packing + ' Syringe Each)';
-        this.packDetails.unit = 'Syringe(s)';
-        break;
-      case 'RPSLS': this.packDetails.packing = 'Packing : 1 Respule (' + cartData.packing + ' Respule Each)';
-        this.packDetails.unit = 'Respule(s)';
-        break;
-      case 'ROLL': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'SACH': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'SCRUB': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'SHAMP': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'SLTN': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'SPRY': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'TPAST': this.packDetails.packing = 'Packing : 1 Paste (' + cartData.packing + ' Paste Each)';
-        this.packDetails.unit = 'Paste(s)';
-        break;
-      case 'VACC': this.packDetails.packing = 'Packing : 1 Vaccine (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Paste(s)';
-        break;
-      case 'VTAB': this.packDetails.packing = 'Packing : 1 Tablet (' + cartData.packing + ' Tablet Each)';
-        this.packDetails.unit = 'Tablet(s)';
-        break;
-      case 'WIPS': this.packDetails.packing = 'Packing : 1 Wipes (' + cartData.packing + ' Wipes Each)';
-        this.packDetails.unit = 'Wipe(s)';
-        break;
-      case 'TULL': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'TBAG': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'SYRNEE': this.packDetails.packing = 'Packing : 1 Pack Syringe (' + cartData.packing + ' Pack Syringe Each)';
-        this.packDetails.unit = 'Packet(s)';
-        break;
-      case 'NSPRY': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
-      case 'RMSRP': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
-        this.packDetails.unit = 'Bottle(s)';
-        break;
+  // setPackaging(cartData:any) {
+  //   switch (cartData.type) {
+  //     case 'TAB': this.packDetails.packing = 'Packing : 1 strip (' + cartData.packing + ' Tablets Each)';
+  //       this.packDetails.unit = 'Strip(s)';
+  //       break;
+  //     case 'SYP': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Syrup Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'LOT': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Lotion Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'INJ': this.packDetails.packing = 'Packing : 1 Vial (' + cartData.packing + ' Injection Each)';
+  //       this.packDetails.unit = 'Vial(s)';
+  //       break;
+  //     case 'POWD': this.packDetails.packing = 'Packing : 1 Box (' + cartData.packing + ' Powder Each)';
+  //       this.packDetails.unit = 'Box(es)';
+  //       break;
+  //     case 'CAP': this.packDetails.packing = 'Packing : 1 strip (' + cartData.packing + ' Capsule Each)';
+  //       this.packDetails.unit = 'Strip(s)';
+  //       break;
+  //     case 'SACH': this.packDetails.packing = 'Packing : 1 Packet (' + cartData.packing + ' Sachet Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'INH': this.packDetails.packing = 'Packing : 1 Box (' + cartData.packing + ' Inhaler Each)';
+  //       this.packDetails.unit = 'Box(es)';
+  //       break;
+  //     case 'ROTO': this.packDetails.packing = 'Packing : 1 Box (' + cartData.packing + ' Redicaps Each)';
+  //       this.packDetails.unit = 'Box(es)';
+  //       break;
+  //     case 'E/DR': this.packDetails.packing = 'Packing : 1 Packet (' + cartData.packing + ' Eye Drop Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'EDRP': this.packDetails.packing = 'Packing : 1 Packet (' + cartData.packing + ' Eye Drop Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'OINT': this.packDetails.packing = 'Packing : 1 Tube (' + cartData.packing + ' Ointment Each)';
+  //       this.packDetails.unit = 'Tube(s)';
+  //       break;
+  //     case 'OIL': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'SOAP': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Pack(s)';
+  //       break;
+  //     case 'FWSH': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Pack(s)';
+  //       break;
+  //     case 'DRP': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Pack(s)';
+  //       break;
+  //     case 'JELY': this.packDetails.packing = 'Packing : 1 Packet (' + cartData.packing + ' Jelly Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'CREM': this.packDetails.packing = 'Packing : 1 Tube (' + cartData.packing + ' Cream Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'CRTG': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'CONER': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'CHRN': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'FLOS': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'DIAP': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'DRES': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'DRNK': this.packDetails.packing = 'Packing :1 Bottle (' + cartData.packing + ' Bottle each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'DSYP': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'DPO': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'ENM': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'EXP': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'EOINT': this.packDetails.packing = 'Packing : 1 Tube (' + cartData.packing + ' Ointment Each)';
+  //       this.packDetails.unit = 'Tube(s)';
+  //       break;
+  //     case 'GEL': this.packDetails.packing = 'Packing : 1 Tube (' + cartData.packing + ' Gel Each)';
+  //       this.packDetails.unit = 'Gel(s)';
+  //       break;
+  //     case 'GRGL': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'GMTR': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'HAISER': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'HWSH': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'INFN': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'VWASH': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'JAR': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'JUIC': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'KIT': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Kit Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'LBALM': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'LQD': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'MPNT': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'MWSH': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'NDRP': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'NIPLE': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'ODRPS': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'PKT': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'PFS': this.packDetails.packing = 'Packing : 1 Syringe (' + cartData.packing + ' Syringe Each)';
+  //       this.packDetails.unit = 'Syringe(s)';
+  //       break;
+  //     case 'RPSLS': this.packDetails.packing = 'Packing : 1 Respule (' + cartData.packing + ' Respule Each)';
+  //       this.packDetails.unit = 'Respule(s)';
+  //       break;
+  //     case 'ROLL': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'SACH': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'SCRUB': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'SHAMP': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'SLTN': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'SPRY': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'TPAST': this.packDetails.packing = 'Packing : 1 Paste (' + cartData.packing + ' Paste Each)';
+  //       this.packDetails.unit = 'Paste(s)';
+  //       break;
+  //     case 'VACC': this.packDetails.packing = 'Packing : 1 Vaccine (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Paste(s)';
+  //       break;
+  //     case 'VTAB': this.packDetails.packing = 'Packing : 1 Tablet (' + cartData.packing + ' Tablet Each)';
+  //       this.packDetails.unit = 'Tablet(s)';
+  //       break;
+  //     case 'WIPS': this.packDetails.packing = 'Packing : 1 Wipes (' + cartData.packing + ' Wipes Each)';
+  //       this.packDetails.unit = 'Wipe(s)';
+  //       break;
+  //     case 'TULL': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'TBAG': this.packDetails.packing = 'Packing : 1 Pack (' + cartData.packing + ' Pack Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'SYRNEE': this.packDetails.packing = 'Packing : 1 Pack Syringe (' + cartData.packing + ' Pack Syringe Each)';
+  //       this.packDetails.unit = 'Packet(s)';
+  //       break;
+  //     case 'NSPRY': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
+  //     case 'RMSRP': this.packDetails.packing = 'Packing : 1 Bottle (' + cartData.packing + ' Bottle Each)';
+  //       this.packDetails.unit = 'Bottle(s)';
+  //       break;
 
-      default: this.packDetails.packing = 'Packing : 1 strip (' + cartData.packing + ' Tablets Each)';
-        this.packDetails.unit = 'Strip(s)';
-    }
-    return this.packDetails;
-  }
+  //     default: this.packDetails.packing = 'Packing : 1 strip (' + cartData.packing + ' Tablets Each)';
+  //       this.packDetails.unit = 'Strip(s)';
+  //   }
+  //   return this.packDetails;
+  // }
 
   setHostNameDinamically(host:string){
     localStorage.setItem(this.HOST_NAME, host);
@@ -632,10 +638,66 @@ export class StorageService {
   getDefaultSearchOperator() {
     let defaultSearchOperator = Common.DEFAULT_OPERATOR;
     let defaultSettings = this.getApplicationDefaultSettings();
-    if(defaultSettings && defaultSettings.defaultSearchOperatorInGrid && defaultSettings.defaultSearchOperatorInGrid != "" && defaultSettings.defaultSearchOperatorInGrid > 0) {
+    if(defaultSettings && defaultSettings.defaultSearchOperatorInGrid && defaultSettings.defaultSearchOperatorInGrid != "") {
       defaultSearchOperator = defaultSettings.defaultSearchOperatorInGrid;
     }
     return defaultSearchOperator;
   }
-  
+  storeAllTemplate(data:any){
+    // let encryptData = this.encryptionService.encryptRequest(data);
+    // console.log(encryptData);
+    let modifiedList = this.modifyTemplateList(data);
+    if(modifiedList){
+      localStorage.setItem(this.ALL_TEMPLATE,JSON.stringify(modifiedList.templatList));
+      localStorage.setItem(this.TEMPLATE_INDEX,JSON.stringify(modifiedList.templateIndexList));
+    }
+  }
+  modifyTemplateList(obj:any){
+    let list:any = {};
+    let indexList:any = [];
+    let oldList = this.getAllTemplateList();
+    let allIndexList = JSON.parse(<any>localStorage.getItem(this.TEMPLATE_INDEX));
+    if(allIndexList && allIndexList.length > 0){
+      indexList = allIndexList;
+    }
+    if(oldList && Object.keys(oldList).length > 0){
+      let size:number = this.coreFunctionService.getJsonSizeInKilobyte(oldList);
+      // console.log(size);
+      if(size >= 1024){
+        let keyName = indexList[0];
+        delete (oldList[keyName]);
+        indexList.splice(0,1);
+      }
+      list = oldList;
+    }else{
+      list = {};
+    }
+    if(obj && obj){
+      Object.keys(obj).forEach(key => {
+        list[key] = obj[key];
+        indexList.push(key);
+      })
+    }
+    let responce = {
+      templatList : list,
+      templateIndexList:indexList
+    }
+    return responce;
+  }
+  getAllTemplateList(){
+    //let allTemplate = localStorage.getItem(this.ALL_TEMPLATE);
+    const obj:any = JSON.parse(<any>localStorage.getItem(this.ALL_TEMPLATE));
+    //return this.encryptionService.decryptRequest(allTemplate);
+    return obj;
+  }
+  getTemplate(tempName:string){
+    let templateList:any = this.getAllTemplateList();
+    //console.log(templateList);
+    if(templateList && templateList[tempName]){
+      return templateList[tempName];
+    }else{
+      return null;
+    }
+  }
+
 }

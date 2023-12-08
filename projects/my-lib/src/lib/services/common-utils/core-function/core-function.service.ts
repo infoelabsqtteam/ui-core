@@ -113,4 +113,46 @@ export class CoreFunctionService {
     }
     return list;
   }
+  convertListToColonString(list:any,type:any,key?:string){
+    let value = "";
+    if(type.toLowerCase() == 'text'){
+      if(list && list.length > 0){
+        for (let index = 0; index < list.length; index++) {
+          const str = list[index];
+          if((index + 1) == list.length){
+            value = value + str;
+          }else{
+            value = value  + str +':';
+          }
+        }
+      }
+    }
+    return value;
+  }
+  prepareTemplate(tempList:any){
+    let preParedList:any = {};
+    if(tempList && tempList.length > 0){
+      tempList.forEach((temp:any) => {
+        preParedList[temp.name] = temp;
+      });
+    }
+    return preParedList;
+  }
+  getTempNameFromPayload(payload:any){
+    let value = '';
+    if(Object.keys(payload).length > 0){
+      let crList = payload['crList'];
+      if(crList && crList.length > 0){
+        let criteria = crList[0];
+        value = criteria['fValue'];
+      }
+    }
+    return value;
+  }
+  getJsonSizeInKilobyte(obj:any){
+    const bytes = new TextEncoder().encode(JSON.stringify(obj)).length;
+    const kiloBytes = (bytes / 1024).toFixed(2);
+    //const megaBytes = kiloBytes / 1024;
+    return Number(kiloBytes);
+  }
 }
