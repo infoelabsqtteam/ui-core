@@ -1296,7 +1296,8 @@ export class LimsCalculationsService {
     let sampling_charge = templateValue['sampling_charge'];
     let totl = net_amount + sampling_charge;
 
-    templateValue['final_amount'] = totl
+    templateValue['final_amount'] = Math.round(totl)
+    console.log(templateValue['final_amount'])
     return templateValue;
   }
 
