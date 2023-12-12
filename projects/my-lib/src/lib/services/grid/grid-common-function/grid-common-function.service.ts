@@ -445,6 +445,7 @@ constructor(
         }
         return returnValue
       case 'date':
+      case 'daterange':
         if(value && value != ''){
           if(this.storageService.checkPlatForm() == 'mobile'){
             returnValue =  this.datePipe.transform(value, 'mediumDate');
