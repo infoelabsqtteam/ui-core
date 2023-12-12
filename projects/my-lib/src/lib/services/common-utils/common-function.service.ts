@@ -185,15 +185,6 @@ export class CommonFunctionService {
                 formValue[element.field_name] = null;
               }
               break;
-            case "number":
-              if(validatField){
-                if(this.applicableForValidation(element) && formValue[element.field_name]<=0){
-                  return {'msg':' ' +element.label + ' should be greater than 0. !!!'}
-                }
-              }else if (!Number(formValue[element.field_name])) {
-                formValue[element.field_name] = 0;
-              }
-              break
             default:
               break;
           }
@@ -218,12 +209,29 @@ export class CommonFunctionService {
             }
           }
           break;
+        case "number":
+          if(validatField){
+            if(this.applicableForValidation(element) && formValue[element.field_name]<=0){
+              return {'msg':' ' +element.label + ' should be greater than 0. !!!'}
+            }
+          }else if (!Number(formValue[element.field_name])) {
+            formValue[element.field_name] = 0;
+          }
+          break
         case "text":
+        case "textarea":
+        case "mobile":
+        case "email":
           if(!validatField){
             if (formValue[element.field_name] == "" || formValue[element.field_name] == undefined) {
               formValue[element.field_name] = null;
             }else if(typeof formValue[element.field_name] == "string"){
-              formValue[element.field_name] = this.coreFunctionService.removeSpaceFromString(formValue[element.field_name]);
+              let value = this.coreFunctionService.removeSpaceFromString(formValue[element.field_name]);
+              if (value == "") {
+                formValue[element.field_name] = null;
+              }else{
+                formValue[element.field_name] = value;
+              }
             }
           }
           break;
@@ -284,15 +292,6 @@ export class CommonFunctionService {
                           });
                         }
                         break;
-                      case "number":
-                        if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
-                          formValue[element.field_name].forEach((fiedlList: any) => {
-                            if (!Number(fiedlList[data.field_name])) {
-                              fiedlList[data.field_name] = 0;
-                            }
-                          });
-                        }
-                        break;
                       default:
                         break;
                     }
@@ -316,13 +315,30 @@ export class CommonFunctionService {
                         });
                       }
                       break;
+                    case "number":
+                      if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                        formValue[element.field_name].forEach((fiedlList: any) => {
+                          if (!Number(fiedlList[data.field_name])) {
+                            fiedlList[data.field_name] = 0;
+                          }
+                        });
+                      }
+                      break;
                     case "text":
+                    case "textarea":
+                    case "mobile":
+                    case "email":
                       if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
                         formValue[element.field_name].forEach((fiedlList: any) => {
                           if (fiedlList[data.field_name] == "" || fiedlList[data.field_name] == undefined) {
                             fiedlList[data.field_name] = null;
                           }else if(typeof fiedlList[data.field_name] == "string"){
-                            fiedlList[data.field_name] = this.coreFunctionService.removeSpaceFromString(fiedlList[data.field_name]);
+                            let value = this.coreFunctionService.removeSpaceFromString(fiedlList[data.field_name]);
+                            if (value == "") {
+                              fiedlList[data.field_name] = null;
+                            }else{
+                              fiedlList[data.field_name] = value;
+                            }
                           }
                         });
                       }
@@ -371,11 +387,6 @@ export class CommonFunctionService {
                     formValue[element.field_name][data.field_name] = null;
                   }
                   break;
-                case "number":
-                  if (!Number(formValue[element.field_name][data.field_name])) {
-                    formValue[element.field_name][data.field_name] = 0;
-                  }
-                  break;
                 default:
                   break;
               }
@@ -399,7 +410,15 @@ export class CommonFunctionService {
                   }
                 }
                 break;
+              case "number":
+                if (!Number(formValue[element.field_name][data.field_name])) {
+                  formValue[element.field_name][data.field_name] = 0;
+                }
+                break;
               case "text":
+              case "textarea":
+              case "mobile":
+              case "email":
                 if(!validatField){
                   if (formValue[element.field_name][data.field_name] == "" || formValue[element.field_name][data.field_name] == undefined) {
                     formValue[element.field_name][data.field_name] = null;
