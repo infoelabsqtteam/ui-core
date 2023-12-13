@@ -156,6 +156,19 @@ export class CoreFunctionService {
     return Number(kiloBytes);
   }
   removeSpaceFromString(str:string){
-    return str.trim();
+    if(str){
+      return str.trim();
+    }else{
+      return null;
+    }
+  }
+  checkBlankProperties(data:any) {
+    const objWithoutNull:any = {...data};
+    Object.keys(objWithoutNull).forEach(key => {
+      if (objWithoutNull[key] === "") {
+        objWithoutNull[key] = null;
+      }
+    });
+    return objWithoutNull;
   }
 }

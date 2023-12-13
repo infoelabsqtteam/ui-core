@@ -190,325 +190,337 @@ export class CommonFunctionService {
           }
         }
       }
-      switch (element.type.toLowerCase()) {
-        case "list_of_string":
-          if(validatField){
-            if(formValue[element.field_name] != "" && formValue[element.field_name] != null){
-              return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
-            }else if(this.applicableForValidation(element) && !this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length > 0){
-              return {'msg':'Please Enter '+ element.label + '. !!!'}
-            }
-          }else if (formValue[element.field_name] == "" || !this.isArray(formValue[element.field_name])) {
-            formValue[element.field_name] = null;
-          }
-          break;
-        case "file":
-          if(!validatField){
-            if (formValue[element.field_name] == "") {
+      if(element && element.type){
+        switch (element.type.toLowerCase()) {
+          case "list_of_string":
+            if(validatField){
+              if(formValue[element.field_name] != "" && formValue[element.field_name] != null){
+                return {'msg':'Entered value for '+element.label+' is not valid. !!!'}
+              }else if(this.applicableForValidation(element) && !this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length > 0){
+                return {'msg':'Please Enter '+ element.label + '. !!!'}
+              }
+            }else if (formValue[element.field_name] == "" || !this.isArray(formValue[element.field_name])) {
               formValue[element.field_name] = null;
             }
-          }
-          break;
-        case "number":
-          if(validatField){
-            if(this.applicableForValidation(element) && formValue[element.field_name]<=0){
-              return {'msg':' ' +element.label + ' should be greater than 0. !!!'}
-            }
-          }else if (!Number(formValue[element.field_name])) {
-            formValue[element.field_name] = 0;
-          }
-          break
-        case "text":
-        case "textarea":
-        case "mobile":
-        case "email":
-          if(!validatField){
-            if (formValue[element.field_name] == "" || formValue[element.field_name] == undefined) {
-              formValue[element.field_name] = null;
-            }else if(typeof formValue[element.field_name] == "string"){
-              let value = this.coreFunctionService.removeSpaceFromString(formValue[element.field_name]);
-              if (value == "") {
+            break;
+          case "file":
+            if(!validatField){
+              if (formValue[element.field_name] == "") {
                 formValue[element.field_name] = null;
-              }else{
-                formValue[element.field_name] = value;
               }
             }
-          }
-          break;
-        case "list_of_fields":
-          if(validatField){
-            if(this.applicableForValidation(element)){
-              if(element.datatype != 'key_value'){
-                if(formValueWithCust[element.field_name] == null || !this.isArray(formValueWithCust[element.field_name]) || formValueWithCust[element.field_name].length <= 0){
-                  return {'msg': element.label + ' is required.'}
-                }
-              }else if(element.datatype == 'key_value'){
-                if(typeof formValueWithCust[element.field_name] != 'object' || Object.keys(formValueWithCust[element.field_name]).length <= 0){
-                  return {'msg': element.label + ' is required.'}
-                }
+            break;
+          case "number":
+            if(validatField){
+              if(this.applicableForValidation(element) && formValue[element.field_name]<=0){
+                return {'msg':' ' +element.label + ' should be greater than 0. !!!'}
               }
+            }else if (!Number(formValue[element.field_name])) {
+              formValue[element.field_name] = 0;
             }
-          }else{
-            if (!this.isArray(formValue[element.field_name]) || formValue[element.field_name].length <= 0) {
-              if (formValue[element.field_name] != null) {
-                if (element.datatype == 'key_value' && typeof formValue[element.field_name] == 'object') {
-                  const object = formValue[element.field_name]
-                  const len = Object.keys(object).length;
-                  if (len == 0) {
-                    formValue[element.field_name] = null;
-                  } else if (object.key != undefined) {
-                    if (object.key == '') {
-                      formValue[element.field_name] = null;
-                    }
-                  }
-                }
-                if (element.datatype != 'key_value') {
+            break
+          case "text":
+          case "textarea":
+          case "mobile":
+          case "email":
+            if(!validatField){
+              if (formValue[element.field_name] == "" || formValue[element.field_name] == undefined) {
+                formValue[element.field_name] = null;
+              }else if(typeof formValue[element.field_name] == "string"){
+                let value = this.coreFunctionService.removeSpaceFromString(formValue[element.field_name]);
+                if (value == "") {
                   formValue[element.field_name] = null;
+                }else{
+                  formValue[element.field_name] = value;
                 }
               }
-            } else {
-              if(element.list_of_fields && element.list_of_fields){
-                for (let j = 0; j < element.list_of_fields.length; j++) {
-                  const data = element.list_of_fields[j];
-                  if(data && data.datatype){
-                    switch (data.datatype.toLowerCase()) {
-                      case "list_of_object":
-                      case "chips":
-                      case "chips_with_mask":
-                        if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
-                          formValue[element.field_name].forEach((fiedlList: any) => {
-                            if (fiedlList[data.field_name] == "" || !this.isArray(fiedlList[data.field_name])) {
-                              fiedlList[data.field_name] = null;
-                            }
-                          });
-                        }
-                        break;
-                      case "object":
-                        if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
-                          formValue[element.field_name].forEach((fiedlList: any) => {
-                            if (fiedlList[data.field_name] == "" || typeof fiedlList[data.field_name] != 'object') {
-                              fiedlList[data.field_name] = null;
-                            }
-                          });
-                        }
-                        break;
-                      default:
-                        break;
+            }
+            break;
+          case "list_of_fields":
+            if(validatField){
+              if(this.applicableForValidation(element)){
+                if(element.datatype != 'key_value'){
+                  if(formValueWithCust[element.field_name] == null || !this.isArray(formValueWithCust[element.field_name]) || formValueWithCust[element.field_name].length <= 0){
+                    return {'msg': element.label + ' is required.'}
+                  }
+                }else if(element.datatype == 'key_value'){
+                  if(typeof formValueWithCust[element.field_name] != 'object' || Object.keys(formValueWithCust[element.field_name]).length <= 0){
+                    return {'msg': element.label + ' is required.'}
+                  }
+                }
+              }
+            }else{
+              if (!this.isArray(formValue[element.field_name]) || formValue[element.field_name].length <= 0) {
+                if (formValue[element.field_name] != null) {
+                  if (element.datatype == 'key_value' && typeof formValue[element.field_name] == 'object') {
+                    const object = formValue[element.field_name]
+                    const len = Object.keys(object).length;
+                    if (len == 0) {
+                      formValue[element.field_name] = null;
+                    } else if (object.key != undefined) {
+                      if (object.key == '') {
+                        formValue[element.field_name] = null;
+                      }
                     }
                   }
-                  switch (data.type.toLowerCase()) {
-                    case "list_of_string":
-                      if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
-                        formValue[element.field_name].forEach((fiedlList: any) => {
-                          if (fiedlList[data.field_name] == "" || !this.isArray(fiedlList[data.field_name])) {
-                            fiedlList[data.field_name] = null;
+                  if (element.datatype != 'key_value') {
+                    formValue[element.field_name] = null;
+                  }
+                }
+              } else {
+                if(element.list_of_fields && element.list_of_fields){
+                  for (let j = 0; j < element.list_of_fields.length; j++) {
+                    const data = element.list_of_fields[j];
+                    if(data && data.datatype){
+                      switch (data.datatype.toLowerCase()) {
+                        case "list_of_object":
+                        case "chips":
+                        case "chips_with_mask":
+                          if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                            formValue[element.field_name].forEach((fiedlList: any) => {
+                              if (fiedlList[data.field_name] == "" || !this.isArray(fiedlList[data.field_name])) {
+                                fiedlList[data.field_name] = null;
+                              }
+                            });
                           }
-                        });
-                      }
-                      break;
-                    case "file":
-                      if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
-                        formValue[element.field_name].forEach((fiedlList: any) => {
-                          if (fiedlList[data.field_name] == "" || fiedlList[data.field_name] == undefined) {
-                            fiedlList[data.field_name] = null;
+                          break;
+                        case "object":
+                          if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                            formValue[element.field_name].forEach((fiedlList: any) => {
+                              if (fiedlList[data.field_name] == "" || typeof fiedlList[data.field_name] != 'object') {
+                                fiedlList[data.field_name] = null;
+                              }
+                            });
                           }
-                        });
+                          break;
+                        default:
+                          break;
                       }
-                      break;
-                    case "number":
-                      if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
-                        formValue[element.field_name].forEach((fiedlList: any) => {
-                          if (!Number(fiedlList[data.field_name])) {
-                            fiedlList[data.field_name] = 0;
+                    }
+                    if(data && data.type){
+                      switch (data.type.toLowerCase()) {
+                        case "list_of_string":
+                          if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                            formValue[element.field_name].forEach((fiedlList: any) => {
+                              if (fiedlList[data.field_name] == "" || !this.isArray(fiedlList[data.field_name])) {
+                                fiedlList[data.field_name] = null;
+                              }
+                            });
                           }
-                        });
-                      }
-                      break;
-                    case "text":
-                    case "textarea":
-                    case "mobile":
-                    case "email":
-                      if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
-                        formValue[element.field_name].forEach((fiedlList: any) => {
-                          if (fiedlList[data.field_name] == "" || fiedlList[data.field_name] == undefined) {
-                            fiedlList[data.field_name] = null;
-                          }else if(typeof fiedlList[data.field_name] == "string"){
-                            let value = this.coreFunctionService.removeSpaceFromString(fiedlList[data.field_name]);
-                            if (value == "") {
-                              fiedlList[data.field_name] = null;
-                            }else{
-                              fiedlList[data.field_name] = value;
-                            }
+                          break;
+                        case "file":
+                          if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                            formValue[element.field_name].forEach((fiedlList: any) => {
+                              if (fiedlList[data.field_name] == "" || fiedlList[data.field_name] == undefined) {
+                                fiedlList[data.field_name] = null;
+                              }
+                            });
                           }
-                        });
-                      }
-                      break;
-                    default:
-                      if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
-                        formValue[element.field_name].forEach((fiedlList: any) => {
-                          if (fiedlList[data.field_name] == "" || fiedlList[data.field_name] == undefined) {
-                            fiedlList[data.field_name] = null;
+                          break;
+                        case "number":
+                          if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                            formValue[element.field_name].forEach((fiedlList: any) => {
+                              if (!Number(fiedlList[data.field_name])) {
+                                fiedlList[data.field_name] = 0;
+                              }
+                            });
                           }
-                        });
+                          break;
+                        case "text":
+                        case "textarea":
+                        case "mobile":
+                        case "email":
+                          if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                            formValue[element.field_name].forEach((fiedlList: any) => {
+                              if(typeof fiedlList[data.field_name] == "string"){
+                                let value = this.coreFunctionService.removeSpaceFromString(fiedlList[data.field_name]);
+                                if (value == "") {
+                                  fiedlList[data.field_name] = null;
+                                }else{
+                                  fiedlList[data.field_name] = value;
+                                }
+                              }else{
+                                fiedlList[data.field_name] = null;
+                              }
+                            });
+                          }
+                          break;
+                        default:
+                          if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
+                            formValue[element.field_name].forEach((fiedlList: any) => {
+                              if (fiedlList[data.field_name] == "" || fiedlList[data.field_name] == undefined) {
+                                fiedlList[data.field_name] = null;
+                              }
+                            });
+                          }
+                          break;
                       }
-                      break;
+                    }
                   }
                 }
               }
             }
-          }
-          break;
-        case "group_of_fields":
-          for (let j = 0; j < element.list_of_fields.length; j++) {
-          const data = element.list_of_fields[j];
-            if(data && data.datatype){
-              switch (data.datatype.toLowerCase()) {
-                case "list_of_object":
-                case "chips":
-                case "chips_with_mask":
-                  if(validatField){
-                    if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
-                      return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
-                    }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
-                      return {'msg':'Please Enter '+ data.label + '. !!!'}
-                    }
-                  }else if (formValue[element.field_name][data.field_name] == "" || !this.isArray(formValue[element.field_name][data.field_name])) {
-                      formValue[element.field_name][data.field_name] = null;
-                    }
-                  break;
-                case "object":
-                  if(validatField){
-                    if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
-                      return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
-                    }else if(this.applicableForValidation(data) && typeof formValue[element.field_name][data.field_name] != 'object'){
-                      return {'msg':'Please Enter '+ data.label + '. !!!'}
-                    }
-                  }else if (formValue[element.field_name][data.field_name] == "" || typeof formValue[element.field_name][data.field_name] != 'object') {
-                    formValue[element.field_name][data.field_name] = null;
-                  }
-                  break;
-                default:
-                  break;
-              }
-            }
-            switch (data.type.toLowerCase()) {
-              case "list_of_string":
-                if(validatField){
-                  if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
-                    return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
-                  }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
-                    return {'msg':'Please Enter '+ data.label + '. !!!'}
-                  }
-                }else if (formValue[element.field_name][data.field_name] == "" || !this.isArray(formValue[element.field_name][data.field_name])) {
-                  formValue[element.field_name][data.field_name] = null;
-                }
-                break;
-              case "file":
-                if(!validatField){
-                  if (formValue[element.field_name][data.field_name] == "" || formValue[element.field_name][data.field_name] == undefined) {
-                    formValue[element.field_name][data.field_name] = null;
-                  }
-                }
-                break;
-              case "number":
-                if (!Number(formValue[element.field_name][data.field_name])) {
-                  formValue[element.field_name][data.field_name] = 0;
-                }
-                break;
-              case "text":
-              case "textarea":
-              case "mobile":
-              case "email":
-                if(!validatField){
-                  if (formValue[element.field_name][data.field_name] == "" || formValue[element.field_name][data.field_name] == undefined) {
-                    formValue[element.field_name][data.field_name] = null;
-                  }else if(typeof formValue[element.field_name][data.field_name] == "string"){
-                    formValue[element.field_name][data.field_name] = this.coreFunctionService.removeSpaceFromString(formValue[element.field_name][data.field_name]);
-                  }
-                }
-                break;
-              default:
-                if (formValue[element.field_name][data.field_name] == "" || formValue[element.field_name][data.field_name] == undefined) {
-                  formValue[element.field_name][data.field_name] = null;
-                }
-                break;
-            }
-          }
-          break;
-        case "stepper":
-          for (let j = 0; j < element.list_of_fields.length; j++) {
-            const step = element.list_of_fields[j];
-            if(step.list_of_fields && step.list_of_fields != null && step.list_of_fields.length > 0){
-              for (let k = 0; k < step.list_of_fields.length; k++) {
-                const data = step.list_of_fields[k];
-                switch (data.datatype) {
+            break;
+          case "group_of_fields":
+            for (let j = 0; j < element.list_of_fields.length; j++) {
+            const data = element.list_of_fields[j];
+              if(data && data.datatype){
+                switch (data.datatype.toLowerCase()) {
                   case "list_of_object":
                   case "chips":
                   case "chips_with_mask":
                     if(validatField){
-                      if(formValue[data.field_name] != "" && formValue[data.field_name] != null){
+                      if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
                         return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
                       }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
                         return {'msg':'Please Enter '+ data.label + '. !!!'}
                       }
-                    }else if (formValue[data.field_name] == "" && !this.isArray(formValue[data.field_name])) {
-                      formValue[data.field_name] = null;
-                    }
+                    }else if (formValue[element.field_name][data.field_name] == "" || !this.isArray(formValue[element.field_name][data.field_name])) {
+                        formValue[element.field_name][data.field_name] = null;
+                      }
                     break;
                   case "object":
                     if(validatField){
-                      if(formValue[data.field_name] != "" && formValue[data.field_name] != null){
+                      if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
                         return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
-                      }else if(this.applicableForValidation(data) && typeof formValue[data.field_name] != 'object'){
+                      }else if(this.applicableForValidation(data) && typeof formValue[element.field_name][data.field_name] != 'object'){
                         return {'msg':'Please Enter '+ data.label + '. !!!'}
                       }
-                    }else if (formValue[data.field_name] == "" && typeof formValue[data.field_name] != 'object') {
-                      formValue[data.field_name] = null;
+                    }else if (formValue[element.field_name][data.field_name] == "" || typeof formValue[element.field_name][data.field_name] != 'object') {
+                      formValue[element.field_name][data.field_name] = null;
                     }
                     break;
-                  case "number":
-                    if (!Number(formValue[data.field_name])) {
-                      formValue[data.field_name] = 0;
-                    }
-                    break;
-                  default:
-                    break;
-                }
-                switch (data.type) {
-                  case "list_of_string":
-                    if(validatField){
-                      if(formValue[data.field_name] != "" && formValue[data.field_name] != null){
-                        return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
-                      }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
-                        return {'msg':'Please Enter '+ data.label + '. !!!'}
-                      }
-                    }else if (formValue[data.field_name] == "" && !this.isArray(formValue[data.field_name])) {
-                      formValue[data.field_name] = null;
-                    }
-                    break;
-
                   default:
                     break;
                 }
               }
+              if(data && data.type){
+                switch (data.type.toLowerCase()) {
+                  case "list_of_string":
+                    if(validatField){
+                      if(formValue[element.field_name][data.field_name] != "" && formValue[element.field_name][data.field_name] != null){
+                        return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
+                      }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
+                        return {'msg':'Please Enter '+ data.label + '. !!!'}
+                      }
+                    }else if (formValue[element.field_name][data.field_name] == "" || !this.isArray(formValue[element.field_name][data.field_name])) {
+                      formValue[element.field_name][data.field_name] = null;
+                    }
+                    break;
+                  case "file":
+                    if(!validatField){
+                      if (formValue[element.field_name][data.field_name] == "" || formValue[element.field_name][data.field_name] == undefined) {
+                        formValue[element.field_name][data.field_name] = null;
+                      }
+                    }
+                    break;
+                  case "number":
+                    if (!Number(formValue[element.field_name][data.field_name])) {
+                      formValue[element.field_name][data.field_name] = 0;
+                    }
+                    break;
+                  case "text":
+                  case "textarea":
+                  case "mobile":
+                  case "email":
+                    if(!validatField){
+                      if (formValue[element.field_name][data.field_name] == "" || formValue[element.field_name][data.field_name] == undefined) {
+                        formValue[element.field_name][data.field_name] = null;
+                      }else if(typeof formValue[element.field_name][data.field_name] == "string"){
+                        let value = this.coreFunctionService.removeSpaceFromString(formValue[element.field_name][data.field_name]);
+                        if (value == "") {
+                          formValue[element.field_name][data.field_name] = null;
+                        }else{
+                          formValue[element.field_name][data.field_name] = value;
+                        }
+                      }
+                    }
+                    break;
+                  default:
+                    if (formValue[element.field_name][data.field_name] == "" || formValue[element.field_name][data.field_name] == undefined) {
+                      formValue[element.field_name][data.field_name] = null;
+                    }
+                    break;
+                }
+              }
             }
-          }
-          break;
-        default:
-          if(validatField){
+            break;
+          case "stepper":
+            for (let j = 0; j < element.list_of_fields.length; j++) {
+              const step = element.list_of_fields[j];
+              if(step.list_of_fields && step.list_of_fields != null && step.list_of_fields.length > 0){
+                for (let k = 0; k < step.list_of_fields.length; k++) {
+                  const data = step.list_of_fields[k];
+                  switch (data.datatype) {
+                    case "list_of_object":
+                    case "chips":
+                    case "chips_with_mask":
+                      if(validatField){
+                        if(formValue[data.field_name] != "" && formValue[data.field_name] != null){
+                          return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
+                        }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
+                          return {'msg':'Please Enter '+ data.label + '. !!!'}
+                        }
+                      }else if (formValue[data.field_name] == "" && !this.isArray(formValue[data.field_name])) {
+                        formValue[data.field_name] = null;
+                      }
+                      break;
+                    case "object":
+                      if(validatField){
+                        if(formValue[data.field_name] != "" && formValue[data.field_name] != null){
+                          return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
+                        }else if(this.applicableForValidation(data) && typeof formValue[data.field_name] != 'object'){
+                          return {'msg':'Please Enter '+ data.label + '. !!!'}
+                        }
+                      }else if (formValue[data.field_name] == "" && typeof formValue[data.field_name] != 'object') {
+                        formValue[data.field_name] = null;
+                      }
+                      break;
+                    case "number":
+                      if (!Number(formValue[data.field_name])) {
+                        formValue[data.field_name] = 0;
+                      }
+                      break;
+                    default:
+                      break;
+                  }
+                  switch (data.type) {
+                    case "list_of_string":
+                      if(validatField){
+                        if(formValue[data.field_name] != "" && formValue[data.field_name] != null){
+                          return {'msg':'Entered value for '+data.label+' is not valid. !!!'}
+                        }else if(this.applicableForValidation(data) && !this.isArray(formValueWithCust[data.field_name]) && formValueWithCust[data.field_name].length > 0){
+                          return {'msg':'Please Enter '+ data.label + '. !!!'}
+                        }
+                      }else if (formValue[data.field_name] == "" && !this.isArray(formValue[data.field_name])) {
+                        formValue[data.field_name] = null;
+                      }
+                      break;
 
-          }else if (formValue[element.field_name] == "" || formValue[element.field_name] == undefined) {
-            formValue[element.field_name] = null;
-          }
-          break;
+                    default:
+                      break;
+                  }
+                }
+              }
+            }
+            break;
+          default:
+            if(validatField){
+
+            }else if (formValue[element.field_name] == "" || formValue[element.field_name] == undefined) {
+              formValue[element.field_name] = null;
+            }
+            break;
+        }
       }
     }
     if(validatField){
       return true;
     }else{
-      return formValue;
+      return this.coreFunctionService.checkBlankProperties(formValue);
     }
   }
+
 
   applicableForValidation(field:any){
     if(field.is_mandatory){
