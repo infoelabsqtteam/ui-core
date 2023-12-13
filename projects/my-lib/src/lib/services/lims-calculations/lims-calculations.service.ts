@@ -175,7 +175,7 @@ export class LimsCalculationsService {
 
   getDecimalAmount(value:any): any {
     let decimaldigitNo:number = this.storageService.getApplicationSetting().roundValueNoOfDigits;
-    let decimalno:number = 0;
+    let decimalno:number = 2;
       if(decimaldigitNo && decimaldigitNo != undefined && decimaldigitNo != null) {
         decimalno = decimaldigitNo;
       }
