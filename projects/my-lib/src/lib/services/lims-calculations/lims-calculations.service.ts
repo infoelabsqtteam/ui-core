@@ -176,9 +176,9 @@ export class LimsCalculationsService {
   getDecimalAmount(value:any): any {
     let decimaldigitNo:number = this.storageService.getApplicationSetting().roundValueNoOfDigits;
     let decimalno:number = 2;
-      if(decimaldigitNo && decimaldigitNo != undefined && decimaldigitNo != null) {
-        decimalno = decimaldigitNo;
-      }
+    if(decimaldigitNo != undefined && decimaldigitNo != null) {
+      decimalno = decimaldigitNo;
+    }
     if (typeof (value) == 'number' && value != undefined && value != null) {
       return Number(value.toFixed(decimalno));
     } else {
@@ -2298,7 +2298,7 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
       case 'unit_price':
         unit_price = 0;
         if (this.coreFunctionService.isNotBlank(templateValue.unit_price)) {
-          unit_price = templateValue.unit_price;
+          unit_price = this.getDecimalAmount(templateValue.unit_price);
         }
         net_amount = qty * unit_price;
 
@@ -2331,7 +2331,7 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
         net_amount = 0;
         if (paramArray.length > 0) {
           paramArray.forEach((data:any) => {
-            data['qty'] = qty;
+            data['qty'] = this.getDecimalAmount(qty);
             this.calculateParameterLimsSegmentWiseForSubsequent(lims_segment, data, field_name);
             gross_amount = gross_amount + data['total'];
             net_amount = net_amount + data['net_amount'];
