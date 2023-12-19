@@ -1013,7 +1013,7 @@ mergeMenus(existingMenus: any, newMenus: any, parent: any) {
           }
         }
       }else{
-        if(parent == ""){
+        if( key === newMenukeys[0] && parent == ""){
           delete mergedMenus[key];
             return mergedMenus;
         }
