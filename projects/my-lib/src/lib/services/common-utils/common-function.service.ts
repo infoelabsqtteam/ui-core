@@ -182,7 +182,7 @@ export class CommonFunctionService {
                   }else if(this.applicableForValidation(element) && typeof formValue[element.field_name] != 'object'){
                     return {'msg':'Please Enter '+ element.label + '. !!!'}
                   }
-                }else if (formValue[element.field_name] == "" || typeof formValue[element.field_name] != 'object') {
+                }else if (formValue[element.field_name] == "" || (typeof formValue[element.field_name] != 'object' && element.type != 'date')) {
                   formValue[element.field_name] = null;
                 }
                 break;
