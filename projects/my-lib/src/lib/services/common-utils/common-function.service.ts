@@ -887,13 +887,191 @@ export class CommonFunctionService {
 
 
   updateUserPreference(data:object,fieldName:string,parent?:string){
-    let payloadData = this.getUserPreferenceObj(data,fieldName,parent);
+    // let payloadData = this.getUserPreferenceObj(data,fieldName,parent);
+    let payloadData = this.modifiedMenuObj(data,fieldName,parent);
     let payload = {
       "curTemp" : "user_preference",
       "data" : payloadData
     }
     this.apiService.SaveFormData(payload);
   }
+    
+modifiedMenuObj (data: any, fieldName: string, parent?: string) {
+    let modifiedMenuObj = this.prepareMenuJson(data,fieldName, parent);
+    let userPreference = {...this.storageService.getUserPreference()}
+    userPreference[fieldName] = this.mergeMenus(userPreference[fieldName], modifiedMenuObj,parent);
+    this.storageService.setUserPreference(userPreference);
+    return userPreference;
+}
+
+prepareMenuJson(menuItems: any,fieldName:string, parent?: any) {
+  const menu: any = {};
+  const itemsArray = Array.isArray(menuItems) ? menuItems : [menuItems];
+  itemsArray.forEach((item) => {
+      const menuReference = {
+          _id: item._id,
+          name: item.name,
+          allSelected: true,
+      };
+
+      let menuData: any;
+      let userPreference = this.storageService.getUserPreference();
+      if (!userPreference) {
+        let uref: any ={}
+        let userRef = this.getReferenceObject(this.storageService.GetUserInfo());
+        uref['userId'] = userRef;
+        userPreference = uref;
+        this.storageService.setUserPreference(userPreference);
+    }
+      let menus = userPreference[fieldName];
+
+      if (!menus) {
+          menus = {};
+          userPreference[fieldName] = menus;
+      }
+
+          if (parent && menus ) {
+            // If parent exists and has a submenu, add the current menu to the existing submenu
+            let refObj:any =  {reference: this.getReferenceObject(menuItems)}
+            let parObjRef : any = this.getReferenceObject(parent);
+            let submenus = menus[parent.name];
+            if(submenus){
+              menuData = {
+                  reference: parObjRef,
+                  submenus: { 
+                    [menuItems.name]: refObj 
+                  },
+              };
+              menu[parent.name] = menuData;
+              return menu;
+            }else{
+                menuData = {
+                  reference: parObjRef,
+                  submenus: {[menuItems.name]: refObj },
+              };
+            menu[parent.name] = menuData;
+            return menu;
+            }
+        } else {
+            menuData = {
+                reference: menuReference,
+                submenus: null,
+            };
+          menu[item.name] = menuData;
+          return menu;
+        }
+  });
+
+  return menu;
+}
+
+
+mergeMenus(existingMenus: any, newMenus: any, parent: any) {
+  const mergedMenus: any = { ...existingMenus };
+  const checkFeb = this.checkFebMenuAddOrNot(newMenus, parent);
+  const newMenukeys = Object.keys(newMenus);
+  if (!checkFeb) {
+        for (const key in newMenus) {
+          if (newMenus.hasOwnProperty(key)) {
+            if (mergedMenus.hasOwnProperty(key) && mergedMenus[key].hasOwnProperty('submenus')) {
+              // If the key exists and has submenus, merge the submenus
+              mergedMenus[key].submenus = {
+                ...mergedMenus[key].submenus,
+                ...newMenus[key].submenus,
+              };
+
+            } else {
+              // If the key doesn't exist or doesn't have submenus, set submenus to newMenus
+              mergedMenus[key] = newMenus[key];
+            }
+          }
+        }
+      } else {
+    for (const key in mergedMenus) {
+      if (mergedMenus.hasOwnProperty(key) && mergedMenus[key].hasOwnProperty('submenus')) {
+        const existingSubmenus = mergedMenus[key].submenus;
+        const newSubmenus = newMenus[key] && newMenus[key].submenus;
+
+        if (existingSubmenus && newSubmenus) {
+          for (const submenuKey in newSubmenus) {
+            if (newSubmenus.hasOwnProperty(submenuKey)) {
+              if (existingSubmenus.hasOwnProperty(submenuKey)) {
+                // Remove existing submenus
+                delete existingSubmenus[submenuKey];
+                return mergedMenus;
+              } else {
+                // Add new submenus
+                existingSubmenus[submenuKey] = newSubmenus[submenuKey];
+              }
+            }
+          }
+        } else {
+          // If either existing or new submenus are missing, delete the menu
+          if( key === newMenukeys[0]){
+            delete mergedMenus[key];
+            return mergedMenus;
+          }
+        }
+      }else{
+        if(parent == ""){
+          delete mergedMenus[key];
+            return mergedMenus;
+        }
+      }
+    }
+  }
+
+  return mergedMenus;
+}
+
+checkFebMenuAddOrNot(menu: any, parent: any) {
+  
+  let userFebMenu = this.getUserPreferenceByFieldName('menus');
+
+  if (!menu || typeof menu !== 'object' || Object.keys(menu).length === 0) {
+    return false;
+  }
+
+  if (parent && (typeof parent !== 'object' || Object.keys(parent).length === 0)) {
+    return false;
+  }
+
+  let menuId = Object.keys(menu).length > 0 ? menu[Object.keys(menu)[0]].reference?._id : null;
+
+  // Check if parent and parent.reference are defined before accessing _id
+  if (parent && parent !== '' && typeof parent === 'object' && userFebMenu) {
+    for (const key in menu) {
+      if (menu.hasOwnProperty(key)) {
+        if (userFebMenu.hasOwnProperty(key) && userFebMenu[key].hasOwnProperty('submenus')) {
+          const menuSubmenus = menu[key].submenus;
+          for (const submenuKey in menuSubmenus) {
+            const submenuId = menuSubmenus[submenuKey].reference?._id;
+            if (!this.isIdExist(userFebMenu[key].submenus, submenuId)) {
+              return false;
+            }else return true;
+          }
+        } else {
+          return false; // Return false if the key is missing or doesn't have submenus in userFebMenu
+        }
+      }
+    }
+  }
+
+  if (userFebMenu && userFebMenu !== null && typeof userFebMenu === 'object' && Object.keys(userFebMenu).length > 0) {
+    return this.isIdExist(userFebMenu, menuId);
+  } else {
+    return false;
+  }
+}
+
+isIdExist(obj: any, targetId: any) {
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key) && obj[key].reference && obj[key].reference._id === targetId) {
+      return true;
+    }
+  }
+  return false;
+}
   getUserPreferenceByFieldName(fieldName:string){
     let data = [];
     let userPreference = this.storageService.getUserPreference();
