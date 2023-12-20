@@ -156,10 +156,10 @@ export class CoreFunctionService {
     return Number(kiloBytes);
   }
   removeSpaceFromString(str:string){
-    if(str){
+    if(str && typeof str == "string"){
       return str.trim();
     }else{
-      return null;
+      return str;
     }
   }
   checkBlankProperties(data:any) {

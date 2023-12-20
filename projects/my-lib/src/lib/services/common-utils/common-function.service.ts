@@ -308,10 +308,11 @@ export class CommonFunctionService {
                           case "email":
                             if (formValue[element.field_name] && formValue[element.field_name].length > 0) {
                               formValue[element.field_name].forEach((fiedlList: any) => {
-                                let value = this.coreFunctionService.removeSpaceFromString(fiedlList[data.field_name]);
+                                let value = fiedlList[data.field_name];
                                   if (value == "") {
                                     fiedlList[data.field_name] = null;
                                   }else{
+                                    value = this.coreFunctionService.removeSpaceFromString(fiedlList[data.field_name]);
                                     fiedlList[data.field_name] = value;
                                   }
                               });
@@ -399,10 +400,11 @@ export class CommonFunctionService {
                         if (formValue[element.field_name][data.field_name] == "" || formValue[element.field_name][data.field_name] == undefined) {
                           formValue[element.field_name][data.field_name] = null;
                         }else if(typeof formValue[element.field_name][data.field_name] == "string"){
-                          let value = this.coreFunctionService.removeSpaceFromString(formValue[element.field_name][data.field_name]);
+                          let value = formValue[element.field_name][data.field_name];
                           if (value == "") {
                             formValue[element.field_name][data.field_name] = null;
                           }else{
+                            value = this.coreFunctionService.removeSpaceFromString(formValue[element.field_name][data.field_name]);
                             formValue[element.field_name][data.field_name] = value;
                           }
                         }
