@@ -632,7 +632,23 @@ export class StorageService {
     let applicationSetting = this.getApplicationSetting();
     return applicationSetting.defaultApplicationSettings;
   }
+  getApplicationAuthenticationSettings(){
+    let applicationSetting = this.getApplicationSetting();
+    if(applicationSetting && applicationSetting.authenticationSettings){
+      return applicationSetting.authenticationSettings;
+    }else{
+      return null;
+    }
 
+  }
+  getTwoFactorAuthenticationType(){
+    let authenticationSetting = this.getApplicationAuthenticationSettings();
+    if(authenticationSetting && authenticationSetting.twoFactorAuthentication && authenticationSetting.twoFactorAuthenticationType){
+      return authenticationSetting.twoFactorAuthenticationType;
+    }else{
+      return null;
+    }
+  }
 
 
   getDefaultSearchOperator() {
