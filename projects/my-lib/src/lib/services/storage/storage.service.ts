@@ -157,7 +157,16 @@ export class StorageService {
   GetRefreshToken() {
     return localStorage.getItem(this.REFRESH_TOKEN);
   }
-
+  SetFavTabs(data:any){
+    sessionStorage.setItem("FAVTABS",JSON.stringify(data))
+  }
+  GetFavTabs(){
+    const favTabsString = sessionStorage.getItem("FAVTABS");
+    return favTabsString ? JSON.parse(favTabsString) : null;
+  }
+  ClearFavTabs(){
+    sessionStorage.removeItem("FAVTABS")
+  }
   GetIdTokenStatus(){
     let expired = 0;
     let expireTime = Number(localStorage.getItem(this.ID_TOKEN_EXPIRY_TIME));

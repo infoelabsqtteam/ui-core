@@ -6,6 +6,7 @@ import { CoreFunctionService } from '../common-utils/core-function/core-function
 import { ApiService } from '../api/api.service';
 import { ModelService } from '../model/model.service';
 import { EnvService } from '../env/env.service';
+import { DataShareService } from '../data-share/data-share.service';
 
 
 @Injectable({
@@ -21,7 +22,8 @@ export class CommonFunctionService {
     private datePipe: DatePipe,
     private apiService:ApiService,
     private coreFunctionService:CoreFunctionService,
-    private envService:EnvService
+    private envService:EnvService,
+    private dataShareService: DataShareService
     ) {
     this.userInfo = this.storageService.GetUserInfo();
   }
@@ -895,23 +897,66 @@ export class CommonFunctionService {
     }
     this.apiService.SaveFormData(payload);
   }
-    
+getAllTabs(tabs:any) {
+  const allTabs = tabs.reduce((acc: any, tab: any) => {
+    const tabRef = this.getTabRef(tab);
+    if (Object.keys(tabRef).length > 0) {
+      Object.assign(acc, tabRef);
+    }
+    return acc;
+  }, {});
+
+  return allTabs;
+}
+getFebTabs(tabs: any) {
+  return tabs
+  .filter((tab: any) => tab.febMenu === true)
+  .reduce((acc: any, tab: any) => {
+    const tabRef = this.getTabRef(tab);
+    if (Object.keys(tabRef).length > 0) {
+      Object.assign(acc, tabRef);
+    }
+    return acc;
+  }, {});
+}
+getTabRef(tab:any) {
+  let res: any = {};
+    if (tab && tab.tab_name != '' && tab.tab_name != null) {
+        const tabReference = {
+          reference:{
+              _id: tab._id,
+              name: tab.tab_name,
+              // febMenu: tab.febMenu,
+            }
+          };
+      res[tab.tab_name] = tabReference;
+    }
+    return res;
+}
 modifiedMenuObj (data: any, fieldName: string, parent?: string) {
     let modifiedMenuObj = this.prepareMenuJson(data,fieldName, parent);
     let userPreference = {...this.storageService.getUserPreference()}
     userPreference[fieldName] = this.mergeMenus(userPreference[fieldName], modifiedMenuObj,parent);
     this.storageService.setUserPreference(userPreference);
+    this.storageService.ClearFavTabs();
     return userPreference;
 }
-
 prepareMenuJson(menuItems: any,fieldName:string, parent?: any) {
+  let tabsData = this.dataShareService.getTempData()
+  const templateTabs = tabsData[0].templateTabs;
+  let favTabsLocal = this.storageService.GetFavTabs();
+  let favTabs:any;
+  if(favTabsLocal){
+    favTabs = this.getFebTabs(favTabsLocal);
+  }
+  const allTabs = this.getAllTabs(templateTabs)
   const menu: any = {};
   const itemsArray = Array.isArray(menuItems) ? menuItems : [menuItems];
   itemsArray.forEach((item) => {
       const menuReference = {
           _id: item._id,
           name: item.name,
-          allSelected: true,
+          allSelected: !this.isFavExist(favTabs)
       };
 
       let menuData: any;
@@ -932,40 +977,39 @@ prepareMenuJson(menuItems: any,fieldName:string, parent?: any) {
 
           if (parent && menus ) {
             // If parent exists and has a submenu, add the current menu to the existing submenu
-            let refObj:any =  {reference: this.getReferenceObject(menuItems)}
+            let refObj:any =  {
+              reference: {
+                ...this.getReferenceObject(menuItems),
+                allSelected:!this.isFavExist(favTabs)
+              },
+              templateTabs:this.isFavExist(favTabs) ? favTabs : allTabs
+              }
             let parObjRef : any = this.getReferenceObject(parent);
-            let submenus = menus[parent.name];
-            if(submenus){
+            // let submenus = menus[parent.name];
+            // if(submenus){
               menuData = {
                   reference: parObjRef,
                   submenus: { 
-                    [menuItems.name]: refObj 
+                    [menuItems.name]: refObj,
                   },
               };
               menu[parent.name] = menuData;
               return menu;
-            }else{
-                menuData = {
-                  reference: parObjRef,
-                  submenus: {[menuItems.name]: refObj },
-              };
-            menu[parent.name] = menuData;
-            return menu;
-            }
         } else {
             menuData = {
                 reference: menuReference,
                 submenus: null,
+                templateTabs: this.isFavExist(favTabs) ? favTabs : allTabs
             };
           menu[item.name] = menuData;
           return menu;
         }
   });
-
   return menu;
 }
-
-
+isFavExist(favTabs:any) {
+  return favTabs !== undefined && Object.keys(favTabs).length !== 0;
+}
 mergeMenus(existingMenus: any, newMenus: any, parent: any) {
   const mergedMenus: any = { ...existingMenus };
   const checkFeb = this.checkFebMenuAddOrNot(newMenus, parent);
@@ -998,7 +1042,6 @@ mergeMenus(existingMenus: any, newMenus: any, parent: any) {
               if (existingSubmenus.hasOwnProperty(submenuKey)) {
                 // Remove existing submenus
                 delete existingSubmenus[submenuKey];
-                return mergedMenus;
               } else {
                 // Add new submenus
                 existingSubmenus[submenuKey] = newSubmenus[submenuKey];
@@ -1009,21 +1052,38 @@ mergeMenus(existingMenus: any, newMenus: any, parent: any) {
           // If either existing or new submenus are missing, delete the menu
           if( key === newMenukeys[0]){
             delete mergedMenus[key];
-            return mergedMenus;
           }
         }
       }else{
         if( key === newMenukeys[0] && parent == ""){
           delete mergedMenus[key];
-            return mergedMenus;
         }
       }
     }
   }
-
-  return mergedMenus;
+  // return {}
+  return this.deleteEmptyMenus(mergedMenus);
 }
+deleteEmptyMenus(menus: any): any {
+  const updatedMenus: any = { ...menus };
 
+  for (const key in updatedMenus) {
+    if (updatedMenus.hasOwnProperty(key) && updatedMenus[key].submenus != null) {
+      if (Object.keys(updatedMenus[key].submenus).length === 0) {
+        // Delete the menu if submenus is empty
+        delete updatedMenus[key];
+      } else {
+        // Check templateTabs condition
+        const templateTabs = updatedMenus[key].submenus.templateTabs;
+        if (templateTabs != null && Object.keys(templateTabs).length === 0) {
+          // Delete the menu if templateTabs is empty
+          delete updatedMenus[key];
+        }
+      }
+    }
+  }
+  return updatedMenus;
+}
 checkFebMenuAddOrNot(menu: any, parent: any) {
   
   let userFebMenu = this.getUserPreferenceByFieldName('menus');
