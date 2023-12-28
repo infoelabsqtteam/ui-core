@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormControl, FormArray, Validators } from '@ang
 import { CommonFunctionService } from '../../services/common-utils/common-function.service';
 import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
 import { NotificationService } from '../notify/notification.service';
+import { StorageService } from '../storage/storage.service';
 
 
 @Injectable({
@@ -15,6 +16,7 @@ export class LimsCalculationsService {
     private commonFunctionService: CommonFunctionService,
     private coreFunctionService: CoreFunctionService,
     private notificationService: NotificationService,
+    private storageService:StorageService,
     private apiCallService:ApiCallService
   ) { }
 
@@ -172,8 +174,13 @@ export class LimsCalculationsService {
   }
 
   getDecimalAmount(value:any): any {
+    let decimaldigitNo:number = this.storageService.getApplicationSetting().roundValueNoOfDigits;
+    let decimalno:number = 2;
+    if(decimaldigitNo != undefined && decimaldigitNo != null) {
+      decimalno = decimaldigitNo;
+    }
     if (typeof (value) == 'number' && value != undefined && value != null) {
-      return Number(value.toFixed(2));
+      return Number(value.toFixed(decimalno));
     } else {
       return;
     }
@@ -1714,12 +1721,12 @@ populateParameterAmountWithSubsequent(data:any,net_amount:number,discount_percen
   data['discount_percent'] = this.getDecimalAmount(discount_percent);
   data['discount_amount'] = this.getDecimalAmount(+discount_amount);
   if(subsequent_discount_amount || subsequent_discount_amount == 0){
-    data["subsequent_discount_amount"] = subsequent_discount_amount;
+    data["subsequent_discount_amount"] = this.getDecimalAmount(subsequent_discount_amount);
   }
   if(subsequent_discount_percent || subsequent_discount_percent == 0){
-    data["subsequent_discount_percent"] = subsequent_discount_percent;
+    data["subsequent_discount_percent"] = this.getDecimalAmount(subsequent_discount_percent);
   }
-  data['qty'] = quantity;
+  data['qty'] = this.getDecimalAmount(quantity);
   data['total'] = this.getDecimalAmount(gross_amount);
   data['quotation_effective_rate'] =  this.getDecimalAmount(gross_amount);
 
@@ -1918,9 +1925,9 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
       case "subsequent_offer_rate":
         let offer_rate = 0;
         if(incoming_field == "subsequent_offer_rate"){
-          offer_rate = data.subsequent_offer_rate;
+          offer_rate = this.getDecimalAmount(data.subsequent_offer_rate);
         }else{
-          offer_rate = data.offer_rate;
+          offer_rate = this.getDecimalAmount(data.offer_rate);
         }
         if (!this.coreFunctionService.isNotBlank(offer_rate)) {
           offer_rate = 0;
@@ -1961,9 +1968,9 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
             if(data.no_of_injection2 && data.no_of_injection2 > 0){
               if(quantity == 1){
                 subsequentGrossAmount = data.no_of_injection2;
-                subsequent_discount_amount = subsequentGrossAmount - data.subsequent_offer_rate;
+                subsequent_discount_amount = this.getDecimalAmount(subsequentGrossAmount - data.subsequent_offer_rate);
               }else{
-                subsequentGrossAmount = gross_amount - effectiveGrossAmount;
+                subsequentGrossAmount = this.getDecimalAmount(gross_amount - effectiveGrossAmount);
                 subsequent_discount_amount = subsequentGrossAmount - ( effectiveTotal - data.offer_rate);
               }
             }else{
@@ -2015,7 +2022,7 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
           }
         }else{
           if(data.no_of_injection2 && data.no_of_injection2 > 0){
-            subsequent_discount_amount = data.subsequent_discount_amount;
+            subsequent_discount_amount = this.getDecimalAmount(data.subsequent_discount_amount);
             if (!this.coreFunctionService.isNotBlank(subsequent_discount_amount)) {
               subsequent_discount_amount = 0;
             }
@@ -2292,7 +2299,7 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
       case 'unit_price':
         unit_price = 0;
         if (this.coreFunctionService.isNotBlank(templateValue.unit_price)) {
-          unit_price = templateValue.unit_price;
+          unit_price = this.getDecimalAmount(templateValue.unit_price);
         }
         net_amount = qty * unit_price;
 
@@ -2325,7 +2332,7 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
         net_amount = 0;
         if (paramArray.length > 0) {
           paramArray.forEach((data:any) => {
-            data['qty'] = qty;
+            data['qty'] = this.getDecimalAmount(qty);
             this.calculateParameterLimsSegmentWiseForSubsequent(lims_segment, data, field_name);
             gross_amount = gross_amount + data['total'];
             net_amount = net_amount + data['net_amount'];
@@ -2364,12 +2371,12 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
     unit_price = templateValue["unit_price"];
   }
 
-  templateValue['total'] = gross_amount;
+  templateValue['total'] = this.getDecimalAmount(gross_amount);
   templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
   templateValue['net_amount'] = this.getDecimalAmount(net_amount);
   templateValue['discount_percent'] = this.getDecimalAmount(discount_percent);
   templateValue['final_amount'] = this.getDecimalAmount(final_amount);
-  templateValue['unit_price'] = unit_price;
+  templateValue['unit_price'] = this.getDecimalAmount(unit_price);
   if (paramArray.length > 0) {
     templateValue['quotation_param_methods'] = paramArray;
   }

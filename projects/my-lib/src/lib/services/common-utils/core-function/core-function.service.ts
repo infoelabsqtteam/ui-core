@@ -155,4 +155,20 @@ export class CoreFunctionService {
     //const megaBytes = kiloBytes / 1024;
     return Number(kiloBytes);
   }
+  removeSpaceFromString(str:string){
+    if(str && typeof str == "string"){
+      return str.trim();
+    }else{
+      return str;
+    }
+  }
+  checkBlankProperties(data:any) {
+    const objWithoutNull:any = {...data};
+    Object.keys(objWithoutNull).forEach(key => {
+      if (objWithoutNull[key] === "") {
+        objWithoutNull[key] = null;
+      }
+    });
+    return objWithoutNull;
+  }
 }
