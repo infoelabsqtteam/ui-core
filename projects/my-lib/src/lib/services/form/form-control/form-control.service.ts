@@ -590,12 +590,10 @@ export class FormControlService {
 
   updateCustomizedValue(custmizedFormValue: any, index: number, value: any) {
     let response = {
-      custmizedFormValue: custmizedFormValue,
-      selectedListofStringIndex: index
+      custmizedFormValue: custmizedFormValue
     }
-    if (response.selectedListofStringIndex !== null && response.selectedListofStringIndex >= 0) {
-      response.custmizedFormValue[response.selectedListofStringIndex] = value;
-      response.selectedListofStringIndex = -1;
+    if (index !== null && index >= 0) {
+      response.custmizedFormValue[index] = value;
     } else {
       response.custmizedFormValue.push(value);
     }
@@ -604,8 +602,7 @@ export class FormControlService {
 
   editListOfString(parentfield: any,field: any,index: number,custmizedFormValue: any, templateForm: FormGroup ) {
     let response = {
-      templateForm: templateForm,
-      selectedListofStringIndex: index
+      templateForm: templateForm
     }
     let type = field.type;
     let fieldName = field.field_name
