@@ -161,8 +161,7 @@ export class StorageService {
     sessionStorage.setItem("FAVTABS",JSON.stringify(data))
   }
   GetFavTabs(){
-    const favTabsString = sessionStorage.getItem("FAVTABS");
-    return favTabsString ? JSON.parse(favTabsString) : null;
+    return JSON.parse(sessionStorage.getItem("FAVTABS") ?? 'null');
   }
   ClearFavTabs(){
     sessionStorage.removeItem("FAVTABS")

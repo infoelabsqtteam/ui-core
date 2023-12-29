@@ -897,42 +897,7 @@ export class CommonFunctionService {
     }
     this.apiService.SaveFormData(payload);
   }
-getAllTabs(tabs:any) {
-  const allTabs = tabs.reduce((acc: any, tab: any) => {
-    const tabRef = this.getTabRef(tab);
-    if (Object.keys(tabRef).length > 0) {
-      Object.assign(acc, tabRef);
-    }
-    return acc;
-  }, {});
-
-  return allTabs;
-}
-getFebTabs(tabs: any) {
-  return tabs
-  .filter((tab: any) => tab.febMenu === true)
-  .reduce((acc: any, tab: any) => {
-    const tabRef = this.getTabRef(tab);
-    if (Object.keys(tabRef).length > 0) {
-      Object.assign(acc, tabRef);
-    }
-    return acc;
-  }, {});
-}
-getTabRef(tab:any) {
-  let res: any = {};
-    if (tab && tab.tab_name != '' && tab.tab_name != null) {
-        const tabReference = {
-          reference:{
-              _id: tab._id,
-              name: tab.tab_name,
-              // febMenu: tab.febMenu,
-            }
-          };
-      res[tab.tab_name] = tabReference;
-    }
-    return res;
-}
+// Modifies the user preference object with the provided data
 modifiedMenuObj (data: any, fieldName: string, parent?: string) {
     let modifiedMenuObj = this.prepareMenuJson(data,fieldName, parent);
     let userPreference = {...this.storageService.getUserPreference()}
@@ -941,9 +906,10 @@ modifiedMenuObj (data: any, fieldName: string, parent?: string) {
     this.storageService.ClearFavTabs();
     return userPreference;
 }
+// Prepares a menu object from menu items
 prepareMenuJson(menuItems: any,fieldName:string, parent?: any) {
   let tabsData = this.dataShareService.getTempData()
-  const templateTabs = tabsData[0].templateTabs;
+  const templateTabs = tabsData?.[0]?.templateTabs ?? null;
   let favTabsLocal = this.storageService.GetFavTabs();
   let favTabs:any;
   if(favTabsLocal){
@@ -1007,9 +973,49 @@ prepareMenuJson(menuItems: any,fieldName:string, parent?: any) {
   });
   return menu;
 }
+// Gets all tab's reference Obj from the provided array of tabs
+getAllTabs(tabs:any) {
+  const allTabs = tabs.reduce((acc: any, tab: any) => {
+    const tabRef = this.getTabRef(tab);
+    if (Object.keys(tabRef).length > 0) {
+      Object.assign(acc, tabRef);
+    }
+    return acc;
+  }, {});
+
+  return allTabs;
+}
+// Gets only the tab's reference Obj with febMenu set to true from the provided array of tabs
+getFebTabs(tabs: any) {
+  return tabs
+  .filter((tab: any) => tab.febMenu === true)
+  .reduce((acc: any, tab: any) => {
+    const tabRef = this.getTabRef(tab);
+    if (Object.keys(tabRef).length > 0) {
+      Object.assign(acc, tabRef);
+    }
+    return acc;
+  }, {});
+}
+// Creates a reference object for a tab
+getTabRef(tab:any) {
+  let res: any = {};
+    if (tab && tab.tab_name != '' && tab.tab_name != null) {
+        const tabReference = {
+          reference:{
+              _id: tab._id,
+              name: tab.tab_name,
+            }
+          };
+      res[tab.tab_name] = tabReference;
+    }
+    return res;
+}
+// Checks if favTabs exist
 isFavExist(favTabs:any) {
   return favTabs !== undefined && Object.keys(favTabs).length !== 0;
 }
+// Merges existingMenus with newMenus
 mergeMenus(existingMenus: any, newMenus: any, parent: any) {
   const mergedMenus: any = { ...existingMenus };
   const checkFeb = this.checkFebMenuAddOrNot(newMenus, parent);
@@ -1023,7 +1029,6 @@ mergeMenus(existingMenus: any, newMenus: any, parent: any) {
                 ...mergedMenus[key].submenus,
                 ...newMenus[key].submenus,
               };
-
             } else {
               // If the key doesn't exist or doesn't have submenus, set submenus to newMenus
               mergedMenus[key] = newMenus[key];
@@ -1061,12 +1066,11 @@ mergeMenus(existingMenus: any, newMenus: any, parent: any) {
       }
     }
   }
-  // return {}
   return this.deleteEmptyMenus(mergedMenus);
 }
+// Deletes empty menus from the provided menus object
 deleteEmptyMenus(menus: any): any {
   const updatedMenus: any = { ...menus };
-
   for (const key in updatedMenus) {
     if (updatedMenus.hasOwnProperty(key) && updatedMenus[key].submenus != null) {
       if (Object.keys(updatedMenus[key].submenus).length === 0) {
@@ -1084,10 +1088,9 @@ deleteEmptyMenus(menus: any): any {
   }
   return updatedMenus;
 }
+// Checks if a menu should be added based on the febMenu condition
 checkFebMenuAddOrNot(menu: any, parent: any) {
-  
   let userFebMenu = this.getUserPreferenceByFieldName('menus');
-
   if (!menu || typeof menu !== 'object' || Object.keys(menu).length === 0) {
     return false;
   }
@@ -1097,7 +1100,6 @@ checkFebMenuAddOrNot(menu: any, parent: any) {
   }
 
   let menuId = Object.keys(menu).length > 0 ? menu[Object.keys(menu)[0]].reference?._id : null;
-
   // Check if parent and parent.reference are defined before accessing _id
   if (parent && parent !== '' && typeof parent === 'object' && userFebMenu) {
     for (const key in menu) {
@@ -1123,7 +1125,7 @@ checkFebMenuAddOrNot(menu: any, parent: any) {
     return false;
   }
 }
-
+// Checks if a given ID exists in the provided object
 isIdExist(obj: any, targetId: any) {
   for (const key in obj) {
     if (obj.hasOwnProperty(key) && obj[key].reference && obj[key].reference._id === targetId) {
