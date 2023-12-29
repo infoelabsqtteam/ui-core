@@ -447,4 +447,37 @@ export class AuthService implements OnInit{
     return exists;
   }
 
+  authenticateUser(payload:any){
+    let response = {
+      status: '',
+      class: '',
+      msg: '',
+      message:''
+    };
+    let api = this.envService.getAuthApi('TWO_FACTOR_AUTHENTICATION');
+    this.http.post(api, this.encryptionService.encryptRequest(payload)).subscribe(
+      (respData:any) =>{
+        if(respData && respData['token']){
+            const cognitoIdToken = respData['token'];
+            const cognitoExpiresIn = 86400;
+            this.storageService.setExpiresIn(cognitoExpiresIn);
+            this.storageService.SetIdToken(cognitoIdToken);
+            response.status = 'success';
+            response.class = 'bg-success';
+            response.msg = 'Login  Successful.';
+            if(respData['message']){
+              response.message = respData['message'];
+            }
+            this.authDataShareService.setAuthentication(true);
+            this.authDataShareService.setAuthenticationResponce(response);
+        }
+      },
+      (error)=>{
+        response.msg = error.message;
+        response.status = 'error';
+        response.class = 'bg-danger';
+        this.authDataShareService.setAuthenticationResponce(response);
+      }
+    )
+  }
 }
