@@ -129,11 +129,12 @@ export class CoreFunctionService {
     }
     return value;
   }
-  prepareTemplate(tempList:any){
+  prepareTemplate(tempList:any,moduleName:string){
     let preParedList:any = {};
     if(tempList && tempList.length > 0){
       tempList.forEach((temp:any) => {
-        preParedList[temp.name] = temp;
+        let name = moduleName+"_"+temp.name;
+        preParedList[name] = temp;
       });
     }
     return preParedList;

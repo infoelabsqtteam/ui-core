@@ -195,8 +195,9 @@ resetMenuData(){
   this.dataShareService.shareMenuData([])
 }
 GetTempData(payload:any){
+  let moduleName = payload['module'];
   let name = this.coreFunctionService.getTempNameFromPayload(payload);
-  let template = this.stroageService.getTemplate(name);
+  let template = this.stroageService.getTemplate(name,moduleName);
   if(template){
     this.dataShareService.shareTempData([template]);
   }else{
@@ -204,7 +205,7 @@ GetTempData(payload:any){
     this.http.post(api, payload).subscribe(
       (respData) => {
           this.dataShareService.shareTempData(respData);
-          let preparedTempList = this.coreFunctionService.prepareTemplate(respData);
+          let preparedTempList = this.coreFunctionService.prepareTemplate(respData,moduleName);
           this.stroageService.storeAllTemplate(preparedTempList)
         },
       (error) => {
