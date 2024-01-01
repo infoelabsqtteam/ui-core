@@ -1047,9 +1047,12 @@ export class CommonFunctionService {
   }
   // Gets all tab's reference Obj from the provided array of tabs
   getAllTabs(tabs:any) {
+    if (!tabs) {
+      return {};
+    }
     const allTabs = tabs.reduce((acc: any, tab: any) => {
       const tabRef = this.getTabRef(tab);
-      if (Object.keys(tabRef).length > 0) {
+      if (tabRef && Object.keys(tabRef).length > 0) {
         Object.assign(acc, tabRef);
       }
       return acc;
@@ -1059,11 +1062,14 @@ export class CommonFunctionService {
   }
   // Gets only the tab's reference Obj with febMenu set to true from the provided array of tabs
   getFebTabs(tabs: any) {
+    if (!tabs) {
+      return {};
+    }
     return tabs
     .filter((tab: any) => tab.febMenu === true)
     .reduce((acc: any, tab: any) => {
       const tabRef = this.getTabRef(tab);
-      if (Object.keys(tabRef).length > 0) {
+      if (tabRef && Object.keys(tabRef).length > 0) {
         Object.assign(acc, tabRef);
       }
       return acc;
@@ -1077,6 +1083,7 @@ export class CommonFunctionService {
             reference:{
                 _id: tab._id,
                 name: tab.tab_name,
+                // select : true
               }
             };
         res[tab.tab_name] = tabReference;
@@ -1211,10 +1218,7 @@ export class CommonFunctionService {
     for (const key in userFebMenu) {
       if (userFebMenu.hasOwnProperty(key)) {
         const menu = userFebMenu[key];
-        if (
-          (menu.reference && menu.reference._id === targetMenu._id) ||
-          menu.reference.name === targetMenu.name
-        ) {
+        if (menu.reference && menu.reference._id === targetMenu._id) {
           return true; 
         }
         if (menu.submenus) {
