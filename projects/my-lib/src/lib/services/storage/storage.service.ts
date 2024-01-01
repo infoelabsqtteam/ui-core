@@ -706,11 +706,12 @@ export class StorageService {
     //return this.encryptionService.decryptRequest(allTemplate);
     return obj;
   }
-  getTemplate(tempName:string){
+  getTemplate(tempName:string,moduleName:string){
     let templateList:any = this.getAllTemplateList();
     //console.log(templateList);
     if(templateList && templateList[tempName]){
-      return templateList[tempName];
+      let name = moduleName+"_"+tempName;
+      return templateList[name];
     }else{
       return null;
     }
