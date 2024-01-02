@@ -617,4 +617,36 @@ constructor(
   }
 
 
+  compareAuditHistoryData(formFieldsData:any,currentObjectData:any,previousObjectData:any){
+      let formFields = formFieldsData;
+      let currentObj = {};
+      let previousObject = {};
+      for (let i = 0; i < formFields.length; i++ ) {
+        let field = formFields[i];
+        let isChanged = false;
+        if(field && field.field_name) {
+            currentObj = currentObjectData[field.field_name];
+            previousObject = previousObjectData[field.field_name];
+            if(currentObj != null && currentObj != undefined && typeof currentObj == 'object'){
+              currentObj = currentObjectData[field.field_name].name;
+              previousObject = previousObjectData[field.field_name].name;
+              if(currentObj != previousObject) {
+                isChanged = true;
+              }
+            }else {
+              if(currentObj != previousObject){
+                isChanged = true;
+              }
+            }
+            field['isChanged'] = isChanged; 
+            formFieldsData[i] = field;
+        }
+      }
+  }
+
+
+
+
+
+
 }
