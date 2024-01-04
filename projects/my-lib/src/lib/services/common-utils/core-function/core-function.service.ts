@@ -16,6 +16,10 @@ export class CoreFunctionService {
   getModulesFormMapObject(obj:any){
     let user = obj.user;
     let permissions = obj.permission;
+    //Set My Favorite Module at Top
+    if(permissions?.MYFAV){
+      permissions = { MYFAV: permissions.MYFAV, ...permissions };
+    }
     let utvn:any = {};
     let modules:any = [];
     let permissionList = {};
