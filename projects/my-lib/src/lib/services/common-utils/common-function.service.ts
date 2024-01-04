@@ -961,32 +961,43 @@ export class CommonFunctionService {
 
 
   updateUserPreference(data:object,fieldName:string,parent?:string){
-    // let payloadData = this.getUserPreferenceObj(data,fieldName,parent);
-    let payloadData = this.modifiedMenuObj(data,fieldName,parent);
+    let payloadData     
+    switch(fieldName) {
+      case 'favouriteMenus':
+        payloadData = this.modifiedMenuObj(data,fieldName,parent);
+        break;
+      case 'tab':
+        payloadData = this.addOrRemoveTabs(data);
+        break;
+      default:
+        payloadData = this.storageService.getUserPreference()
+        break;
+    }
     let payload = {
       "curTemp" : "user_preference",
       "data" : payloadData
     }
     this.apiService.SaveFormData(payload);
   }
+
+  addOrRemoveTabs(tab:any){
+    let menuIndexs = this.dataShareService.getMenuOrSubmenuIndexs()
+    let modules = this.storageService.GetModules()
+    let extractedMenu =  this.extractMenuDetails(tab,modules,menuIndexs);
+    let userPreference = this.updateFavTabs(extractedMenu,tab)
+    return userPreference;
+  }
   // Modifies the user preference object with the provided data
   modifiedMenuObj (data: any, fieldName: string, parent?: string) {
       let modifiedMenuObj = this.prepareMenuJson(data,fieldName, parent);
       let userPreference = {...this.storageService.getUserPreference()}
       userPreference[fieldName] = this.mergeMenus(userPreference[fieldName], modifiedMenuObj,parent);
-      this.storageService.setUserPreference(userPreference);
-      this.storageService.ClearFavTabs();
       return userPreference;
   }
   // Prepares a menu object from menu items
   prepareMenuJson(menuItems: any,fieldName:string, parent?: any) {
     let tabsData = this.dataShareService.getTempData()
     const templateTabs = tabsData?.[0]?.templateTabs ?? null;
-    let favTabsLocal = this.storageService.GetFavTabs();
-    let favTabs:any;
-    if(favTabsLocal){
-      favTabs = this.getFebTabs(favTabsLocal);
-    }
     const allTabs = this.getAllTabs(templateTabs)
     const menu: any = {};
     const itemsArray = Array.isArray(menuItems) ? menuItems : [menuItems];
@@ -994,7 +1005,7 @@ export class CommonFunctionService {
         const menuReference = {
             _id: item._id,
             name: item.name,
-            allSelected: !this.isFavExist(favTabs)
+            allSelected: true
         };
 
         let menuData: any;
@@ -1018,13 +1029,11 @@ export class CommonFunctionService {
               let refObj:any =  {
                 reference: {
                   ...this.getReferenceObject(menuItems),
-                  allSelected:!this.isFavExist(favTabs)
+                  allSelected:true
                 },
-                templateTabs:this.isFavExist(favTabs) ? favTabs : allTabs
+                templateTabs: allTabs
                 }
               let parObjRef : any = this.getReferenceObject(parent);
-              // let submenus = menus[parent.name];
-              // if(submenus){
                 menuData = {
                     reference: parObjRef,
                     submenus: { 
@@ -1037,7 +1046,7 @@ export class CommonFunctionService {
               menuData = {
                   reference: menuReference,
                   submenus: null,
-                  templateTabs: this.isFavExist(favTabs) ? favTabs : allTabs
+                  templateTabs:  allTabs
               };
             menu[item.name] = menuData;
             return menu;
@@ -1060,21 +1069,6 @@ export class CommonFunctionService {
 
     return allTabs;
   }
-  // Gets only the tab's reference Obj with febMenu set to true from the provided array of tabs
-  getFebTabs(tabs: any) {
-    if (!tabs) {
-      return {};
-    }
-    return tabs
-    .filter((tab: any) => tab.febMenu === true)
-    .reduce((acc: any, tab: any) => {
-      const tabRef = this.getTabRef(tab);
-      if (tabRef && Object.keys(tabRef).length > 0) {
-        Object.assign(acc, tabRef);
-      }
-      return acc;
-    }, {});
-  }
   // Creates a reference object for a tab
   getTabRef(tab:any) {
     let res: any = {};
@@ -1089,10 +1083,6 @@ export class CommonFunctionService {
         res[tab.tab_name] = tabReference;
       }
       return res;
-  }
-  // Checks if favTabs exist
-  isFavExist(favTabs:any) {
-    return favTabs !== undefined && Object.keys(favTabs).length !== 0;
   }
   // Merges existingMenus with newMenus
   mergeMenus(existingMenus: any, newMenus: any, parent: any) {
@@ -1156,20 +1146,29 @@ export class CommonFunctionService {
           // Delete the menu if submenus is empty
           delete updatedMenus[key];
         } else {
-          // Check templateTabs condition
-          const templateTabs = updatedMenus[key].submenus.templateTabs;
+          let subMenus = updatedMenus[key].submenus;
+          for (const subMenuKey in subMenus){
+            // Check templateTabs condition
+            const templateTabs = updatedMenus[key].submenus[subMenuKey].templateTabs;
+            if (templateTabs != null && Object.keys(templateTabs).length === 0) {
+              // Delete the menu if templateTabs is empty
+              delete updatedMenus[key];
+            }
+          }
+        }
+      }else{
+        const templateTabs = updatedMenus[key].templateTabs;
           if (templateTabs != null && Object.keys(templateTabs).length === 0) {
             // Delete the menu if templateTabs is empty
             delete updatedMenus[key];
           }
-        }
       }
     }
     return updatedMenus;
   }
   // Checks if a menu should be added based on the febMenu condition
   checkFebMenuAddOrNot(menu: any, parent: any) {
-    let userFebMenu = this.getUserPreferenceByFieldName('menus');
+    let userFebMenu = this.getUserPreferenceByFieldName('favouriteMenus');
     if (!menu || typeof menu !== 'object' || Object.keys(menu).length === 0) {
       return false;
     }
@@ -1243,7 +1242,139 @@ export class CommonFunctionService {
     }
     return data;
   }
+  // Extract the menu and submenu data for tab
+  extractMenuDetails(tab:any,data: any[], indices: { menuIndex: number, submenuIndex: number, moduleIndex: number }) {
+    const { menuIndex, submenuIndex, moduleIndex } = indices;
+    let newMenu:any = {}
+    let tabRef = this.getTabRef(tab)
 
+    if(submenuIndex!=-1 ){
+      let submenu = data[moduleIndex]?.["menu_list"][menuIndex]?.["submenu"]?.[submenuIndex];
+      let parent = data[moduleIndex]?.["menu_list"][menuIndex];      
+      newMenu[parent.name] = {
+        reference: this.getReferenceObject(parent),
+        submenus: { 
+          [submenu.name]: {
+            reference : {
+              ...this.getReferenceObject(submenu),
+              allSelected:false
+            },
+            templateTabs:{...tabRef}
+          }
+        },
+    };
+      
+    }else{
+      let menu = data[moduleIndex]?.["menu_list"][menuIndex];
+      newMenu[menu.name] = {
+        reference: {...this.getReferenceObject(menu), allSelected:false},
+        templateTabs: {...tabRef}
+      }
+    }
+    return newMenu;
+  }
+  //update tabs
+  updateFavTabs(newMenus:any, tab:any) {
+    let existingUserPreferences = { ...this.storageService.getUserPreference() }
+    let existingMenus = existingUserPreferences['favouriteMenus'];
+    let updatedMenus = { ...existingMenus };
+    let favExist = this.checkFebTabAddOrNot(tab);
+
+    if (!favExist) {
+        for (let menuName in newMenus) {
+            if (newMenus.hasOwnProperty(menuName)) {
+                let newMenu = newMenus[menuName];
+
+                if (existingMenus.hasOwnProperty(menuName)) {
+                    let existingMenu = existingMenus[menuName];
+
+                    existingMenu.reference = newMenu.reference;
+                    if (!existingMenu.submenus) {
+                        if (existingMenu.templateTabs && newMenu.templateTabs) {
+                            delete existingMenu.templateTabs[tab.tab_name];
+                            if (existingMenu.submenus && newMenu.submenus) {
+                                existingMenu.templateTabs = { ...existingMenu.templateTabs, ...newMenu.templateTabs };
+                            } else {
+                                existingMenu.templateTabs = { ...existingMenu.templateTabs, ...newMenu.templateTabs };
+                            }
+                        }
+                    } else {
+                        for (let subMenuKey in newMenu.submenus) {
+                            if (newMenu.submenus.hasOwnProperty(subMenuKey)) {
+                                let newSubMenu = newMenu.submenus[subMenuKey];
+
+                                if (existingMenu.submenus.hasOwnProperty(subMenuKey)) {
+                                    let existingSubMenu = existingMenu.submenus[subMenuKey];
+                                    existingSubMenu.reference = newSubMenu.reference;
+                                    if (existingSubMenu.templateTabs && newSubMenu.templateTabs) {
+                                        existingSubMenu.templateTabs = { ...existingSubMenu.templateTabs, ...newSubMenu.templateTabs };
+                                    } else {
+                                        existingSubMenu.templateTabs = newSubMenu.templateTabs;
+                                    }
+                                } else {
+                                    existingMenu.submenus[subMenuKey] = { ...newSubMenu };
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    updatedMenus[menuName] = { ...newMenu };
+                }
+            }
+        }
+    }
+    if (favExist) {
+        for (let menuName in existingMenus) {
+          if (existingMenus.hasOwnProperty(menuName)) {
+                let newMenu = newMenus[menuName];
+                let existingMenu = existingMenus[menuName];
+                if(newMenu){
+                  existingMenu.reference = newMenu.reference;
+                }
+                if (!existingMenu.submenus) {
+                    if (existingMenu.templateTabs && existingMenu.templateTabs[tab.tab_name]) {
+                        delete existingMenu.templateTabs[tab.tab_name];
+                    }
+                } else {
+                    for (let subMenuKey in existingMenu.submenus) {
+                        if (existingMenu.submenus.hasOwnProperty(subMenuKey)) {
+                            let existingSubMenu = existingMenu.submenus[subMenuKey];
+                            if (existingSubMenu.templateTabs && existingSubMenu.templateTabs[tab.tab_name]) {
+                                delete existingSubMenu.templateTabs[tab.tab_name];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    updatedMenus = this.deleteEmptyMenus(updatedMenus);
+    existingUserPreferences['favouriteMenus'] = updatedMenus;
+    // this.storageService.setUserPreference(existingUserPreferences);
+
+    return existingUserPreferences;
+  }
+  checkFebTabAddOrNot(tab:any) {
+    const menus = this.storageService.getUserPreference()?.['favouriteMenus'] || {};
+    return this.isIdExistInTemplateTabs(menus, tab._id);
+  }
+  isIdExistInTemplateTabs(obj: any, targetId: string): boolean {
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const value = obj[key];
+
+        if (value && typeof value === 'object') {
+          // Recursively search in nested objects
+          if (this.isIdExistInTemplateTabs(value, targetId)) {
+            return true;
+          }
+        } else if (key === "_id" && value === targetId) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
   getUserPreferenceObj(data:any,fieldName:string,parent?:string){
     let refObj:any = this.getReferenceObject(data);
     if(parent != ''){
@@ -1324,7 +1455,9 @@ export class CommonFunctionService {
   getReferenceObject(obj:any){
     let ref:any = {}
     ref["_id"]=obj._id;
-    ref["code"] = obj.code;
+    if(obj.code!=null){
+      ref["code"] = obj.code;
+    }
     ref["name"] = obj.name;
     if(obj.version != null){
       ref["version"] = obj.version
