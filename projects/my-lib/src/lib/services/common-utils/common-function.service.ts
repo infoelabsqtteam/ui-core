@@ -958,6 +958,100 @@ export class CommonFunctionService {
   });
    return listOfObjects;
   }
+  getUserPreferenceObj(data: any, fieldName: string, parent?: string) {
+    let refObj: any = this.getReferenceObject(data);
+    if (parent != '') {
+      refObj = parent;
+    }
+    if (fieldName == 'favoriteMenus') {
+      refObj = data;
+    }
+    let uRef: any = {};
+    let userPreference = this.storageService.getUserPreference();
+    if (
+      userPreference &&
+      userPreference._id &&
+      userPreference._id != null &&
+      userPreference._id != ''
+    ) {
+      let fieldData = userPreference[fieldName];
+      if (fieldData && fieldData.length > 0) {
+        let matchIndex = -1;
+        for (let index = 0; index < fieldData.length; index++) {
+          const element = fieldData[index];
+          if (element._id == refObj._id) {
+            matchIndex = index;
+            break;
+          }
+        }
+        if (matchIndex > -1) {
+          if (parent != '') {
+            let submenu = fieldData[matchIndex].submenu;
+            let submenuMatchIndex = -1;
+            if (submenu && submenu.length > 0) {
+              for (let j = 0; j < submenu.length; j++) {
+                const subMenu = submenu[j];
+                if (subMenu._id == data._id) {
+                  submenuMatchIndex = j;
+                  break;
+                }
+              }
+            }
+            if (submenuMatchIndex > -1) {
+              submenu.splice(submenuMatchIndex);
+              if (fieldData[matchIndex].submenu.length == 0) {
+                fieldData.splice(matchIndex);
+              } else {
+                fieldData[matchIndex].submenu = submenu;
+              }
+            } else {
+              if (submenu.length > 0) {
+                fieldData[matchIndex].submenu.push(data);
+              } else {
+                fieldData[matchIndex].submenu = [];
+                fieldData[matchIndex].submenu.push(data);
+              }
+            }
+          } else {
+            fieldData.splice(matchIndex, 1);
+          }
+        } else {
+          if (parent != '') {
+            refObj['submenu'] = [];
+            refObj['submenu'].push(data);
+            fieldData.push(refObj);
+          } else {
+            fieldData.push(refObj);
+          }
+        }
+      } else {
+        fieldData = [];
+        fieldData.push(refObj);
+      }
+      userPreference[fieldName] = fieldData;
+      uRef = userPreference;
+    } else {
+      let user = this.storageService.GetUserInfo();
+      let userRef = this.getReferenceObject(user);
+      let dataList = [];
+      dataList.push(refObj);
+      uRef['userId'] = userRef;
+      uRef[fieldName] = dataList;
+    }
+    return uRef;
+  }
+  getReferenceObject(obj: any) {
+    let ref: any = {};
+    ref['_id'] = obj._id;
+    if (obj.code != null) {
+      ref['code'] = obj.code;
+    }
+    ref['name'] = obj.name;
+    if (obj.version != null) {
+      ref['version'] = obj.version;
+    }
+    return ref;
+  }
   dateDiff(dateSent:any){
     let obj:any={};
     let currentDate = new Date();

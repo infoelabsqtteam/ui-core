@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
 import { ApiService } from '../api/api.service';
 import { DataShareService } from '../data-share/data-share.service';
+import { CommonFunctionService } from '../common-utils/common-function.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,8 @@ export class UserPrefrenceService {
   constructor(
     private storageService: StorageService,
     private apiService: ApiService,
-    private dataShareService: DataShareService
+    private dataShareService: DataShareService,
+    private commonFunctionService: CommonFunctionService
   ) {}
 
   updateUserPreference(data: object, fieldName: string, parent?: string) {
@@ -72,7 +74,7 @@ export class UserPrefrenceService {
       let userPreference = this.storageService.getUserPreference();
       if (!userPreference) {
         let uref: any = {};
-        let userRef = this.getReferenceObject(
+        let userRef = this.commonFunctionService.getReferenceObject(
           this.storageService.GetUserInfo()
         );
         uref['userId'] = userRef;
@@ -90,12 +92,12 @@ export class UserPrefrenceService {
         // If parent exists and has a submenu, add the current menu to the existing submenu
         let refObj: any = {
           reference: {
-            ...this.getReferenceObject(menuItems),
+            ...this.commonFunctionService.getReferenceObject(menuItems),
             allSelected: true,
           },
           templateTabs: allTabs,
         };
-        let parObjRef: any = this.getReferenceObject(parent);
+        let parObjRef: any = this.commonFunctionService.getReferenceObject(parent);
         menuData = {
           reference: parObjRef,
           submenus: {
@@ -355,11 +357,11 @@ export class UserPrefrenceService {
         ];
       let parent = data[moduleIndex]?.['menu_list'][menuIndex];
       newMenu[parent.name] = {
-        reference: this.getReferenceObject(parent),
+        reference: this.commonFunctionService.getReferenceObject(parent),
         submenus: {
           [submenu.name]: {
             reference: {
-              ...this.getReferenceObject(submenu),
+              ...this.commonFunctionService.getReferenceObject(submenu),
               allSelected: false,
             },
             templateTabs: { ...tabRef },
@@ -369,7 +371,7 @@ export class UserPrefrenceService {
     } else {
       let menu = data[moduleIndex]?.['menu_list'][menuIndex];
       newMenu[menu.name] = {
-        reference: { ...this.getReferenceObject(menu), allSelected: false },
+        reference: { ...this.commonFunctionService.getReferenceObject(menu), allSelected: false },
         templateTabs: { ...tabRef },
       };
     }
@@ -497,99 +499,5 @@ export class UserPrefrenceService {
       }
     }
     return false;
-  }
-  getUserPreferenceObj(data: any, fieldName: string, parent?: string) {
-    let refObj: any = this.getReferenceObject(data);
-    if (parent != '') {
-      refObj = parent;
-    }
-    if (fieldName == 'favoriteMenus') {
-      refObj = data;
-    }
-    let uRef: any = {};
-    let userPreference = this.storageService.getUserPreference();
-    if (
-      userPreference &&
-      userPreference._id &&
-      userPreference._id != null &&
-      userPreference._id != ''
-    ) {
-      let fieldData = userPreference[fieldName];
-      if (fieldData && fieldData.length > 0) {
-        let matchIndex = -1;
-        for (let index = 0; index < fieldData.length; index++) {
-          const element = fieldData[index];
-          if (element._id == refObj._id) {
-            matchIndex = index;
-            break;
-          }
-        }
-        if (matchIndex > -1) {
-          if (parent != '') {
-            let submenu = fieldData[matchIndex].submenu;
-            let submenuMatchIndex = -1;
-            if (submenu && submenu.length > 0) {
-              for (let j = 0; j < submenu.length; j++) {
-                const subMenu = submenu[j];
-                if (subMenu._id == data._id) {
-                  submenuMatchIndex = j;
-                  break;
-                }
-              }
-            }
-            if (submenuMatchIndex > -1) {
-              submenu.splice(submenuMatchIndex);
-              if (fieldData[matchIndex].submenu.length == 0) {
-                fieldData.splice(matchIndex);
-              } else {
-                fieldData[matchIndex].submenu = submenu;
-              }
-            } else {
-              if (submenu.length > 0) {
-                fieldData[matchIndex].submenu.push(data);
-              } else {
-                fieldData[matchIndex].submenu = [];
-                fieldData[matchIndex].submenu.push(data);
-              }
-            }
-          } else {
-            fieldData.splice(matchIndex, 1);
-          }
-        } else {
-          if (parent != '') {
-            refObj['submenu'] = [];
-            refObj['submenu'].push(data);
-            fieldData.push(refObj);
-          } else {
-            fieldData.push(refObj);
-          }
-        }
-      } else {
-        fieldData = [];
-        fieldData.push(refObj);
-      }
-      userPreference[fieldName] = fieldData;
-      uRef = userPreference;
-    } else {
-      let user = this.storageService.GetUserInfo();
-      let userRef = this.getReferenceObject(user);
-      let dataList = [];
-      dataList.push(refObj);
-      uRef['userId'] = userRef;
-      uRef[fieldName] = dataList;
-    }
-    return uRef;
-  }
-  getReferenceObject(obj: any) {
-    let ref: any = {};
-    ref['_id'] = obj._id;
-    if (obj.code != null) {
-      ref['code'] = obj.code;
-    }
-    ref['name'] = obj.name;
-    if (obj.version != null) {
-      ref['version'] = obj.version;
-    }
-    return ref;
   }
 }
