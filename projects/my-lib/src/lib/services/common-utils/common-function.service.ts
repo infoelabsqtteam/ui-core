@@ -1149,10 +1149,10 @@ export class CommonFunctionService {
           let subMenus = updatedMenus[key].submenus;
           for (const subMenuKey in subMenus){
             // Check templateTabs condition
-            const templateTabs = updatedMenus[key].submenus[subMenuKey].templateTabs;
+            const templateTabs = updatedMenus[key]?.submenus[subMenuKey]?.templateTabs;
             if (templateTabs != null && Object.keys(templateTabs).length === 0) {
               // Delete the menu if templateTabs is empty
-              delete updatedMenus[key];
+              delete updatedMenus[key].submenus[subMenuKey];
             }
           }
         }
