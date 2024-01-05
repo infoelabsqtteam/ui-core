@@ -72,7 +72,6 @@ export class CoreFunctionService {
     }
     let modifiedModules = this.setDefaultIndex(modules);
     utvn['modules'] = this.sortMenu(modifiedModules)
-    console.log(  );
     utvn['permission'] = permissionList;
     utvn['user'] = user;
     return utvn;
