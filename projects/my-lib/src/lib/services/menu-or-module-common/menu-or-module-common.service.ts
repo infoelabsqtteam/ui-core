@@ -204,7 +204,7 @@ constructor(
     }
     for (let index = 0; index < menuList.length; index++) {
       const menu = menuList[index];
-      if(menu.name == menuName){
+      if(!menu.submenu && menu.name == menuName){
         indexs.menuindex = index;
         indexs.submenuindex = -1;
       }else{
