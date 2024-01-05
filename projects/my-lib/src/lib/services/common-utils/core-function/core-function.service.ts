@@ -107,7 +107,7 @@ export class CoreFunctionService {
   setDefaultIndexForModules(modules:any){
     modules.forEach((module:any) => {
       if(!module?.index){
-        module["index"] = 0;
+        module["index"] = 9999;
       }
     })
     return modules;
