@@ -70,7 +70,7 @@ export class CoreFunctionService {
         modules.push(moduleObj);
       });
     }
-    let modifiedModules = this.setDefaultIndex(modules);
+    let modifiedModules = this.setDefaultIndexForModules(modules);
     utvn['modules'] = this.sortMenu(modifiedModules)
     utvn['permission'] = permissionList;
     utvn['user'] = user;
@@ -104,7 +104,7 @@ export class CoreFunctionService {
       }
     }
   }
-  setDefaultIndex(modules:any){
+  setDefaultIndexForModules(modules:any){
     modules.forEach((module:any) => {
       if(!module?.index){
         module["index"] = 0;
