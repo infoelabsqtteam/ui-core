@@ -105,11 +105,14 @@ export class CoreFunctionService {
     }
   }
   setDefaultIndexForModules(modules:any){
-    modules.forEach((module:any) => {
-      if(!module?.index){
-        module["index"] = 9999;
-      }
-    })
+    if(modules?.length>0){
+      let maxIndex = modules.length
+      modules.forEach((module:any) => {
+        if(!module?.index){
+        module["index"] = maxIndex;
+        }
+      })
+    }
     return modules;
   }
   sortMenu(menuList:any){
