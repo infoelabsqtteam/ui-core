@@ -16,10 +16,6 @@ export class CoreFunctionService {
   getModulesFormMapObject(obj:any){
     let user = obj.user;
     let permissions = obj.permission;
-    //Set My Favorite Module at Top
-    if(permissions?.MYFAV){
-      permissions = { MYFAV: permissions.MYFAV, ...permissions };
-    }
     let utvn:any = {};
     let modules:any = [];
     let permissionList = {};
@@ -74,7 +70,9 @@ export class CoreFunctionService {
         modules.push(moduleObj);
       });
     }
-    utvn['modules'] = modules;
+    let modifiedModules = this.setDefaultIndex(modules);
+    utvn['modules'] = this.sortMenu(modifiedModules)
+    console.log(  );
     utvn['permission'] = permissionList;
     utvn['user'] = user;
     return utvn;
@@ -106,6 +104,14 @@ export class CoreFunctionService {
         });
       }
     }
+  }
+  setDefaultIndex(modules:any){
+    modules.forEach((module:any) => {
+      if(!module?.index){
+        module["index"] = 0;
+      }
+    })
+    return modules;
   }
   sortMenu(menuList:any){
     let list:any=[];
