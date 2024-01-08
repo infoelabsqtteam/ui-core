@@ -74,7 +74,6 @@ export class UserPrefrenceService {
       let userPreference = this.storageService.getUserPreference();
       if (!userPreference) {
         userPreference = this.createUserPreference(fieldName);
-        this.storageService.setUserPreference(userPreference);
       }
       let menus = userPreference[fieldName];
       if (parent && menus) {
@@ -382,7 +381,6 @@ export class UserPrefrenceService {
     let existingUserPreferences = {...this.storageService.getUserPreference()};
     if(Object.keys(existingUserPreferences).length == 0){
       existingUserPreferences = this.createUserPreference('favouriteMenus');
-      this.storageService.setUserPreference(existingUserPreferences);
     }
     let existingMenus = existingUserPreferences['favouriteMenus'];
     let updatedMenus = { ...existingMenus };
