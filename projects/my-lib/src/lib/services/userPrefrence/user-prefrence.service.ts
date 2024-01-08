@@ -65,29 +65,16 @@ export class UserPrefrenceService {
     const itemsArray = Array.isArray(menuItems) ? menuItems : [menuItems];
     itemsArray.forEach((item) => {
       const menuReference = {
-        _id: item._id,
-        name: item.name,
+        ...this.commonFunctionService.getReferenceObject(item),
         allSelected: true,
       };
 
       let menuData: any;
       let userPreference = this.storageService.getUserPreference();
       if (!userPreference) {
-        let uref: any = {};
-        let userRef = this.commonFunctionService.getReferenceObject(
-          this.storageService.GetUserInfo()
-        );
-        uref['userId'] = userRef;
-        userPreference = uref;
-        this.storageService.setUserPreference(userPreference);
+        userPreference = this.createUserPreference(fieldName);
       }
       let menus = userPreference[fieldName];
-
-      if (!menus) {
-        menus = {};
-        userPreference[fieldName] = menus;
-      }
-
       if (parent && menus) {
         // If parent exists and has a submenu, add the current menu to the existing submenu
         let refObj: any = {
@@ -118,6 +105,17 @@ export class UserPrefrenceService {
     });
     return menu;
   }
+  //Create UserPreference when not exist
+  createUserPreference(fieldName:string){
+    let uref: any = {};
+    let userRef = this.commonFunctionService.getReferenceObject(
+      this.storageService.GetUserInfo()
+    );
+    uref['userId'] = userRef;
+    //set empty obj for required key
+    uref[fieldName] = {}
+    return uref;
+  }
   // Gets all tab's reference Obj from the provided array of tabs
   getAllTabs(tabs: any) {
     if (!tabs) {
@@ -138,11 +136,7 @@ export class UserPrefrenceService {
     let res: any = {};
     if (tab && tab.tab_name != '' && tab.tab_name != null) {
       const tabReference = {
-        reference: {
-          _id: tab._id,
-          name: tab.tab_name,
-          // select : true
-        },
+        reference: this.commonFunctionService.getReferenceObject(tab),
       };
       res[tab.tab_name] = tabReference;
     }
@@ -364,7 +358,7 @@ export class UserPrefrenceService {
               ...this.commonFunctionService.getReferenceObject(submenu),
               allSelected: false,
             },
-            templateTabs: { ...tabRef },
+            templateTabs: tabRef,
           },
         },
       };
@@ -372,16 +366,17 @@ export class UserPrefrenceService {
       let menu = data[moduleIndex]?.['menu_list'][menuIndex];
       newMenu[menu.name] = {
         reference: { ...this.commonFunctionService.getReferenceObject(menu), allSelected: false },
-        templateTabs: { ...tabRef },
+        templateTabs: tabRef,
       };
     }
     return newMenu;
   }
   //update tabs
   updateFavTabs(newMenus: any, tab: any) {
-    let existingUserPreferences = {
-      ...this.storageService.getUserPreference(),
-    };
+    let existingUserPreferences = {...this.storageService.getUserPreference()};
+    if(Object.keys(existingUserPreferences).length == 0){
+      existingUserPreferences = this.createUserPreference('favouriteMenus');
+    }
     let existingMenus = existingUserPreferences['favouriteMenus'];
     let updatedMenus = { ...existingMenus };
     let favExist = this.checkFebTabAddOrNot(tab);
