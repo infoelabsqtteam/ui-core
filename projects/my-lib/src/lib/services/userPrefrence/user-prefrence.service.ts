@@ -73,21 +73,10 @@ export class UserPrefrenceService {
       let menuData: any;
       let userPreference = this.storageService.getUserPreference();
       if (!userPreference) {
-        let uref: any = {};
-        let userRef = this.commonFunctionService.getReferenceObject(
-          this.storageService.GetUserInfo()
-        );
-        uref['userId'] = userRef;
-        userPreference = uref;
+        userPreference = this.createUserPreference(fieldName);
         this.storageService.setUserPreference(userPreference);
       }
       let menus = userPreference[fieldName];
-
-      if (!menus) {
-        menus = {};
-        userPreference[fieldName] = menus;
-      }
-
       if (parent && menus) {
         // If parent exists and has a submenu, add the current menu to the existing submenu
         let refObj: any = {
@@ -117,6 +106,17 @@ export class UserPrefrenceService {
       }
     });
     return menu;
+  }
+  //Create UserPreference when not exist
+  createUserPreference(fieldName:string){
+    let uref: any = {};
+    let userRef = this.commonFunctionService.getReferenceObject(
+      this.storageService.GetUserInfo()
+    );
+    uref['userId'] = userRef;
+    //set empty obj for required key
+    uref[fieldName] = {}
+    return uref;
   }
   // Gets all tab's reference Obj from the provided array of tabs
   getAllTabs(tabs: any) {
@@ -379,9 +379,11 @@ export class UserPrefrenceService {
   }
   //update tabs
   updateFavTabs(newMenus: any, tab: any) {
-    let existingUserPreferences = {
-      ...this.storageService.getUserPreference(),
-    };
+    let existingUserPreferences = {...this.storageService.getUserPreference()};
+    if(Object.keys(existingUserPreferences).length == 0){
+      existingUserPreferences = this.createUserPreference('favouriteMenus');
+      this.storageService.setUserPreference(existingUserPreferences);
+    }
     let existingMenus = existingUserPreferences['favouriteMenus'];
     let updatedMenus = { ...existingMenus };
     let favExist = this.checkFebTabAddOrNot(tab);
