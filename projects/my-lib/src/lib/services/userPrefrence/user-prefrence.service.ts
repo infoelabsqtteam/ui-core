@@ -65,8 +65,7 @@ export class UserPrefrenceService {
     const itemsArray = Array.isArray(menuItems) ? menuItems : [menuItems];
     itemsArray.forEach((item) => {
       const menuReference = {
-        _id: item._id,
-        name: item.name,
+        ...this.commonFunctionService.getReferenceObject(item),
         allSelected: true,
       };
 
@@ -137,11 +136,7 @@ export class UserPrefrenceService {
     let res: any = {};
     if (tab && tab.tab_name != '' && tab.tab_name != null) {
       const tabReference = {
-        reference: {
-          _id: tab._id,
-          name: tab.tab_name,
-          // select : true
-        },
+        reference: this.commonFunctionService.getReferenceObject(tab),
       };
       res[tab.tab_name] = tabReference;
     }
@@ -363,7 +358,7 @@ export class UserPrefrenceService {
               ...this.commonFunctionService.getReferenceObject(submenu),
               allSelected: false,
             },
-            templateTabs: { ...tabRef },
+            templateTabs: tabRef,
           },
         },
       };
@@ -371,7 +366,7 @@ export class UserPrefrenceService {
       let menu = data[moduleIndex]?.['menu_list'][menuIndex];
       newMenu[menu.name] = {
         reference: { ...this.commonFunctionService.getReferenceObject(menu), allSelected: false },
-        templateTabs: { ...tabRef },
+        templateTabs: tabRef,
       };
     }
     return newMenu;
