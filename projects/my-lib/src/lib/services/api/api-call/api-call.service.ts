@@ -671,6 +671,10 @@ export class ApiCallService {
   setPageNoAndSize(payload:any,page:number){
     payload['pageNo'] = page - 1;
     payload['pageSize'] = this.itemNumOfGrid;
+    let activeRole = this.storageService.getActiveRole();
+    if(activeRole){
+      payload['role'] = activeRole;
+    }
     return payload;
   }
   checkQtmpApi(params:any,field:any,payload:any,multipleFormCollection:any,object:any,objectWithCustom:any){

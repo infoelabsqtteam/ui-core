@@ -20,6 +20,7 @@ export class StorageService {
   RESET_PASS_SESSION:string = 'RESET_PASS_SESSION';
   EXPIRY_IN:any= 'EXPIRY_IN';
   USER_KEY: string = 'USER';
+  ROLE:string = "ROLE";
   ACTIVE_MENU: string = 'MENU';
   MENU_TYPE: string = 'MENU_TYPE';
   ID_TOKEN_EXPIRY_TIME: string = 'ID_TOKEN_EXPIRY_TIME';
@@ -204,6 +205,21 @@ export class StorageService {
     }else{
       return {};
     }
+  }
+  GetRoleList(){
+    const obj:any = JSON.parse(<any>localStorage.getItem(this.USER_KEY));
+    if(obj && obj.rollList){
+      return obj.rollList
+    }else{
+      return [];
+    }
+  }
+  setActiveRole(role:any){
+    localStorage.setItem(this.ROLE, JSON.stringify(role));
+  }
+  getActiveRole(){
+    const obj:any = JSON.parse(<any>localStorage.getItem(this.ROLE));
+    return obj;
   }
   GetUserReference() {
     let user = this.GetUserInfo();
