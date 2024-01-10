@@ -226,7 +226,7 @@ deleteGridRow(payload:any){
   )
 }
 
-SaveFormData(payload:any){
+async SaveFormData(payload:any){
   let api = this.envService.getApi('SAVE_FORM_DATA');
   this.saveCall(api+ '/' + payload.curTemp,payload)
 }
