@@ -643,4 +643,45 @@ constructor(
         }
       }
   }
+  copmareListOfFields(fields:any,currentObjectData:any,previousObjectData:any){
+    let currentData:any[] = currentObjectData[fields.field_name];
+    let previousData:any[] = previousObjectData[fields.field_name];
+    let currentObj:any;
+    let previousObject:any;
+    if(currentObjectData[fields.field_name] && currentObjectData[fields.field_name].length > 0) {
+      for (let i = 0; i < fields.list_of_fields.length; i++) {
+        let isChanged = false;
+        const field = fields.list_of_fields[i]
+        for (let j = 0; j < currentData.length; j++) {
+          let comparecurrentObj = currentData[j];
+            comparecurrentObj = comparecurrentObj[field.field_name];
+          let comparepreviousObject = previousData[j];
+            comparepreviousObject = comparepreviousObject[field.field_name];
+
+          if(comparecurrentObj != null && comparecurrentObj != undefined && typeof comparecurrentObj == 'object'){
+            currentObj = comparecurrentObj[field.field_name].name;
+            previousObject = comparepreviousObject[field.field_name].name;
+            if(comparecurrentObj != comparepreviousObject) {
+              isChanged = true;
+            }
+          }else {
+            if(comparecurrentObj != comparepreviousObject){
+              if(comparecurrentObj != null && comparecurrentObj != undefined && comparepreviousObject != null && comparepreviousObject != undefined ) {
+                isChanged = true;
+              }else {
+                isChanged = false;
+              }
+            }
+          }
+        }
+        field['isChanged'] = isChanged; 
+        fields[i] = field;
+      }
+    }
+  }
+
+
+
+
+  
 }
