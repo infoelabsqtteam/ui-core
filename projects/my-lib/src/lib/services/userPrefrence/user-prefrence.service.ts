@@ -15,28 +15,34 @@ export class UserPrefrenceService {
     private commonFunctionService: CommonFunctionService
   ) {}
 
-  updateUserPreference(data: object, fieldName: string, parent?: string) {
-    let payloadData;
-    switch (fieldName) {
-      case 'favouriteMenus':
-        payloadData = this.modifiedMenuObj(data, fieldName, parent);
-        break;
-      case 'tab':
-        payloadData = this.addOrRemoveTabs(data);
-        break;
-      case 'userpreferance':
-        payloadData = this.addOrRemoveTabs(data);
-        break;
-      default:
-        payloadData = this.storageService.getUserPreference();
-        break;
-    }
-    let payload = {
-      curTemp: 'user_preference',
-      data: payloadData,
-    };
-    this.apiService.SaveFormData(payload);
-  }
+  updateUserPreference(data: object, fieldName: string, parent?: string): Promise<{ success: boolean }> {
+    return new Promise(async (resolve) => {
+      try {
+        let payloadData;
+  
+        switch (fieldName) {
+          case 'favouriteMenus':
+            payloadData = this.modifiedMenuObj(data, fieldName, parent);
+            break;
+          case 'tab':
+            payloadData = this.addOrRemoveTabs(data);
+            break;
+          default:
+            payloadData = this.storageService.getUserPreference();
+            break;
+        }
+        const payload = {
+          curTemp: 'user_preference',
+          data: payloadData,
+        };
+        this.apiService.SaveFormData(payload);
+
+        resolve({ success: true });
+      } catch (error) {
+        resolve({ success: false });
+      }
+    });
+  } 
 
   addOrRemoveTabs(tab: any) {
     let menuIndexs = this.dataShareService.getMenuOrSubmenuIndexs();
@@ -58,9 +64,6 @@ export class UserPrefrenceService {
   }
   // Prepares a menu object from menu items
   prepareMenuJson(menuItems: any, fieldName: string, parent?: any) {
-    let tabsData = this.dataShareService.getTempData();
-    const templateTabs = tabsData?.[0]?.templateTabs ?? null;
-    const allTabs = this.getAllTabs(templateTabs);
     const menu: any = {};
     const itemsArray = Array.isArray(menuItems) ? menuItems : [menuItems];
     itemsArray.forEach((item) => {
@@ -82,7 +85,6 @@ export class UserPrefrenceService {
             ...this.commonFunctionService.getReferenceObject(menuItems),
             allSelected: true,
           },
-          templateTabs: allTabs,
         };
         let parObjRef: any = this.commonFunctionService.getReferenceObject(parent);
         menuData = {
@@ -97,7 +99,6 @@ export class UserPrefrenceService {
         menuData = {
           reference: menuReference,
           submenus: null,
-          templateTabs: allTabs,
         };
         menu[item.name] = menuData;
         return menu;
@@ -116,6 +117,12 @@ export class UserPrefrenceService {
     uref[fieldName] = {}
     return uref;
   }
+  // GetTemplateTabs in current Menu
+  getTemplateTabs(){
+    const tabsData = this.dataShareService.getTempData();
+    const templateTabs = tabsData?.[0]?.templateTabs ?? null;
+    return templateTabs;
+  }
   // Gets all tab's reference Obj from the provided array of tabs
   getAllTabs(tabs: any) {
     if (!tabs) {
@@ -130,6 +137,21 @@ export class UserPrefrenceService {
     }, {});
 
     return allTabs;
+  }
+   // Gets only the tab's reference Obj with favourite set to true from the provided array of tabs
+   getFebTabs(tabs: any) {
+    if (!tabs) {
+      return {};
+    }
+    return tabs
+    .filter((tab: any) => tab.favourite === true)
+    .reduce((acc: any, tab: any) => {
+      const tabRef = this.getTabRef(tab);
+      if (tabRef && Object.keys(tabRef).length > 0) {
+        Object.assign(acc, tabRef);
+      }
+      return acc;
+    }, {});
   }
   // Creates a reference object for a tab
   getTabRef(tab: any) {
@@ -373,13 +395,13 @@ export class UserPrefrenceService {
   }
   //update tabs
   updateFavTabs(newMenus: any, tab: any) {
-    let existingUserPreferences = {...this.storageService.getUserPreference()};
-    if(Object.keys(existingUserPreferences).length == 0){
+    let existingUserPreferences = this.storageService.getUserPreference();
+    if(!existingUserPreferences){
       existingUserPreferences = this.createUserPreference('favouriteMenus');
     }
     let existingMenus = existingUserPreferences['favouriteMenus'];
     let updatedMenus = { ...existingMenus };
-    let favExist = this.checkFebTabAddOrNot(tab);
+    let favExist = !tab.favourite
 
     if (!favExist) {
       for (let menuName in newMenus) {
@@ -435,16 +457,15 @@ export class UserPrefrenceService {
           }
         }
       }
-    }
-    if (favExist) {
+    } else {
       for (let menuName in existingMenus) {
-        if (existingMenus.hasOwnProperty(menuName)) {
+        if (newMenus.hasOwnProperty(menuName)) {
           let newMenu = newMenus[menuName];
-          let existingMenu = existingMenus[menuName];
-          if (newMenu) {
-            existingMenu.reference = newMenu.reference;
-          }
+          let existingMenu = existingMenus[menuName];          
           if (!existingMenu.submenus) {
+              existingMenu.reference = newMenu?.reference;
+              const favTabs = this.getFebTabs(this.getTemplateTabs());
+              existingMenu["templateTabs"] = favTabs;
             if (
               existingMenu.templateTabs &&
               existingMenu.templateTabs[tab.tab_name]
@@ -453,8 +474,11 @@ export class UserPrefrenceService {
             }
           } else {
             for (let subMenuKey in existingMenu.submenus) {
-              if (existingMenu.submenus.hasOwnProperty(subMenuKey)) {
+              if (newMenu.submenus.hasOwnProperty(subMenuKey)) {
                 let existingSubMenu = existingMenu.submenus[subMenuKey];
+                const favTabs = this.getFebTabs(this.getTemplateTabs());
+                existingSubMenu["templateTabs"] = favTabs;
+                existingSubMenu.reference = newMenu?.submenus[subMenuKey]?.reference
                 if (
                   existingSubMenu.templateTabs &&
                   existingSubMenu.templateTabs[tab.tab_name]
@@ -469,13 +493,12 @@ export class UserPrefrenceService {
     }
     updatedMenus = this.deleteEmptyMenus(updatedMenus);
     existingUserPreferences['favouriteMenus'] = updatedMenus;
-    // this.storageService.setUserPreference(existingUserPreferences);
 
     return existingUserPreferences;
   }
+  // Check the tab id in local USER_PREF
   checkFebTabAddOrNot(tab: any) {
-    const menus =
-      this.storageService.getUserPreference()?.['favouriteMenus'] || {};
+    const menus = this.storageService.getUserPreference()?.['favouriteMenus'] || {};
     return this.isIdExistInTemplateTabs(menus, tab._id);
   }
   isIdExistInTemplateTabs(obj: any, targetId: string): boolean {
