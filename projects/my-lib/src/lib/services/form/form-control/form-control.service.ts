@@ -81,7 +81,9 @@ export class FormControlService {
                         let custmizedKey = this.commonFunctionService.custmizedKey(element);
                         if (!responce.dataListForUpload[custmizedKey]) responce.dataListForUpload[custmizedKey] = {};
                         if (!responce.dataListForUpload[custmizedKey][data.field_name]) responce.dataListForUpload[custmizedKey][data.field_name] = [];
-                        responce.dataListForUpload[custmizedKey][data.field_name] = JSON.parse(JSON.stringify(object[data.field_name]));
+                        
+                        responce.dataListForUpload[custmizedKey][data.field_name] = this.fileHandlerService.modifyUploadFiles(JSON.parse(JSON.stringify(object[data.field_name])));
+                        //responce.dataListForUpload[custmizedKey][data.field_name] = JSON.parse(JSON.stringify(object[data.field_name]));
                         const value = this.fileHandlerService.modifyFileSetValue(object[data.field_name]);
                         //this.templateForm.get(element.field_name).get(data.field_name).setValue(value);
                         (<FormGroup>responce.templateForm.controls[element.field_name]).controls[data.field_name].setValue(value);
