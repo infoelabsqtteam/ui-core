@@ -300,6 +300,7 @@ constructor(
       let tab_name = tab.tab_name;
       let check = this.permissionService.checkPermission(tab_name,'view');
       tab['display'] = check;
+      tab['febMenu'] = this.checkFebMenuAddOrNot(tab,'');
     });
     return tabs;
   }
@@ -311,6 +312,50 @@ constructor(
       tab['addForm'] = check;
     }
     return tab;
+  }
+  checkFebMenuAddOrNot(tab:any,parent:any){
+    let tabId = tab._id;
+    if(parent != ''){
+      tabId = parent._id;
+    }
+    let userFebTab = this.userPrefrenceService.getUserPreferenceByFieldName('favoriteTabs');
+    if(userFebTab && userFebTab != null && userFebTab.length > 0){
+      let match = -1;
+      for (let index = 0; index < userFebTab.length; index++) {
+        const element = userFebTab[index];
+        if(element._id == tabId ){
+          match = index;
+          break;
+        }
+      }
+      if(match > -1){
+        if(parent != ''){
+          const submenu = userFebTab[match]['tab'];
+          let subMatchIndex = -1;
+          if(submenu && submenu.length > 0){
+            for (let j = 0; j < submenu.length; j++) {
+              const subMenu = submenu[j];
+              if(subMenu._id == tab._id){
+                subMatchIndex = j;
+                break;
+              }
+
+            }
+          }
+          if(subMatchIndex > -1){
+            return true
+          }else{
+            return false;
+          }
+        }else{
+          return true;
+        }
+      }else{
+        return false;
+      }
+    }else{
+      return false;
+    }
   }
 
   // for App

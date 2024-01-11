@@ -15,34 +15,34 @@ export class UserPrefrenceService {
     private commonFunctionService: CommonFunctionService
   ) {}
 
-  async updateUserPreference(data: object, fieldName: string, parent?: string) {
-    try {
-      let payloadData;
-      switch (fieldName) {
-        case 'favouriteMenus':
-          payloadData = this.modifiedMenuObj(data, fieldName, parent);
-          break;
-        case 'tab':
-        case 'userpreferance':
-          payloadData = this.addOrRemoveTabs(data);
-          break;
-        default:
-          payloadData = this.storageService.getUserPreference();
-          break;
+  updateUserPreference(data: object, fieldName: string, parent?: string): Promise<{ success: boolean }> {
+    return new Promise(async (resolve) => {
+      try {
+        let payloadData;
+  
+        switch (fieldName) {
+          case 'favouriteMenus':
+            payloadData = this.modifiedMenuObj(data, fieldName, parent);
+            break;
+          case 'tab':
+            payloadData = this.addOrRemoveTabs(data);
+            break;          
+          default:
+            payloadData = this.storageService.getUserPreference();
+            break;
+        }
+        const payload = {
+          curTemp: 'user_preference',
+          data: payloadData,
+        };
+        this.apiService.SaveFormData(payload);
+
+        resolve({ success: true });
+      } catch (error) {
+        resolve({ success: false });
       }
-  
-      const payload = {
-        curTemp: 'user_preference',
-        data: payloadData,
-      };
-  
-      await this.apiService.SaveFormData(payload);
-  
-      return { success: true };
-    } catch (error) {
-      return { success: false };
-    }
-  }  
+    });
+  } 
 
   addOrRemoveTabs(tab: any) {
     let menuIndexs = this.dataShareService.getMenuOrSubmenuIndexs();
