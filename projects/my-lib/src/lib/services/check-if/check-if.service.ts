@@ -724,8 +724,8 @@ export class CheckIfService {
         if(val != '') {
           check = true;
           break;
-        }     
-      } 
+        }      
+      }
     }else {
       check = true;
     }

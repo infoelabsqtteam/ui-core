@@ -26,7 +26,7 @@ export class UserPrefrenceService {
             break;
           case 'tab':
             payloadData = this.addOrRemoveTabs(data);
-            break;          
+            break;
           default:
             payloadData = this.storageService.getUserPreference();
             break;
