@@ -638,10 +638,10 @@ export class CheckIfService {
                     const crList = cri.split("#");
                     switch (crList[1]) {
                       case "lte":
-                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is gretter then to "+crList[0]+". !!!";
+                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is gretter than to "+crList[0]+". !!!";
                         break;
                       case "gte":
-                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is less then to "+crList[0]+". !!!";
+                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is less than to "+crList[0]+". !!!";
                         break;
                       default:
                         checkStatus.msg = "Entered value for "+field.label?field.label:''+" is already added. !!!";
@@ -724,8 +724,8 @@ export class CheckIfService {
         if(val != '') {
           check = true;
           break;
-        }
-      }      
+        }     
+      } 
     }else {
       check = true;
     }
