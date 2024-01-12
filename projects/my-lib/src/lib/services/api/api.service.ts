@@ -562,9 +562,21 @@ GetQr(payload:any){
   )
 }
 
+getAuditVersionList(payload:any){
+  let api = this.envService.getApi('AUDIT_VERSION_LIST');
+  this.http.get(api +"/"+ payload).subscribe(
+    (respData) => {
+      this.dataShareService.setAuditVersionList(respData);
+      },
+    (error) => {
+        console.log(error);
+      }
+  )
+}
+
 getAuditHistory(payload:any){
   let api = this.envService.getApi('AUDIT_HISTORY');
-  this.http.post(api +"/"+ payload['_id'], payload).subscribe(
+  this.http.post(api +"/"+ payload['path'], payload.data).subscribe(
     (respData) => {
       this.dataShareService.setAuditHistoryData(respData);
       },

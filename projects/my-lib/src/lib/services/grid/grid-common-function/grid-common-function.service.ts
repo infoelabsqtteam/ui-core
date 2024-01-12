@@ -617,4 +617,79 @@ constructor(
   }
 
 
+  compareAuditHistoryData(formFieldsData:any,currentObjectData:any,previousObjectData:any){
+      let formFields = formFieldsData;
+      let currentObj = {};
+      let previousObject = {};
+      for (let i = 0; i < formFields.length; i++ ) {
+        let field = formFields[i];
+        let isChanged = false;
+        if(field && field.field_name) {
+            currentObj = currentObjectData[field.field_name];
+            previousObject = previousObjectData[field.field_name];
+            if(currentObj != null && currentObj != undefined && typeof currentObj == 'object'){
+              currentObj = currentObjectData[field.field_name].name;
+              previousObject = previousObjectData[field.field_name].name;
+              if(currentObj != previousObject) {
+                isChanged = true;
+              }
+            }else {
+              if(currentObj != previousObject){
+                isChanged = true;
+              }
+            }
+            field['isChanged'] = isChanged; 
+            formFieldsData[i] = field;
+        }
+      }
+  }
+
+
+  copmareListOfFields(fields:any,currentObjectData:any,previousObjectData:any){
+    let currentData:any[] = currentObjectData[fields.field_name];
+    let previousData:any[] = previousObjectData[fields.field_name];
+    let currentObj:any;
+    let previousObject:any;
+    if(currentObjectData[fields.field_name] && currentObjectData[fields.field_name].length > 0) {
+      for (let i = 0; i < fields.list_of_fields.length; i++) {
+        let isChanged = false;
+        const field = fields.list_of_fields[i]
+        for (let j = 0; j < currentData.length; j++) {
+          let comparecurrentObj = currentData[j];
+            comparecurrentObj = comparecurrentObj[field.field_name];
+          let comparepreviousObject = previousData[j];
+            comparepreviousObject = comparepreviousObject[field.field_name];
+
+          if(comparecurrentObj != null && comparecurrentObj != undefined && typeof comparecurrentObj == 'object'){
+            currentObj = comparecurrentObj[field.field_name].name;
+            previousObject = comparepreviousObject[field.field_name].name;
+            if(comparecurrentObj != comparepreviousObject) {
+              isChanged = true;
+            }
+          }else {
+            if(comparecurrentObj != comparepreviousObject){
+              if(comparecurrentObj != null && comparecurrentObj != undefined && comparepreviousObject != null && comparepreviousObject != undefined ) {
+                isChanged = true;
+              }else {
+                isChanged = false;
+              }
+            }
+          }
+        }
+        field['isChanged'] = isChanged; 
+        fields[i] = field;
+      }
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
 }
