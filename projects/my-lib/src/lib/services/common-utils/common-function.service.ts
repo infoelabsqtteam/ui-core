@@ -725,9 +725,6 @@ export class CommonFunctionService {
   getAuditHistory(data:object){
     this.apiService.getAuditHistory(data);
   }
-  getAuditVersionList(data:object){
-    this.apiService.getAuditVersionList(data);
-  }
   downloadFile(file:string) {
     const payload = {
       path: 'download',
