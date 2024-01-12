@@ -70,7 +70,8 @@ export class CoreFunctionService {
         modules.push(moduleObj);
       });
     }
-    utvn['modules'] = modules;
+    let modifiedModules = this.setDefaultIndexForModules(modules);
+    utvn['modules'] = this.sortMenu(modifiedModules)
     utvn['permission'] = permissionList;
     utvn['user'] = user;
     return utvn;
@@ -103,6 +104,17 @@ export class CoreFunctionService {
       }
     }
   }
+  setDefaultIndexForModules(modules:any){
+    if(modules?.length>0){
+      let maxIndex = modules.length
+      modules.forEach((module:any) => {
+        if(!module?.index){
+        module["index"] = maxIndex;
+        }
+      })
+    }
+    return modules;
+  }
   sortMenu(menuList:any){
     let list:any=[];
     let mlist = menuList.sort((a:any,b:any) =>  a.index - b.index);
@@ -129,11 +141,12 @@ export class CoreFunctionService {
     }
     return value;
   }
-  prepareTemplate(tempList:any){
+  prepareTemplate(tempList:any,moduleName:string){
     let preParedList:any = {};
     if(tempList && tempList.length > 0){
       tempList.forEach((temp:any) => {
-        preParedList[temp.name] = temp;
+        let name = moduleName+"_"+temp.name;
+        preParedList[name] = temp;
       });
     }
     return preParedList;

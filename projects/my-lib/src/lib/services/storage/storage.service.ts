@@ -157,7 +157,6 @@ export class StorageService {
   GetRefreshToken() {
     return localStorage.getItem(this.REFRESH_TOKEN);
   }
-
   GetIdTokenStatus(){
     let expired = 0;
     let expireTime = Number(localStorage.getItem(this.ID_TOKEN_EXPIRY_TIME));
@@ -706,11 +705,12 @@ export class StorageService {
     //return this.encryptionService.decryptRequest(allTemplate);
     return obj;
   }
-  getTemplate(tempName:string){
+  getTemplate(tempName:string,moduleName:string){
     let templateList:any = this.getAllTemplateList();
     //console.log(templateList);
     if(templateList && templateList[tempName]){
-      return templateList[tempName];
+      let name = moduleName+"_"+tempName;
+      return templateList[name];
     }else{
       return null;
     }
