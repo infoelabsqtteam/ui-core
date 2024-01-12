@@ -632,8 +632,7 @@ constructor(
               if(currentObj != previousObject) {
                 isChanged = true;
               }
-            }
-            else {
+            }else {
               if(currentObj != previousObject){
                 isChanged = true;
               }
