@@ -6,7 +6,6 @@ import { CoreFunctionService } from '../common-utils/core-function/core-function
 import { ApiService } from '../api/api.service';
 import { ModelService } from '../model/model.service';
 import { EnvService } from '../env/env.service';
-import { DataShareService } from '../data-share/data-share.service';
 
 
 @Injectable({
@@ -23,7 +22,6 @@ export class CommonFunctionService {
     private apiService:ApiService,
     private coreFunctionService:CoreFunctionService,
     private envService:EnvService,
-    private dataShareService: DataShareService
     ) {
     this.userInfo = this.storageService.GetUserInfo();
   }
