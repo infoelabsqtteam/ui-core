@@ -173,6 +173,18 @@ export class LimsCalculationsService {
     return staticModal;
   }
 
+  currencyRate(object:any){
+    let modifyObje = object;
+    if(object.currencyRate && object.currencyRate != undefined && object.currencyRate != null) {
+      let currencyRate = object['currencyRate'];
+      let final_amount = object['final_amount'];
+      let modifycurrencyRate = final_amount / currencyRate;
+      object['convertedAmount'] = this.getDecimalAmount(modifycurrencyRate);
+      modifyObje = object;
+    }
+    return modifyObje;
+  }
+
   getDecimalAmount(value:any): any {
     let decimaldigitNo:number = this.storageService.getApplicationSetting().roundValueNoOfDigits;
     let decimalno:number = 2;
