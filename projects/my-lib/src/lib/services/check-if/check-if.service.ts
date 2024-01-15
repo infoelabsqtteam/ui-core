@@ -124,7 +124,7 @@ export class CheckIfService {
     }
     return check;
   }
-  checkDublicateOnForm(fields:any,value:any,list:any,i:any,showIfFieldList:any,custmizedFormValue:any,templateForm:FormGroup,parent?:any){
+  checkDublicateOnForm(fields:any,value:any,list:any,i:any,showIfFieldList:any,custmizedFormValue:any,dataListForUpload:any,templateForm:FormGroup,parent?:any){
     let checkDublic = {
       status : false,
       msg : ""
@@ -141,8 +141,13 @@ export class CheckIfService {
           custmizedKey = this.commonFunctionService.custmizedKey(parent);
           field_control = templateForm.controls[parent.field_name];
         }
-        if(custmizedKey && custmizedKey != '' && custmizedFormValue[custmizedKey] && custmizedFormValue[custmizedKey][element.field_name]){
-          custmizedData = custmizedFormValue[custmizedKey][element.field_name]
+        if(custmizedKey && custmizedKey != ''){
+          if(custmizedFormValue[custmizedKey] && custmizedFormValue[custmizedKey][element.field_name]) {
+            custmizedData = custmizedFormValue[custmizedKey][element.field_name]
+          }
+          if(dataListForUpload[custmizedKey] && dataListForUpload[custmizedKey][element.field_name]) {
+            custmizedData = dataListForUpload[custmizedKey][element.field_name]
+          }
         }else{
           if(custmizedFormValue[element.field_name] && custmizedFormValue[element.field_name].length > 0){
             custmizedData = custmizedFormValue[element.field_name]
@@ -200,6 +205,7 @@ export class CheckIfService {
         }
         switch (element.type) {
           case 'list_of_string':
+          case 'file':
             if (list_of_field_data[element.field_name] == '' || list_of_field_data[element.field_name] == null) {
               if(mendatory && custmizedData == ''){
                 if(custmizedData.length == 0){
