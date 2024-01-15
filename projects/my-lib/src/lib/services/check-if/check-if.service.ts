@@ -205,7 +205,6 @@ export class CheckIfService {
         }
         switch (element.type) {
           case 'list_of_string':
-          case 'file':
             if (list_of_field_data[element.field_name] == '' || list_of_field_data[element.field_name] == null) {
               if(mendatory && custmizedData == ''){
                 if(custmizedData.length == 0){
@@ -221,6 +220,17 @@ export class CheckIfService {
               checkDublic.msg = 'Entered value for '+element.label+' is not valid. !!!';
               //this.notificationService.notify('bg-danger','Entered value for '+element.label+' is not valid. !!!');
               return checkDublic;
+            }
+            break;
+          case 'file':
+            if(mendatory && custmizedData == ''){
+              if(custmizedData.length == 0){
+                checkValue = 1;
+                checkDublic.status = true
+                checkDublic.msg = "Please Enter " + element.label;
+                //this.notificationService.notify("bg-danger", "Please Enter " + element.label);
+                return checkDublic;
+              }
             }
             break;
           case 'typeahead':
