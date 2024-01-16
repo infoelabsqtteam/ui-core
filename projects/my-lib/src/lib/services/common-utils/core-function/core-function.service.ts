@@ -13,9 +13,10 @@ export class CoreFunctionService {
       return false;
     }
   }
-  getModulesFormMapObject(obj:any){
+  getModulesFromMapObject(obj:any){
     let user = obj.user;
     let permissions = obj.permission;
+    let rollList = obj.rollList;
     let utvn:any = {};
     let modules:any = [];
     let permissionList = {};
@@ -74,6 +75,7 @@ export class CoreFunctionService {
     utvn['modules'] = this.sortMenu(modifiedModules)
     utvn['permission'] = permissionList;
     utvn['user'] = user;
+    utvn['rollList'] = rollList;
     return utvn;
   }
   setTabOrPermission(menu:any,permissionList:any){

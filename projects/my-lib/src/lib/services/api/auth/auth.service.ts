@@ -87,7 +87,7 @@ export class AuthService implements OnInit{
     this.http.post(api, reqBody).subscribe(
       (respData:any) =>{
         if (respData && respData.user) {
-          let modifyData = this.coreFunctionService.getModulesFormMapObject(respData);
+          let modifyData = this.coreFunctionService.getModulesFromMapObject(respData);
           this.storageService.SetUserInfo(modifyData);
           this.storageService.GetUserInfo();
           this.envService.setRequestType('PRIVATE');
