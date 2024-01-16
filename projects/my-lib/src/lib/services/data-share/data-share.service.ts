@@ -60,6 +60,7 @@ export class DataShareService {
   getIsGridSelectionOpen:Subject<any> = new Subject<any>();
   chartModelShowHide:Subject<any> = new Subject<any>();
   auditHistoryList:Subject<any> = new Subject<any>();
+  auditVersionList:Subject<any> = new Subject<any>();
   applicationSettings:Subject<any> = new Subject<any>();
   userNotification:Subject<any> = new Subject<any>();
   userPreference:Subject<any> = new Subject<any>();
@@ -285,6 +286,11 @@ export class DataShareService {
   setAuditHistoryData(data:any){
     this.auditHistoryList.next(data);
   }
+
+  setAuditVersionList(data:any){
+    this.auditVersionList.next(data);
+  }
+
   shareUserNotification(responce:any){
     this.userNotification.next(responce);
   }

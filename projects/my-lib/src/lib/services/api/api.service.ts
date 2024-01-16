@@ -195,8 +195,9 @@ resetMenuData(){
   this.dataShareService.shareMenuData([])
 }
 GetTempData(payload:any){
+  let moduleName = payload['module'];
   let name = this.coreFunctionService.getTempNameFromPayload(payload);
-  let template = this.stroageService.getTemplate(name);
+  let template = this.stroageService.getTemplate(name,moduleName);
   if(template){
     this.dataShareService.shareTempData([template]);
   }else{
@@ -204,7 +205,7 @@ GetTempData(payload:any){
     this.http.post(api, payload).subscribe(
       (respData) => {
           this.dataShareService.shareTempData(respData);
-          let preparedTempList = this.coreFunctionService.prepareTemplate(respData);
+          let preparedTempList = this.coreFunctionService.prepareTemplate(respData,moduleName);
           this.stroageService.storeAllTemplate(preparedTempList)
         },
       (error) => {
@@ -561,9 +562,21 @@ GetQr(payload:any){
   )
 }
 
+getAuditVersionList(payload:any){
+  let api = this.envService.getApi('AUDIT_VERSION_LIST');
+  this.http.get(api +"/"+ payload).subscribe(
+    (respData) => {
+      this.dataShareService.setAuditVersionList(respData);
+      },
+    (error) => {
+        console.log(error);
+      }
+  )
+}
+
 getAuditHistory(payload:any){
   let api = this.envService.getApi('AUDIT_HISTORY');
-  this.http.post(api +"/"+ payload['_id'], payload).subscribe(
+  this.http.post(api +"/"+ payload['path'], payload.data).subscribe(
     (respData) => {
       this.dataShareService.setAuditHistoryData(respData);
       },
