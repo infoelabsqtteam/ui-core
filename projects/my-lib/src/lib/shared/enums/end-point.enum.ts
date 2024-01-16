@@ -24,6 +24,7 @@ export enum EndPoint {
     AUTH_FORGET_PASSWORD = "login/fp",
     AUTH_RESET_PASSWORD = "login/rp",
     AUTH_CHANGE_PASSWORD = "login/cp",
+    TWO_FACTOR_AUTHENTICATION = "login/tfa",
     GET_AUTH_APP = "user/auth/app/",
     SAVE_CONTACT_US = "ins/save/contact_us_query",
     SAVE_CAREER_WITH_US = "ins/save/career_with_us",
@@ -45,7 +46,7 @@ export enum EndPoint {
     GET_QR_CODE = "rpts/qrGen/",
     PUBLIC = "public/",
     //GET_VDR_DATA = "vdrn/getrtf/e",
-    GET_VDR_DATA = "vdrn/getRefCodeRootFolderForAppId/e",    
+    GET_VDR_DATA = "vdrn/getRefCodeRootFolderForAppId/e",
     MOVE_FOLDER_CHILD = "vdrn/getch",
     UPLOAD_DOC_FILE = "vdrn/crtfl/e",
     INSERT_FILE_AFTER_UPLOAD = "vdrn/crtflaftupl/e",
@@ -60,6 +61,7 @@ export enum EndPoint {
     GET_FOLDER_BY_KEY = "vdrn/getS3FolderDataByKey",
     GIT_VERSION = "git/version",
     DOC_PERMISSION = 'vdrn/svper',
-    AUDIT_HISTORY = "getAuditHistory/ID",
+    AUDIT_HISTORY = "getAuditHistory",
+    AUDIT_VERSION_LIST = "getAuditVersionList",
     DOWNLOAD_MANUAL= "s3/getSignedS3Url"
 }

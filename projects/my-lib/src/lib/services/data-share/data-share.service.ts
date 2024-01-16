@@ -60,11 +60,14 @@ export class DataShareService {
   getIsGridSelectionOpen:Subject<any> = new Subject<any>();
   chartModelShowHide:Subject<any> = new Subject<any>();
   auditHistoryList:Subject<any> = new Subject<any>();
+  auditVersionList:Subject<any> = new Subject<any>();
   applicationSettings:Subject<any> = new Subject<any>();
   userNotification:Subject<any> = new Subject<any>();
   userPreference:Subject<any> = new Subject<any>();
   moduleIndex:Subject<any> = new Subject<any>();
   menuIndexs:Subject<any> = new Subject<any>();
+  pModuleIndex:any=-1;
+  menuOrSubmenuIndex:any={};
   headerMenu:Subject<any> = new Subject<any>();
   requestResponce:Subject<boolean> = new Subject<boolean>();
   mongoDbChartList:Subject<any> = new Subject<any>();
@@ -171,7 +174,7 @@ export class DataShareService {
   }
   setNestedForm(form:any){
     this.nestedForm.next(form)
-  }  
+  }
   setHostData(data:any){
     this.hostData.next(data);
   }
@@ -282,6 +285,11 @@ export class DataShareService {
   setAuditHistoryData(data:any){
     this.auditHistoryList.next(data);
   }
+
+  setAuditVersionList(data:any){
+    this.auditVersionList.next(data);
+  }
+
   shareUserNotification(responce:any){
     this.userNotification.next(responce);
   }
@@ -293,9 +301,17 @@ export class DataShareService {
   }
   setModuleIndex(index:any){
     this.moduleIndex.next(index);
+    this.pModuleIndex = index;
   }
   setMenuIndexs(indexs:any){
-    this.menuIndexs.next(indexs)
+    this.menuIndexs.next(indexs);
+    this.menuOrSubmenuIndex = indexs;
+  }
+  getProjectModuleIndex(){
+    return this.pModuleIndex;
+  }
+  getMenuOrSubmenuIndexs(){
+    return this.menuOrSubmenuIndex;
   }
   setReqResponce(responce:boolean){
     this.requestResponce.next(responce)

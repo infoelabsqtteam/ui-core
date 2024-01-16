@@ -31,130 +31,134 @@ export class FormValueService {
     let valueOfForm:any = {};
     if (updateMode || complete_object_payload_mode){
       tableFields.forEach((element:any) => {
-        switch (element.type) {
-          case 'stepper':
-            element.list_of_fields.forEach((step:any) => {
-              if(step.list_of_fields && step.list_of_fields != null && step.list_of_fields.length > 0){
-                step.list_of_fields.forEach((data:any) => {
-                  selectedRow[data.field_name] = formValue[step.field_name][data.field_name]
-                  if(data.tree_view_object && data.tree_view_object.field_name != ""){
-                    const treeViewField = data.tree_view_object.field_name;
-                    selectedRow[treeViewField] = formValue[step.field_name][treeViewField]
-                  }
-                });
-              }
-            });
-            break;
-          case 'group_of_fields':
-            element.list_of_fields.forEach((data:any) => {
-              switch (data.type) {
-                case 'date':
-                  if(data && data.date_format && data.date_format != ''){
-                    if(typeof formValue[element.field_name][data.field_name] != 'string'){
-                      selectedRow[element.field_name][data.field_name] = this.datePipe.transform(formValue[element.field_name][data.field_name],'dd/MM/yyyy');
+        if(element.field_name && element.field_name != ''){
+          switch (element.type) {
+            case 'stepper':
+              element.list_of_fields.forEach((step:any) => {
+                if(step.list_of_fields && step.list_of_fields != null && step.list_of_fields.length > 0){
+                  step.list_of_fields.forEach((data:any) => {
+                    selectedRow[data.field_name] = formValue[step.field_name][data.field_name]
+                    if(data.tree_view_object && data.tree_view_object.field_name != ""){
+                      const treeViewField = data.tree_view_object.field_name;
+                      selectedRow[treeViewField] = formValue[step.field_name][treeViewField]
+                    }
+                  });
+                }
+              });
+              break;
+            case 'group_of_fields':
+              element.list_of_fields.forEach((data:any) => {
+                switch (data.type) {
+                  case 'date':
+                    if(data && data.date_format && data.date_format != ''){
+                      if(typeof formValue[element.field_name][data.field_name] != 'string'){
+                        selectedRow[element.field_name][data.field_name] = this.datePipe.transform(formValue[element.field_name][data.field_name],'dd/MM/yyyy');
+                      }else{
+                        selectedRow[element.field_name] = formValue[element.field_name];
+                      }
                     }else{
                       selectedRow[element.field_name] = formValue[element.field_name];
                     }
-                  }else{
-                    selectedRow[element.field_name] = formValue[element.field_name];
-                  }
-                  break;
+                    break;
 
-                default:
-                  selectedRow[element.field_name] = formValue[element.field_name];
-                  break;
+                  default:
+                    selectedRow[element.field_name] = formValue[element.field_name];
+                    break;
+                }
+              });
+              break;
+            case 'gmap':
+            case "gmapview":
+              if(element && element.datatype == "object"){
+                let locationData:any = {};
+                locationData['latitude'] = latitude;
+                locationData['longitude'] = longitude;
+                locationData['address'] = address;
+                locationData['date'] = JSON.parse(JSON.stringify(new Date()));
+                locationData['time'] = this.datePipe.transform(new Date(),'shortTime');
+                selectedRow[element.field_name] = locationData;
+              }else{
+                selectedRow['latitude'] = latitude;
+                selectedRow['longitude'] = longitude;
+                selectedRow[element.field_name] = address;
               }
-            });
-            break;
-          case 'gmap':
-          case "gmapview":
-            if(element && element.datatype == "object"){
-              let locationData:any = {};
-              locationData['latitude'] = latitude;
-              locationData['longitude'] = longitude;
-              locationData['address'] = address;
-              locationData['date'] = JSON.parse(JSON.stringify(new Date()));
-              locationData['time'] = this.datePipe.transform(new Date(),'shortTime');
-              selectedRow[element.field_name] = locationData;
-            }else{
-              selectedRow['latitude'] = latitude;
-              selectedRow['longitude'] = longitude;
-              selectedRow[element.field_name] = address;
-            }
-            break;
-          case 'date':
-            if(element && element.date_format && element.date_format != ''){
-              selectedRow[element.field_name] = this.datePipe.transform(selectedRow[element.field_name],'dd/MM/yyyy');
-            } else {
+              break;
+            case 'date':
+              if(element && element.date_format && element.date_format != ''){
+                selectedRow[element.field_name] = this.datePipe.transform(selectedRow[element.field_name],'dd/MM/yyyy');
+              } else {
+                selectedRow[element.field_name] = formValue[element.field_name];
+              }
+              break;
+            default:
               selectedRow[element.field_name] = formValue[element.field_name];
-            }
-            break;
-          default:
-            selectedRow[element.field_name] = formValue[element.field_name];
-            break;
+              break;
+          }
         }
       });
     }else{
       tableFields.forEach((element:any) => {
-        switch (element.type) {
-          case 'stepper':
-            element.list_of_fields.forEach((step:any) => {
-              if(step.list_of_fields && step.list_of_fields != null && step.list_of_fields.length > 0){
-                step.list_of_fields.forEach((data:any) => {
-                  modifyFormValue[data.field_name] = formValue[step.field_name][data.field_name]
-                  if(data.tree_view_object && data.tree_view_object.field_name != ""){
-                    const treeViewField = data.tree_view_object.field_name;
-                    modifyFormValue[treeViewField] = formValue[step.field_name][treeViewField]
-                  }
-                });
-              }
-            });
-            break;
-          case 'group_of_fields':
-            modifyFormValue[element.field_name] = formValue[element.field_name];
-            element.list_of_fields.forEach((data:any) => {
-              switch (data.type) {
-                case 'date':
-                  if(data && data.date_format && data.date_format != ''){
-                    modifyFormValue[element.field_name][data.field_name] = this.datePipe.transform(formValue[element.field_name][data.field_name],'dd/MM/yyyy');
-                  }  else {
-                    modifyFormValue[element.field_name][data.field_name] = formValue[element.field_name][data.field_name];
-                  }
-                  break;
-
-                default:
-                  modifyFormValue[element.field_name][data.field_name] = formValue[element.field_name][data.field_name];
-                  break;
-              }
-            });
-            break;
-          case 'gmap':
-          case "gmapview":
-            if(element && element.datatype == "object"){
-              let locationData:any = {};
-              locationData['latitude'] = latitude;
-              locationData['longitude'] = longitude;
-              locationData['address'] = address;
-              locationData['date'] = JSON.parse(JSON.stringify(new Date()));
-              locationData['time'] = this.datePipe.transform(new Date(),'shortTime')
-              modifyFormValue[element.field_name] = locationData;
-            }else{
-              modifyFormValue['latitude'] = latitude;
-              modifyFormValue['longitude'] = longitude;
-              modifyFormValue[element.field_name] = address;
-            }
-            break;
-          case 'date':
-            if(element && element.date_format && element.date_format != ''){
-              modifyFormValue[element.field_name] = this.datePipe.transform(formValue[element.field_name],'dd/MM/yyyy');
-            } else {
+        if(element.field_name && element.field_name != ''){
+          switch (element.type) {
+            case 'stepper':
+              element.list_of_fields.forEach((step:any) => {
+                if(step.list_of_fields && step.list_of_fields != null && step.list_of_fields.length > 0){
+                  step.list_of_fields.forEach((data:any) => {
+                    modifyFormValue[data.field_name] = formValue[step.field_name][data.field_name]
+                    if(data.tree_view_object && data.tree_view_object.field_name != ""){
+                      const treeViewField = data.tree_view_object.field_name;
+                      modifyFormValue[treeViewField] = formValue[step.field_name][treeViewField]
+                    }
+                  });
+                }
+              });
+              break;
+            case 'group_of_fields':
               modifyFormValue[element.field_name] = formValue[element.field_name];
-            }
-            break;
-          default:
-            modifyFormValue[element.field_name] = formValue[element.field_name];
-            //modifyFormValue = formValue;
-            break;
+              element.list_of_fields.forEach((data:any) => {
+                switch (data.type) {
+                  case 'date':
+                    if(data && data.date_format && data.date_format != ''){
+                      modifyFormValue[element.field_name][data.field_name] = this.datePipe.transform(formValue[element.field_name][data.field_name],'dd/MM/yyyy');
+                    }  else {
+                      modifyFormValue[element.field_name][data.field_name] = formValue[element.field_name][data.field_name];
+                    }
+                    break;
+
+                  default:
+                    modifyFormValue[element.field_name][data.field_name] = formValue[element.field_name][data.field_name];
+                    break;
+                }
+              });
+              break;
+            case 'gmap':
+            case "gmapview":
+              if(element && element.datatype == "object"){
+                let locationData:any = {};
+                locationData['latitude'] = latitude;
+                locationData['longitude'] = longitude;
+                locationData['address'] = address;
+                locationData['date'] = JSON.parse(JSON.stringify(new Date()));
+                locationData['time'] = this.datePipe.transform(new Date(),'shortTime')
+                modifyFormValue[element.field_name] = locationData;
+              }else{
+                modifyFormValue['latitude'] = latitude;
+                modifyFormValue['longitude'] = longitude;
+                modifyFormValue[element.field_name] = address;
+              }
+              break;
+            case 'date':
+              if(element && element.date_format && element.date_format != ''){
+                modifyFormValue[element.field_name] = this.datePipe.transform(formValue[element.field_name],'dd/MM/yyyy');
+              } else {
+                modifyFormValue[element.field_name] = formValue[element.field_name];
+              }
+              break;
+            default:
+              modifyFormValue[element.field_name] = formValue[element.field_name];
+              //modifyFormValue = formValue;
+              break;
+          }
         }
       });
     }
