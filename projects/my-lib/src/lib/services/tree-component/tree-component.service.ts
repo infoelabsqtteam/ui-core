@@ -309,8 +309,8 @@ export class TreeComponentService {
     tree.forEach((child:any) => {
         let modifyObj:any = {};
         modifyObj['reference'] = child.reference;
-        if(child && child.crList){
-          modifyObj['crList'] = child.crList;
+        if(child && child.criteria){
+          modifyObj['criteria'] = child.criteria;
         }
         if(child.allSelected){
           modifyObj['reference']['allSelected'] = child.allSelected;
