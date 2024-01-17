@@ -6,6 +6,7 @@ import { DataShareService } from '../data-share/data-share.service';
 import { PermissionService } from '../permission/permission.service';
 import { StorageService } from '../storage/storage.service';
 import { CommonAppDataShareService } from '../data-share/common-app-data-share/common-app-data-share.service';
+import { UserPrefrenceService } from '../userPrefrence/user-prefrence.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,8 @@ constructor(
   private dataShareService:DataShareService,
   private apiService:ApiService,
   private router:Router,
-  private commonAppDataShareService: CommonAppDataShareService
+  private commonAppDataShareService: CommonAppDataShareService,
+  private userPrefrenceService: UserPrefrenceService
 ) { }
 
   // modifyModuleListWithPermission(moduleList:any){
@@ -202,7 +204,7 @@ constructor(
     }
     for (let index = 0; index < menuList.length; index++) {
       const menu = menuList[index];
-      if(menu.name == menuName){
+      if(!menu.submenu && menu.name == menuName){
         indexs.menuindex = index;
         indexs.submenuindex = -1;
       }else{
@@ -316,7 +318,7 @@ constructor(
     if(parent != ''){
       tabId = parent._id;
     }
-    let userFebTab = this.commonFunctionService.getUserPreferenceByFieldName('favoriteTabs');
+    let userFebTab = this.userPrefrenceService.getUserPreferenceByFieldName('favoriteTabs');
     if(userFebTab && userFebTab != null && userFebTab.length > 0){
       let match = -1;
       for (let index = 0; index < userFebTab.length; index++) {

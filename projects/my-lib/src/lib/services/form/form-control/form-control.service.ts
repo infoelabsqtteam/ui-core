@@ -81,7 +81,9 @@ export class FormControlService {
                         let custmizedKey = this.commonFunctionService.custmizedKey(element);
                         if (!responce.dataListForUpload[custmizedKey]) responce.dataListForUpload[custmizedKey] = {};
                         if (!responce.dataListForUpload[custmizedKey][data.field_name]) responce.dataListForUpload[custmizedKey][data.field_name] = [];
-                        responce.dataListForUpload[custmizedKey][data.field_name] = JSON.parse(JSON.stringify(object[data.field_name]));
+                        
+                        responce.dataListForUpload[custmizedKey][data.field_name] = this.fileHandlerService.modifyUploadFiles(JSON.parse(JSON.stringify(object[data.field_name])));
+                        //responce.dataListForUpload[custmizedKey][data.field_name] = JSON.parse(JSON.stringify(object[data.field_name]));
                         const value = this.fileHandlerService.modifyFileSetValue(object[data.field_name]);
                         //this.templateForm.get(element.field_name).get(data.field_name).setValue(value);
                         (<UntypedFormGroup>responce.templateForm.controls[element.field_name]).controls[data.field_name].setValue(value);
@@ -590,12 +592,10 @@ export class FormControlService {
 
   updateCustomizedValue(custmizedFormValue: any, index: number, value: any) {
     let response = {
-      custmizedFormValue: custmizedFormValue,
-      selectedListofStringIndex: index
+      custmizedFormValue: custmizedFormValue
     }
-    if (response.selectedListofStringIndex !== null && response.selectedListofStringIndex >= 0) {
-      response.custmizedFormValue[response.selectedListofStringIndex] = value;
-      response.selectedListofStringIndex = -1;
+    if (index !== null && index >= 0) {
+      response.custmizedFormValue[index] = value;
     } else {
       response.custmizedFormValue.push(value);
     }
@@ -604,8 +604,7 @@ export class FormControlService {
 
   editListOfString(parentfield: any,field: any,index: number,custmizedFormValue: any, templateForm: UntypedFormGroup ) {
     let response = {
-      templateForm: templateForm,
-      selectedListofStringIndex: index
+      templateForm: templateForm
     }
     let type = field.type;
     let fieldName = field.field_name
