@@ -29,13 +29,13 @@ jobs:
     - name: Set up Node
       uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        node-version: '16.13.2'
     
     - name: Installing source NPM dependencies...
       run: npm install
       
     - name: Installing Angular
-      run: npm install -g @angular/cli@13.0.0
+      run: npm install -g @angular/cli@15
     
     - name: Set Node Options
       run: echo "NODE_OPTIONS=--max_old_space_size=${{ secrets.RAM }}" >> $GITHUB_ENV
