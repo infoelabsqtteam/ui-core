@@ -76,14 +76,23 @@ export class AuthService implements OnInit{
     this.resetData()
     this.redirectToSignPage();
   }
+
   GetUserInfoFromToken(payload:any, loginRedirect?:string){
     let response = {
       status: '',
       class: '',
       msg: ''
     };
-    let api = this.envService.getAuthApi('GET_USER_PERMISSION');
-    const reqBody = { key: payload };
+    let api = "";
+    let reqBody = {};
+    if(payload && payload.roleName && payload.roleName != ''){
+      api = this.envService.getAuthApi('GET_USER_PERMISSION')+"/"+payload.roleName;
+      reqBody = { key: payload.token };
+    }else{
+      api = this.envService.getAuthApi('GET_USER_PERMISSION');
+      reqBody = { key: payload };
+    }
+
     this.http.post(api, reqBody).subscribe(
       (respData:any) =>{
         if (respData && respData.user) {
