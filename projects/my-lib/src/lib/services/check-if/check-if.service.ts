@@ -124,7 +124,7 @@ export class CheckIfService {
     }
     return check;
   }
-  checkDublicateOnForm(fields:any,value:any,list:any,i:any,showIfFieldList:any,custmizedFormValue:any,templateForm:FormGroup,parent?:any){
+  checkDublicateOnForm(fields:any,value:any,list:any,i:any,showIfFieldList:any,custmizedFormValue:any,dataListForUpload:any,templateForm:FormGroup,parent?:any){
     let checkDublic = {
       status : false,
       msg : ""
@@ -141,8 +141,13 @@ export class CheckIfService {
           custmizedKey = this.commonFunctionService.custmizedKey(parent);
           field_control = templateForm.controls[parent.field_name];
         }
-        if(custmizedKey && custmizedKey != '' && custmizedFormValue[custmizedKey] && custmizedFormValue[custmizedKey][element.field_name]){
-          custmizedData = custmizedFormValue[custmizedKey][element.field_name]
+        if(custmizedKey && custmizedKey != ''){
+          if(custmizedFormValue[custmizedKey] && custmizedFormValue[custmizedKey][element.field_name]) {
+            custmizedData = custmizedFormValue[custmizedKey][element.field_name]
+          }
+          if(dataListForUpload[custmizedKey] && dataListForUpload[custmizedKey][element.field_name]) {
+            custmizedData = dataListForUpload[custmizedKey][element.field_name]
+          }
         }else{
           if(custmizedFormValue[element.field_name] && custmizedFormValue[element.field_name].length > 0){
             custmizedData = custmizedFormValue[element.field_name]
@@ -215,6 +220,17 @@ export class CheckIfService {
               checkDublic.msg = 'Entered value for '+element.label+' is not valid. !!!';
               //this.notificationService.notify('bg-danger','Entered value for '+element.label+' is not valid. !!!');
               return checkDublic;
+            }
+            break;
+          case 'file':
+            if(mendatory && custmizedData == ''){
+              if(custmizedData.length == 0){
+                checkValue = 1;
+                checkDublic.status = true
+                checkDublic.msg = "Please Enter " + element.label;
+                //this.notificationService.notify("bg-danger", "Please Enter " + element.label);
+                return checkDublic;
+              }
             }
             break;
           case 'typeahead':
@@ -638,13 +654,13 @@ export class CheckIfService {
                     const crList = cri.split("#");
                     switch (crList[1]) {
                       case "lte":
-                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is gretter than to "+crList[0]+". !!!";
+                        checkStatus.msg = "Entered value for "+ (field.label?field.label:'') +" is gretter than to "+crList[0]+". !!!";
                         break;
                       case "gte":
-                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is less than to "+crList[0]+". !!!";
+                        checkStatus.msg = "Entered value for "+ (field.label?field.label:'') +" is less than to "+crList[0]+". !!!";
                         break;
                       default:
-                        checkStatus.msg = "Entered value for "+field.label?field.label:''+" is already added. !!!";
+                        checkStatus.msg = "Entered value for "+ (field.label?field.label:'') +" is already added. !!!";
                         break;
                     }
                     break;
@@ -724,7 +740,7 @@ export class CheckIfService {
         if(val != '') {
           check = true;
           break;
-        }      
+        }
       }
     }else {
       check = true;
