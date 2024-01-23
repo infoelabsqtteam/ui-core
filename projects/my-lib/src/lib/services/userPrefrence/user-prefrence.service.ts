@@ -87,7 +87,7 @@ export class UserPrefrenceService {
         let parObjRef: any = this.commonFunctionService.getReferenceObject(parent);
         menuData = {
           reference: parObjRef,
-          favourite: true,
+          favourite: item.favourite,
           submenus: {
             [menuItems.name]: refObj,
           },
@@ -103,7 +103,7 @@ export class UserPrefrenceService {
       } else {
         menuData = {
           reference: menuReference,
-          favourite: true,
+          favourite: item.favourite,
         };
         if(moduleName!== null){
           menu[moduleName]={
@@ -181,7 +181,7 @@ export class UserPrefrenceService {
         reference: this.commonFunctionService.getReferenceObject(tab),
       };
       if(optKey!= '' && optKey!= undefined){
-        tabReference[optKey] = true;
+        tabReference[optKey] = tab.favourite;
       }
       res[tab.tab_name] = tabReference;
     }
