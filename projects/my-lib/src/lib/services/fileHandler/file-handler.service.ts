@@ -77,12 +77,13 @@ export class FileHandlerService {
 
 
       if(responce.dataListForUpload[custmizedKey][curFieldName] && responce.dataListForUpload[custmizedKey][curFieldName].length > 0){
-        let fileList = responce.dataListForUpload[custmizedKey][curFieldName];
-        let fileName = this.modifyFileSetValue(fileList);
-
+        let fileName  = "";
         if(curFileUploadField.type == 'input_with_uploadfile'){
+          let fileList = responce.dataListForUpload[custmizedKey][curFieldName];
+          fileName = this.modifyFileSetValue(fileList);
           let tooltipMsg = this.getFileTooltipMsg(fileList);
           responce.tableFields[parentIndex].list_of_fields[curIndex]['tooltipMsg'] = tooltipMsg;
+          
         }
 
         (<FormGroup>responce.templateForm.controls[curFileUploadFieldparentfield.field_name]).controls[curFieldName].setValue(fileName);
@@ -121,7 +122,7 @@ export class FileHandlerService {
     if(parent && parent != ''){
       let custmisedKey = this.commonFunctionService.custmizedKey(parent);
       dataListForUpload[custmisedKey][fieldName].splice(index,1);
-    }else{
+          }else{
       dataListForUpload[fieldName].splice(index,1)
     }
     return dataListForUpload;
