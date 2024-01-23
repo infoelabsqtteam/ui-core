@@ -198,6 +198,11 @@ export class LimsCalculationsService {
     }
   }
 
+  convertCurrencyRate(amount:any,currencyRate:any){
+    let convertedAmount =amount/currencyRate;
+    return this.getDecimalAmount(convertedAmount);
+}
+
   legacyQuotationParameterCalculation(data:any, fieldName:any) {
     let quantity = 0;
     let discount_percent = 0;
@@ -641,7 +646,7 @@ export class LimsCalculationsService {
 
 
 
-  calculate_invoice_amount_row_wise(data:any, fieldName:any) {
+  calculate_invoice_amount_row_wise(data:any, fieldName:any,currencyRate:any) {
     let total = 0;
     let disc_per = 0;
     let disc_amt = 0;
@@ -686,6 +691,9 @@ export class LimsCalculationsService {
         final_amt = surcharge + net_amount;
         break;
     }
+    if(data.hasOwnProperty("finalConvertedAmount") && currencyRate != "" && currencyRate != undefined){
+      data["finalConvertedAmount"] = this.convertCurrencyRate(final_amt,currencyRate)
+    }
     data["discount_percent"] = disc_per;
     data["discount_amount"] = disc_amt;
     data["final_amount"] = final_amt;
@@ -693,7 +701,7 @@ export class LimsCalculationsService {
   }
 
 
-  calculateNetAmount(data:any, fieldName:any, grid_cell_function:any) {
+  calculateNetAmount(data:any, fieldName:any, grid_cell_function:any,currencyRate:any) {
     switch (grid_cell_function) {
       case "calculateQuotationParameterAmountForAutomotiveLims":
         this.calculateQuotationParameterAmountForAutomotiveLims(data, fieldName["field_name"]);
@@ -711,7 +719,7 @@ export class LimsCalculationsService {
         break;
 
       case "calculate_invoice_amount_row_wise":
-        this.calculate_invoice_amount_row_wise(data, fieldName["field_name"]);
+        this.calculate_invoice_amount_row_wise(data, fieldName["field_name"],currencyRate);
         break;
 
       default:
@@ -751,7 +759,7 @@ export class LimsCalculationsService {
           templateValue['quotation_param_methods'].forEach((element:any) => {
             const new_element = { ...element };
             new_element.discount_percent = this.getDecimalAmount(+discount_percent);
-            this.calculateNetAmount(new_element, "qty", "");
+            this.calculateNetAmount(new_element, "qty", "","");
             quotation_param_methods.push(new_element);
           })
           templateValue['quotation_param_methods'].setValue(quotation_param_methods);
@@ -1327,7 +1335,7 @@ export class LimsCalculationsService {
       const data = JSON.parse(JSON.stringify(element));
       data['discount_percent'] = discount;
       data['qty'] = quantity;
-      this.calculateNetAmount(data, "discount_percent", "");
+      this.calculateNetAmount(data, "discount_percent", "","");
       updatedParamsList.push(data);
     });
     templateValue["quotation_param_methods"] = updatedParamsList;
@@ -1371,7 +1379,7 @@ export class LimsCalculationsService {
       const data = JSON.parse(JSON.stringify(element));
       data['discount_percent'] = discount;
       data['qty'] = quantity;
-      this.calculateNetAmount(data, "qty", "");
+      this.calculateNetAmount(data, "qty", "","");
       updatedParamsList.push(data)
     });
     templateValue["quotation_param_methods"] = updatedParamsList;
@@ -1498,7 +1506,7 @@ export class LimsCalculationsService {
       }
       //calculate quote Amount
       if(templateValue.hasOwnProperty("currencyRate") && templateValue.currencyRate != "" && templateValue.currencyRate != undefined){
-        converted_Amount=net_payble/Number(templateValue.currencyRate);
+        converted_Amount=this.convertCurrencyRate(net_payble,templateValue.currencyRate)
       }
       let total:any ={};
       total['surcharge'] = this.getDecimalAmount(surcharge);
@@ -1591,7 +1599,7 @@ export class LimsCalculationsService {
       }
       //calculate quote Amount
       if(templateValue.hasOwnProperty("currencyRate") && templateValue.currencyRate != "" && templateValue.currencyRate != undefined){
-        converted_Amount=net_payble/Number(templateValue.currencyRate);
+        converted_Amount=this.convertCurrencyRate(net_payble,templateValue.currencyRate)
       }
       let total:any ={};
       total['surcharge'] = this.getDecimalAmount(surcharge);
