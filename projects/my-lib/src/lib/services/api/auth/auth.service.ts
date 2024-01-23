@@ -89,7 +89,7 @@ export class AuthService implements OnInit{
       api = this.envService.getAuthApi('GET_USER_PERMISSION')+"/"+payload.roleName;
       reqBody = { key: payload.token };
     }else{
-      api = this.envService.getAuthApi('GET_USER_PERMISSION');
+      api = this.envService.getAuthApi('GET_USER_PERMISSION')+"/"+null;
       reqBody = { key: payload };
     }
 
