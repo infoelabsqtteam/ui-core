@@ -178,10 +178,10 @@ export class CoreFunctionService {
   checkBlankProperties(data:any) {
     const objWithoutNull:any = {...data};
     Object.keys(objWithoutNull).forEach(key => {
-      if (objWithoutNull[key] === "") {
+      if (objWithoutNull[key] && objWithoutNull[key] === "") {
         objWithoutNull[key] = null;
       }else {
-        if(typeof objWithoutNull[key] == 'object' && objWithoutNull[key] != null && objWithoutNull[key] != undefined) {
+        if(objWithoutNull[key] && typeof objWithoutNull[key] == 'object' && objWithoutNull[key] != null && objWithoutNull[key] != undefined) {
           Object.keys(objWithoutNull[key]).forEach(keyValue => {
             if (objWithoutNull[key][keyValue] === "") {
                   objWithoutNull[key][keyValue] = null;
