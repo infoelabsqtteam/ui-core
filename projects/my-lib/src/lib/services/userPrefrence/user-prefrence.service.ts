@@ -97,9 +97,11 @@ export class UserPrefrenceService {
         };
         if(moduleName!=null){
           menu[moduleName]={
-            reference : this.getModuleRef(moduleName),
-            favourite: true,
-            [parent.name] : menuData
+            menus:{
+              reference : this.getModuleRef(moduleName),
+              favourite: true,
+              [parent.name] : menuData
+            }
           }
           return menu;
         }
@@ -110,9 +112,11 @@ export class UserPrefrenceService {
         };
         if(moduleName!== null){
           menu[moduleName]={
-            reference : this.getModuleRef(moduleName),
-            favourite: true,
-            [item.name] : menuData
+            menus:{
+              reference : this.getModuleRef(moduleName),
+              favourite: true,
+              [item.name] : menuData
+            }
           }
           return menu;
         }
@@ -400,33 +404,36 @@ export class UserPrefrenceService {
         ];
       let parent = data[moduleIndex]?.['menu_list'][menuIndex];
       newMenu[moduleRef.name] = {
-        reference : moduleRef,
-        favourite: true,
-        [parent.name] : {
-        reference: this.commonFunctionService.getReferenceObject(parent),
-        favourite: true,
-        submenus: {
-          [submenu.name]: {
+        menus:{
+            reference : moduleRef,
             favourite: true,
-            reference: {
-              ...this.commonFunctionService.getReferenceObject(submenu),
-              allSelected: false,
-            },
-            templateTabs: tabRef,
-          },
+            [parent.name] : {
+              reference: this.commonFunctionService.getReferenceObject(parent),
+              favourite: true,
+              submenus: {
+                [submenu.name]: {
+                  favourite: true,
+                  reference: {
+                    ...this.commonFunctionService.getReferenceObject(submenu),
+                    allSelected: false,
+                  },
+                  templateTabs: tabRef,
+                },
+          }
         },
       }
     };
     } else {
       let menu = data[moduleIndex]?.['menu_list'][menuIndex];
       newMenu[moduleRef.name]={
+        menus: {
         reference : moduleRef,
         favourite:true,
         [menu.name] : {
         favourite: true,
         reference: { ...this.commonFunctionService.getReferenceObject(menu), allSelected: false },
         templateTabs: tabRef,
-      }
+      }}
     };
     }
     return newMenu;
