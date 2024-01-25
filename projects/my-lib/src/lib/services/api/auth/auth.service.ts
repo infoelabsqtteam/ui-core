@@ -164,6 +164,8 @@ export class AuthService implements OnInit{
               response.message = respData['message'];
             }
             this.authDataShareService.setAuthentication(true);
+            response.status = "success";
+            this.authDataShareService.setUserInfo(response);
         } else if(respData && respData['message']){
           response.status = 'error';
           response.class = 'bg-danger';
