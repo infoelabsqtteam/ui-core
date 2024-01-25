@@ -81,7 +81,7 @@ export class UserPrefrenceService {
       if (parent) {
         // If parent exists and has a submenu, add the current menu to the existing submenu
         let refObj: any = {
-          favourite: true,
+          favourite: item.favourite,
           reference: {
             ...this.commonFunctionService.getReferenceObject(menuItems),
             allSelected: true,
@@ -97,9 +97,9 @@ export class UserPrefrenceService {
         };
         if(moduleName!=null){
           menu[moduleName]={
+            favourite: item.favourite,
+            reference : this.getModuleRef(moduleName),
             menus:{
-              reference : this.getModuleRef(moduleName),
-              favourite: true,
               [parent.name] : menuData
             }
           }
@@ -112,9 +112,9 @@ export class UserPrefrenceService {
         };
         if(moduleName!== null){
           menu[moduleName]={
+            reference : this.getModuleRef(moduleName),
+            favourite: item.favourite,
             menus:{
-              reference : this.getModuleRef(moduleName),
-              favourite: true,
               [item.name] : menuData
             }
           }
@@ -396,6 +396,9 @@ export class UserPrefrenceService {
     let newMenu: any = {};
     let tabRef = this.getTabRef(tab,'favourite');
     let moduleRef = this.commonFunctionService.getReferenceObject(data[moduleIndex]);
+    let isFavExist = tab.favourite
+    let updateAllSelect = !tab.favourite?false:true
+
 
     if (submenuIndex != -1) {
       let submenu =
@@ -404,18 +407,18 @@ export class UserPrefrenceService {
         ];
       let parent = data[moduleIndex]?.['menu_list'][menuIndex];
       newMenu[moduleRef.name] = {
+        favourite: isFavExist,
+        reference : moduleRef,
         menus:{
-            reference : moduleRef,
-            favourite: true,
             [parent.name] : {
               reference: this.commonFunctionService.getReferenceObject(parent),
-              favourite: true,
+              favourite: isFavExist,
               submenus: {
                 [submenu.name]: {
-                  favourite: true,
+                  favourite: isFavExist,
                   reference: {
                     ...this.commonFunctionService.getReferenceObject(submenu),
-                    allSelected: false,
+                    allSelected: updateAllSelect,
                   },
                   templateTabs: tabRef,
                 },
@@ -426,12 +429,12 @@ export class UserPrefrenceService {
     } else {
       let menu = data[moduleIndex]?.['menu_list'][menuIndex];
       newMenu[moduleRef.name]={
-        menus: {
+        favourite: isFavExist,
         reference : moduleRef,
-        favourite:true,
+        menus: {
         [menu.name] : {
-        favourite: true,
-        reference: { ...this.commonFunctionService.getReferenceObject(menu), allSelected: false },
+        favourite: isFavExist,
+        reference: { ...this.commonFunctionService.getReferenceObject(menu), allSelected: updateAllSelect },
         templateTabs: tabRef,
       }}
     };
