@@ -4,6 +4,13 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class CoreFunctionService {
+  commonOperators:any={
+    eq :"EQUAL",
+    in : "IN",
+    neq : "NOT EQAL",
+    stwic : "START WITH IGNORE CASE",
+    cnts : "CONTAINS"
+  };
 
   constructor() { }
   isNotBlank(value:any){
@@ -193,5 +200,13 @@ export class CoreFunctionService {
       }
     });
     return objWithoutNull;
+  }
+  getOperators(type:string){
+    let operatorList = this.commonOperators;
+    if(type == "date"){
+      operatorList['gte'] = "GREATER THAN EQUAL";
+      operatorList['lte'] = "LESS THAN EQUAL";
+    }
+    return operatorList;
   }
 }
