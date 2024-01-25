@@ -183,7 +183,7 @@ export class CoreFunctionService {
       if (objWithoutNull[key] === "") {
         objWithoutNull[key] = null;
       }else {
-        if(typeof objWithoutNull[key] == 'object') {
+        if(objWithoutNull[key] && typeof objWithoutNull[key] == 'object') {
           Object.keys(objWithoutNull[key]).forEach(keyValue => {
             if (objWithoutNull[key][keyValue] === "") {
                   objWithoutNull[key][keyValue] = null;
