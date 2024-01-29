@@ -420,6 +420,11 @@ constructor(
     return gridColumns;
   }
 
+  isDate(date:any) {
+    let dateValue:any = new Date(date);
+    return (dateValue !== "Invalid Date") && !isNaN(dateValue);
+  }
+
   getValueForGrid(field:any, object:any) {
     let value:any = '';
     let fieldName: any= '';
@@ -456,13 +461,7 @@ constructor(
           }
         }
         return returnValue;
-      case 'time': 
-        let dateObject = new Date(value);
-        if(dateObject.toString() === 'Invalid Date') {
-          return value;
-        }else {
-          return this.datePipe.transform(value, 'h:mm a');
-        }
+      case 'time': return this.isDate(value) ? this.datePipe.transform(value, 'h:mm a') : value;
       case "boolean": return value ? "Yes" : "No";
       case "currency": return this.CurrencyPipe.transform(value, 'INR');
   	  case "dropdown": return value && value.name ? value.name : value;
@@ -586,13 +585,7 @@ constructor(
     switch (field.type.toLowerCase()) {
       case 'datetime': return this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
       case 'date': return this.datePipe.transform(value, 'dd/MM/yyyy');
-      case 'time': 
-        let dateObject = new Date(value);
-        if(dateObject.toString() === 'Invalid Date') {
-          return value;
-        }else {
-          return this.datePipe.transform(value, 'h:mm a');
-        }
+      case 'time': return this.isDate(value) ? this.datePipe.transform(value, 'h:mm a') : value;
       case "boolean": return value ? "Yes" : "No";
       case "currency": return this.CurrencyPipe.transform(value, 'INR');
       case "info":
