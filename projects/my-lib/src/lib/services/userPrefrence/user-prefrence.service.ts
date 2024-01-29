@@ -418,7 +418,7 @@ export class UserPrefrenceService {
                   favourite: isFavExist,
                   reference: {
                     ...this.commonFunctionService.getReferenceObject(submenu),
-                    allSelected: updateAllSelect,
+                    // allSelected: updateAllSelect,
                   },
                   templateTabs: tabRef,
                 },
@@ -434,7 +434,7 @@ export class UserPrefrenceService {
         menus: {
         [menu.name] : {
         favourite: isFavExist,
-        reference: { ...this.commonFunctionService.getReferenceObject(menu), allSelected: updateAllSelect },
+        reference: { ...this.commonFunctionService.getReferenceObject(menu)},
         templateTabs: tabRef,
       }}
     };
