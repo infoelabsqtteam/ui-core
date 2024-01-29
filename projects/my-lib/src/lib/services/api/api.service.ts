@@ -745,6 +745,24 @@ getGridRunningData(payload:any){
     )
   }
   //End For app functions
-
+  async clearCache() {
+    try {
+      let api = this.envService.getApi('CLEAR_CACHE');
+      let respData = await this.http.get<any>(api).toPromise();
+      return respData;
+    } catch (error) {
+      return error;
+    }
+  }
+  
+  async clearTemplate(){
+    try {
+      let api = this.envService.getApi('CLEAR_TEMPLATE');
+      let respData = await this.http.get<any>(api).toPromise();
+      return respData;
+    } catch (error) {
+      return error;
+    }
+  }
 
 }
