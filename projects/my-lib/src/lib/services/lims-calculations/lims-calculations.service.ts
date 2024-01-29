@@ -2349,7 +2349,6 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
         discount_amount = 0;
         net_amount = 0;
         if (paramArray.length > 0) {
-          this.getSlabData(paramArray);
           paramArray.forEach((data:any) => {
             data['qty'] = this.getDecimalAmount(qty);
             this.calculateParameterLimsSegmentWiseForSubsequent(lims_segment, data, field_name);
@@ -2402,34 +2401,6 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
 
   return templateValue;
 
-}
-
-getSlabData(data:any) {
-  let slabrate = 0;    
-  let SelectedslabList = [];
-  for (let index = 0; index < data.length; index++) {
-    let element = data[index];
-    if(element.pricingType == "Slab Wise Rate") {
-      SelectedslabList.push(element);
-    }
-  }
-  if(SelectedslabList && SelectedslabList.length > 0) {
-    if(SelectedslabList[0].slabRates && SelectedslabList[0].slabRates.length > 0) {
-      let slabDataIndex = -1;
-      for (var val of SelectedslabList[0].slabRates) {
-        if(SelectedslabList.length >= val.from && val.to >= SelectedslabList.length) {
-          SelectedslabList[0]['offer_rate'] = val.rate;
-          SelectedslabList[0]['quotation_rate'] = val.rate;
-          SelectedslabList[0]['sale_rate'] = val.rate;
-          SelectedslabList[0]['net_amount'] = val.rate; 
-          SelectedslabList[0]['per_sample_net_rate'] = val.rate;
-          slabDataIndex = this.commonFunctionService.getIndexInArrayById(data,SelectedslabList[0]['_id']);
-          data[slabDataIndex] = SelectedslabList[0];
-          return data;
-        }
-      }
-    }
-  }
 }
 
 /**
