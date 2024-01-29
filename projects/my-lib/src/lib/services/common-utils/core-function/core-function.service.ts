@@ -8,7 +8,7 @@ export class CoreFunctionService {
     eq :"EQUAL",
     in : "IN",
     neq : "NOT EQAL",
-    stwic : "START WITH IGNORE CASE",
+    // stwic : "START WITH IGNORE CASE",
     cnts : "CONTAINS"
   };
 
@@ -201,9 +201,31 @@ export class CoreFunctionService {
   }
   getOperators(type:string){
     let operatorList = this.commonOperators;
-    if(type == "date"){
-      operatorList['gte'] = "GREATER THAN EQUAL";
-      operatorList['lte'] = "LESS THAN EQUAL";
+    switch (type){
+      case "date":
+        operatorList['gte'] = "GREATER THAN EQUAL";
+        operatorList['lt'] = 'LESS THAN',
+        operatorList['lte'] = "LESS THAN EQUAL";
+        operatorList['gt'] = 'GREATER THAN',
+        operatorList['gte'] = 'GREATER THAN EQUAL',
+        operatorList['drng'] = 'DATA RANGE'
+        break;
+      case "number":
+        operatorList['lt'] = 'LESS THAN',
+        operatorList['lte'] = "LESS THAN EQUAL";
+        operatorList['gt'] = 'GREATER THAN',
+        operatorList['gte'] = 'GREATER THAN EQUAL'
+        break;
+      case "string":
+        operatorList['stwic'] = "START WITH IGNORE CASE",
+        operatorList['edw'] = 'END WITH',
+        operatorList['edwic'] = 'END WITH IGNORE CASE',
+        operatorList['cntsic'] = 'CONTAINS IGNORE CASE',
+        operatorList['ncnts'] = 'NOT CONTAINS',
+        operatorList['ncntsic'] = 'NOT CONTAINS IGNORE CASE'
+        break;
+      default:
+        break;
     }
     return operatorList;
   }
