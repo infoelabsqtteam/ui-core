@@ -456,7 +456,8 @@ constructor(
           }
         }
         return returnValue;
-      case 'time': return value;
+      case 'time': return this.datePipe.transform(value, 'h:mm a');
+      case 'timeonly': return value;
       case "boolean": return value ? "Yes" : "No";
       case "currency": return this.CurrencyPipe.transform(value, 'INR');
   	  case "dropdown": return value && value.name ? value.name : value;
@@ -580,7 +581,8 @@ constructor(
     switch (field.type.toLowerCase()) {
       case 'datetime': return this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
       case 'date': return this.datePipe.transform(value, 'dd/MM/yyyy');
-      case 'time': return value;
+      case 'time': return this.datePipe.transform(value, 'h:mm a');
+      case 'timeonly': return value;
       case "boolean": return value ? "Yes" : "No";
       case "currency": return this.CurrencyPipe.transform(value, 'INR');
       case "info":
