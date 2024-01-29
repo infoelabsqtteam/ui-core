@@ -89,7 +89,13 @@ constructor(
             field['display'] = true;
           }
         } else {
-          field['display'] = true;
+            let ishide = field.hide;
+            if(ishide && ishide != undefined && ishide != null) {
+              field.display = false;
+            }
+            else{
+              field['display'] = true;
+            }
         }
         if(field['field_class']){
           field['field_class'] = field['field_class'].trim();

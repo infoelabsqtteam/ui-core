@@ -644,11 +644,6 @@ export class UserPrefrenceService {
   saveColumn(data:any){
     let {columns,form,formTable}=data;
     const checkedFields=columns.filter((col:any)=>col.display==true);
-    const checkedFieldsIds=checkedFields.map((col:any)=>col._id);
-    const uncheckedFields=columns.filter((col:any)=>col.display==false);
-    const uncheckedFieldsIds= uncheckedFields.map((col:any)=>col._id)
-
-   
     let {menuIndex, submenuIndex, moduleIndex}= this.dataShareService.getMenuOrSubmenuIndexs();
     const allModuleData=this.storageService.GetModules();
     let selectedModule= allModuleData[moduleIndex];
@@ -658,7 +653,6 @@ export class UserPrefrenceService {
     let activeMenu=this.storageService.GetActiveMenu() ///get active tab 
     let selectedTab= allTempleteTabs?.find((tab:any)=>tab.tab_name== activeMenu?.name);
     let selectedGrid= selectedTab.grid
-    this.checkAndSetPreference(uncheckedFieldsIds,checkedFieldsIds)
 
     if(submenuIndex!= -1){
        selectedSubMenu= allModuleData[moduleIndex]?.["menu_list"][menuIndex]?.["submenu"][submenuIndex];
@@ -760,39 +754,43 @@ export class UserPrefrenceService {
     return payload;
   }
 
-  checkAndSetPreference(uncheckedFieldsIds:any[],checkedFieldsIds:any[]){
-    let existingUserPreferences:any = this.storageService.getTempGridColumn();
-    if (!existingUserPreferences) {
-      let uref: any = {};
-      let userRef = this.commonFunctionService.getReferenceObject(
-        this.storageService.GetUserInfo()
-      );
-      uref['userId'] = userRef;
-      uref['preference'] = uncheckedFieldsIds;
-      existingUserPreferences = uref;
-      this.storageService.setTempGridColumn(JSON.stringify(existingUserPreferences));
+  addHideKeyInExistingTab(columns:any,fId:String,fieldName:String){
+      let tabName=this.storageService.GetActiveMenu().name;
+      let template=this.dataShareService.getTempData();
+      let tabs = template[0].templateTabs;
+      let selectTabIndex=this.commonFunctionService.getIndexInArrayById(tabs,tabName,'tab_name')
+      let tab = tabs[selectTabIndex];
+      let grid=tab.grid;
+      let gridColumns=grid.gridColumns;
+      if(fId && fieldName){
+        let forms=tab.forms;
+        if(typeof forms== 'object' && Object.keys(forms).length>0){
+          Object.keys(forms).forEach((key:any)=>{
+            let form=forms[key];
+            if(form._id== fId){
+                let formFields=form.tableFields;
+                formFields.forEach((field:any)=>{
+                  if(field.field_name == fieldName){
+                      if(field.gridColumns && field.gridColumns.length>0){
+                        gridColumns=field.gridColumns;
+                      }
+                  }
+                })
+            }
+          })
+        }
+      }
+      if( gridColumns && gridColumns.length>0 && columns.length>0){
+        columns.forEach((col:any,index:any)=>{
+          if(col.display){
+            gridColumns[index]['hide']=false;
+
+          }
+          else{
+            gridColumns[index]['hide']=true;
+
+          }
+        })
+      }
     }
-    else if(Object.keys(existingUserPreferences).length > 0){
-      existingUserPreferences = JSON.parse(existingUserPreferences)
- 
-      if(existingUserPreferences!=null && existingUserPreferences.hasOwnProperty("preference")){
-        let oldPreference=existingUserPreferences["preference"];
-
-        //removing duplicate of uncheckedFieldId from newpreference
-        let newpreference=[...new Set([...oldPreference,...uncheckedFieldsIds])];
-
-        //removing checkedFieldsIds which present in newpreference
-        newpreference=newpreference.filter(element=> !checkedFieldsIds.includes(element))
-        
-        existingUserPreferences['preference']=newpreference;
-        this.storageService.setTempGridColumn(JSON.stringify(existingUserPreferences));     
-       }
-        else{
-
-        existingUserPreferences["preference"]=uncheckedFieldsIds;
-        this.storageService.setTempGridColumn(JSON.stringify(existingUserPreferences));
-      }}
-
-    }
-    
 }
