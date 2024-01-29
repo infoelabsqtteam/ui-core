@@ -2407,6 +2407,4 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
  * End point for subsequet calculation for quotation
  */
 
-
-
 }
