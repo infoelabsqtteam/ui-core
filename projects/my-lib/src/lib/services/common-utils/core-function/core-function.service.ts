@@ -7,8 +7,8 @@ export class CoreFunctionService {
   commonOperators:any={
     eq :"EQUAL",
     in : "IN",
-    neq : "NOT EQAL",
-    stwic : "START WITH IGNORE CASE",
+    neq : "NOT EQUAL",
+    // stwic : "START WITH IGNORE CASE",
     cnts : "CONTAINS"
   };
 
@@ -202,11 +202,43 @@ export class CoreFunctionService {
     return objWithoutNull;
   }
   getOperators(type:string){
-    let operatorList = this.commonOperators;
-    if(type == "date"){
-      operatorList['gte'] = "GREATER THAN EQUAL";
-      operatorList['lte'] = "LESS THAN EQUAL";
-    }
-    return operatorList;
+    let operatorList = {...this.commonOperators};
+    switch (type){
+      case "date":
+        operatorList['gte'] = "GREATER THAN EQUAL";
+        operatorList['lt'] = 'LESS THAN',
+        operatorList['lte'] = "LESS THAN EQUAL";
+        operatorList['gt'] = 'GREATER THAN',
+        operatorList['gte'] = 'GREATER THAN EQUAL',
+        operatorList['drng'] = 'DATE RANGE'
+        break;
+      case "number":
+        operatorList['lt'] = 'LESS THAN',
+        operatorList['lte'] = "LESS THAN EQUAL";
+        operatorList['gt'] = 'GREATER THAN',
+        operatorList['gte'] = 'GREATER THAN EQUAL'
+        break;
+      case "string":
+        operatorList['stwic'] = "START WITH IGNORE CASE",
+        operatorList['edw'] = 'END WITH',
+        operatorList['edwic'] = 'END WITH IGNORE CASE',
+        operatorList['cntsic'] = 'CONTAINS IGNORE CASE',
+        operatorList['ncnts'] = 'NOT CONTAINS',
+        operatorList['ncntsic'] = 'NOT CONTAINS IGNORE CASE'
+        break;
+      default:
+        break;
+    }     
+    return this.sortOperators(operatorList);
+  }
+
+  sortOperators(operatorList:any){
+    const sortedKeys = Object.keys(operatorList).sort();
+     const sortedOperatorList:any = {};
+     sortedKeys.forEach(key => {
+         sortedOperatorList[key] = operatorList[key];
+     });
+ 
+     return sortedOperatorList;
   }
 }

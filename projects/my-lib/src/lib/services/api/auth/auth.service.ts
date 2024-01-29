@@ -106,6 +106,8 @@ export class AuthService implements OnInit{
           this.apiCallService.getUserPrefrerence(respData.user);
           this.apiCallService.getUserNotification(1);
           this.redirectionWithMenuType(loginRedirect);
+          response.status = "success";
+          this.authDataShareService.setUserInfo(response);
         } else {
             this.envService.setRequestType('PUBLIC');
             this.redirectToSignPage();
@@ -173,8 +175,6 @@ export class AuthService implements OnInit{
               response.message = respData['message'];
             }
             this.authDataShareService.setAuthentication(true);
-            response.status = "success";
-            this.authDataShareService.setUserInfo(response);
         } else if(respData && respData['message']){
           response.status = 'error';
           response.class = 'bg-danger';
