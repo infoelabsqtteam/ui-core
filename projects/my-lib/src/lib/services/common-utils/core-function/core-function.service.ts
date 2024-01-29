@@ -7,7 +7,7 @@ export class CoreFunctionService {
   commonOperators:any={
     eq :"EQUAL",
     in : "IN",
-    neq : "NOT EQAL",
+    neq : "NOT EQUAL",
     // stwic : "START WITH IGNORE CASE",
     cnts : "CONTAINS"
   };
@@ -200,7 +200,7 @@ export class CoreFunctionService {
     return objWithoutNull;
   }
   getOperators(type:string){
-    let operatorList = this.commonOperators;
+    let operatorList = {...this.commonOperators};
     switch (type){
       case "date":
         operatorList['gte'] = "GREATER THAN EQUAL";
@@ -226,7 +226,17 @@ export class CoreFunctionService {
         break;
       default:
         break;
-    }
-    return operatorList;
+    }     
+    return this.sortOperators(operatorList);
+  }
+
+  sortOperators(operatorList:any){
+    const sortedKeys = Object.keys(operatorList).sort();
+     const sortedOperatorList:any = {};
+     sortedKeys.forEach(key => {
+         sortedOperatorList[key] = operatorList[key];
+     });
+ 
+     return sortedOperatorList;
   }
 }
