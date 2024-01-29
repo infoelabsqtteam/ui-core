@@ -457,9 +457,9 @@ constructor(
         }
         return returnValue;
       case 'time': 
-      let dateObject = new Date(value);
-      if(dateObject.toString() === 'Invalid Date') {
-        return value;
+        let dateObject = new Date(value);
+        if(dateObject.toString() === 'Invalid Date') {
+          return value;
         }else {
           return this.datePipe.transform(value, 'h:mm a');
         }
@@ -587,9 +587,9 @@ constructor(
       case 'datetime': return this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
       case 'date': return this.datePipe.transform(value, 'dd/MM/yyyy');
       case 'time': 
-      let dateObject = new Date(value);
-      if(dateObject.toString() === 'Invalid Date') {
-        return value;
+        let dateObject = new Date(value);
+        if(dateObject.toString() === 'Invalid Date') {
+          return value;
         }else {
           return this.datePipe.transform(value, 'h:mm a');
         }
