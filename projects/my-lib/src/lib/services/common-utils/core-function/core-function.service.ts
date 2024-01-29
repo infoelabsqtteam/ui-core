@@ -208,7 +208,7 @@ export class CoreFunctionService {
         operatorList['lte'] = "LESS THAN EQUAL";
         operatorList['gt'] = 'GREATER THAN',
         operatorList['gte'] = 'GREATER THAN EQUAL',
-        operatorList['drng'] = 'DATA RANGE'
+        operatorList['drng'] = 'DATE RANGE'
         break;
       case "number":
         operatorList['lt'] = 'LESS THAN',
