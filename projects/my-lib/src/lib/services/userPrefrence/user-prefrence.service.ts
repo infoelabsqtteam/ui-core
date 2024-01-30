@@ -396,10 +396,7 @@ export class UserPrefrenceService {
     let newMenu: any = {};
     let tabRef = this.getTabRef(tab,'favourite');
     let moduleRef = this.commonFunctionService.getReferenceObject(data[moduleIndex]);
-    let isFavExist = tab.favourite
-    let updateAllSelect = !tab.favourite?false:true
-
-
+    let isFavExist = tab.favourite;
     if (submenuIndex != -1) {
       let submenu =
         data[moduleIndex]?.['menu_list'][menuIndex]?.['submenu']?.[
@@ -418,7 +415,6 @@ export class UserPrefrenceService {
                   favourite: isFavExist,
                   reference: {
                     ...this.commonFunctionService.getReferenceObject(submenu),
-                    // allSelected: updateAllSelect,
                   },
                   templateTabs: tabRef,
                 },
