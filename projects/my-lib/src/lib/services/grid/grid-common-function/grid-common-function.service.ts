@@ -89,9 +89,8 @@ constructor(
             field['display'] = true;
           }
         } else {
-            let ishide = field.hide;
-            if(ishide && ishide != undefined && ishide != null) {
-              field.display = false;
+            if(field &&  field.hide) {
+              field['display'] = false;
             }
             else{
               field['display'] = true;
