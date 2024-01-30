@@ -1200,16 +1200,18 @@ export class CommonFunctionService {
     }
   }
 
-  copyGridCellText(value:any){       
-    navigator.clipboard.writeText(value);
-    this.notificationService.notify("bg-success","Text Copied");
+  copyGridCellText(value:any){     
+    if(value){
+      navigator.clipboard.writeText(value);
+      this.notificationService.notify("bg-success","Text Copied");
+    }  
   }
   
   copyGridColumnText(head:any,data:any,elements?:any){
     let columnData = "";
     if(data.length>0){
       let field_name=head.field_name;
-      if(head.type == "info"){
+      if(head.type == "info" && elements && elements.length>0){
         if(head.gridColumns){
           let childGridColumn = head.gridColumns;
           let childFieldName = childGridColumn[0]['field_name'];
