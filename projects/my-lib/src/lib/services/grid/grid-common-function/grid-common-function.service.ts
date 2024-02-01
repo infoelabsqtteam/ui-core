@@ -89,7 +89,12 @@ constructor(
             field['display'] = true;
           }
         } else {
-          field['display'] = true;
+            if(field &&  field.hide) {
+              field['display'] = false;
+            }
+            else{
+              field['display'] = true;
+            }
         }
         if(field['field_class']){
           field['field_class'] = field['field_class'].trim();
