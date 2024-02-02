@@ -89,7 +89,12 @@ constructor(
             field['display'] = true;
           }
         } else {
-          field['display'] = true;
+            if(field &&  field.hide) {
+              field['display'] = false;
+            }
+            else{
+              field['display'] = true;
+            }
         }
         if(field['field_class']){
           field['field_class'] = field['field_class'].trim();
@@ -177,6 +182,8 @@ constructor(
               modifyData[fieldName] = modifyList;
               element.gridColumns = this.modifyGridColumns(gridColumns,object);
               modifyObject.field_index = i;
+            }else {
+              modifyData[fieldName] = cData;
             }
           }
         }else if(type && type.startsWith('list_of_fields') && element.datatype == "list_of_object_with_popup" && field_name == fieldName){
