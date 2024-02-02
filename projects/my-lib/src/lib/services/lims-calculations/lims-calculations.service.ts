@@ -172,19 +172,6 @@ export class LimsCalculationsService {
     staticModal[0]['data'] = object;
     return staticModal;
   }
-
-  currencyRate(object:any){
-    let modifyObje = object;
-    if(object.currencyRate && object.currencyRate != undefined && object.currencyRate != null) {
-      let currencyRate = object['currencyRate'];
-      let final_amount = object['final_amount'];
-      let modifycurrencyRate = final_amount / currencyRate;
-      object['convertedAmount'] = this.getDecimalAmount(modifycurrencyRate);
-      modifyObje = object;
-    }
-    return modifyObje;
-  }
-
   getDecimalAmount(value:any): any {
     let decimaldigitNo:number = this.storageService.getApplicationSetting().roundValueNoOfDigits;
     let decimalno:number = 2;
@@ -1436,7 +1423,6 @@ export class LimsCalculationsService {
     let final_amt = sum+net_amt;
     obj['sampling_charge'] = sum;
     obj['final_amount'] = final_amt;
-    obj=this.currencyRate(obj);       //calculate quote Amount
    return obj;
   }
 
