@@ -234,6 +234,7 @@ constructor(
       case "typeahead":
         if(item.datatype == "list_of_object"){
           if (Array.isArray(listOfField[item.field_name]) && listOfField[item.field_name].length > 0 && listOfField[item.field_name] != null && listOfField[item.field_name] != undefined && listOfField[item.field_name] != '') {
+            item['hideCopy']=true;
             return '<i class="fa fa-eye cursor-pointer"></i>';
           } else {
             return '-';
@@ -258,6 +259,7 @@ constructor(
       case "grid_selection":
       case "list_of_fields":
         if (Array.isArray(listOfField[item.field_name]) && listOfField[item.field_name].length > 0 && listOfField[item.field_name] != null && listOfField[item.field_name] != undefined && listOfField[item.field_name] != '') {
+          item['hideCopy']=true;
           return '<i class="fa fa-eye cursor-pointer"></i>';
         } else {
           return '-';
