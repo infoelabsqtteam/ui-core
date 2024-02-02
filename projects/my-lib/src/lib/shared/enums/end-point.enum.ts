@@ -64,6 +64,4 @@ export enum EndPoint {
     AUDIT_HISTORY = "getAuditHistory",
     AUDIT_VERSION_LIST = "getAuditVersionList",
     DOWNLOAD_MANUAL= "s3/getSignedS3Url",
-    CLEAR_CACHE = "refresh/cache",
-    CLEAR_TEMPLATE = "refresh/template"
 }
