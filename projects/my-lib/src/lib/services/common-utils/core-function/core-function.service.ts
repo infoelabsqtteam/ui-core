@@ -180,14 +180,6 @@ export class CoreFunctionService {
     Object.keys(objWithoutNull).forEach(key => {
       if (objWithoutNull[key] === "") {
         objWithoutNull[key] = null;
-      }else {
-        if(typeof objWithoutNull[key] == 'object') {
-          Object.keys(objWithoutNull[key]).forEach(keyValue => {
-            if (objWithoutNull[key][keyValue] === "") {
-                  objWithoutNull[key][keyValue] = null;
-                }
-          });
-        }
       }
     });
     return objWithoutNull;

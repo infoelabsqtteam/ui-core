@@ -172,7 +172,6 @@ export class LimsCalculationsService {
     staticModal[0]['data'] = object;
     return staticModal;
   }
-
   getDecimalAmount(value:any): any {
     let decimaldigitNo:number = this.storageService.getApplicationSetting().roundValueNoOfDigits;
     let decimalno:number = 2;
