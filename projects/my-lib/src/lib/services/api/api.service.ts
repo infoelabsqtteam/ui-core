@@ -746,5 +746,4 @@ getGridRunningData(payload:any){
   }
   //End For app functions
 
-
 }
