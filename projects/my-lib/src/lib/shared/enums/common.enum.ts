@@ -8,5 +8,6 @@ export enum Common {
     ITEM_NUM_OF_GRID = 25,
     PAGE_NO = 1,
     GOOGLE_API_KEY = "AIzaSyAZG9mCLgVxc4Y9MGAaRxPlyU8I7VON3Sg",
-    DEFAULT_OPERATOR = "stwic"
+    DEFAULT_OPERATOR = "stwic",
+    TINYMICAPIKEY = 'iao4rl1otk4n9or5nn6wkyo63ni2jxiud9ul5tkh6dxibdb2',
 }
