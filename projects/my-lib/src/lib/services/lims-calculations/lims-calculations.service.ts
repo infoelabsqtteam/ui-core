@@ -186,9 +186,9 @@ export class LimsCalculationsService {
   }
 
   convertCurrencyRate(amount:any,currencyRate:any){
-    let convertedAmount =amount/currencyRate;
+    let convertedAmount =amount*currencyRate;
     return this.getDecimalAmount(convertedAmount);
-}
+  }
 
   legacyQuotationParameterCalculation(data:any, fieldName:any) {
     let quantity = 0;
@@ -633,7 +633,7 @@ export class LimsCalculationsService {
 
 
 
-  calculate_invoice_amount_row_wise(data:any, fieldName:any,currencyRate:any) {
+  calculate_invoice_amount_row_wise(data:any, fieldName:any,currencyRate?:any) {
     let total = 0;
     let disc_per = 0;
     let disc_amt = 0;
@@ -678,7 +678,7 @@ export class LimsCalculationsService {
         final_amt = surcharge + net_amount;
         break;
     }
-    if(data.hasOwnProperty("finalConvertedAmount") && currencyRate != "" && currencyRate != undefined){
+    if(data.finalConvertedAmount && currencyRate != "" ){
       data["finalConvertedAmount"] = this.convertCurrencyRate(final_amt,currencyRate)
     }
     data["discount_percent"] = disc_per;
@@ -688,7 +688,7 @@ export class LimsCalculationsService {
   }
 
 
-  calculateNetAmount(data:any, fieldName:any, grid_cell_function:any,currencyRate:any) {
+  calculateNetAmount(data:any, fieldName:any, grid_cell_function:any,currencyRate?:any) {
     switch (grid_cell_function) {
       case "calculateQuotationParameterAmountForAutomotiveLims":
         this.calculateQuotationParameterAmountForAutomotiveLims(data, fieldName["field_name"]);
@@ -1212,6 +1212,9 @@ export class LimsCalculationsService {
     } else {
       unit_price = templateValue["unit_price"];
     }
+    if(templateValue.currencyRate && templateValue.currencyRate != ""){
+      templateValue['convertedAmount']=this.convertCurrencyRate(final_amount,templateValue.currencyRate);
+    }
 
     templateValue['total'] = gross_amount;
     templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
@@ -1431,6 +1434,9 @@ export class LimsCalculationsService {
     let final_amt = sum+net_amt;
     obj['sampling_charge'] = sum;
     obj['final_amount'] = final_amt;
+    if(obj.currencyRate && obj.currencyRate != ""){
+      obj['convertedAmount']=this.convertCurrencyRate(final_amt,obj.currencyRate);
+    }
    return obj;
   }
 
@@ -1450,7 +1456,6 @@ export class LimsCalculationsService {
     let cgst_percent=0;
     let sgst_percent=0;
     let tax_percentage = 0;
-    let converted_Amount=0;
     let tax_type = templateValue['tax_type'];
 
     if(this.coreFunctionService.isNotBlank(templateValue.tax_percentage)){
@@ -1490,11 +1495,10 @@ export class LimsCalculationsService {
       if(gross_amount>0){
         discount_percent = this.getDecimalAmount(100*discount_amount/gross_amount);
       }
-      //calculate quote Amount
-      if(templateValue.hasOwnProperty("currencyRate") && templateValue.currencyRate != "" && templateValue.currencyRate != undefined){
-        converted_Amount=this.convertCurrencyRate(net_payble,templateValue.currencyRate)
-      }
       let total:any ={};
+      if(templateValue.currencyRate && templateValue.currencyRate != ""){
+        total['convertedAmount']=this.convertCurrencyRate(net_payble,templateValue.currencyRate);
+      }
       total['surcharge'] = this.getDecimalAmount(surcharge);
       total['igst_percent'] = this.getDecimalAmount(igst_percent);
       total['gst_percent'] = this.getDecimalAmount(gst_percent);
@@ -1514,7 +1518,6 @@ export class LimsCalculationsService {
       total['sez_amount'] = this.getDecimalAmount(sez_amount);
       total['net_amount'] = this.getDecimalAmount(net_amount);
       total['net_payble'] = this.getDecimalAmount(net_payble);
-      total['convertedAmount'] = this.getDecimalAmount(converted_Amount);
       if(field != null && field.field_name != null && field != ""){
         delete total[field.field_name]
       }
@@ -1543,7 +1546,6 @@ export class LimsCalculationsService {
     let cgst_percent=0;
     let sgst_percent=0;
     let tax_percentage = 0;
-    let converted_Amount = 0;
     let tax_type = templateValue['tax_type'];
 
     if(this.coreFunctionService.isNotBlank(templateValue.tax_percentage)){
@@ -1583,11 +1585,10 @@ export class LimsCalculationsService {
       if(gross_amount>0){
         discount_percent = this.getDecimalAmount(100*discount_amount/gross_amount);
       }
-      //calculate quote Amount
-      if(templateValue.hasOwnProperty("currencyRate") && templateValue.currencyRate != "" && templateValue.currencyRate != undefined){
-        converted_Amount=this.convertCurrencyRate(net_payble,templateValue.currencyRate)
-      }
       let total:any ={};
+      if(templateValue.currencyRate && templateValue.currencyRate != ""){
+        total['convertedAmount']=this.convertCurrencyRate(net_payble,templateValue.currencyRate);
+      }
       total['surcharge'] = this.getDecimalAmount(surcharge);
       total['igst_percent'] = this.getDecimalAmount(igst_percent);
       total['gst_percent'] = this.getDecimalAmount(gst_percent);
