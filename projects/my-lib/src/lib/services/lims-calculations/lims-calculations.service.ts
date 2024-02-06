@@ -678,7 +678,7 @@ export class LimsCalculationsService {
         final_amt = surcharge + net_amount;
         break;
     }
-    if(data.finalConvertedAmount && currencyRate != "" ){
+    if(data.finalConvertedAmount && currencyRate &&currencyRate != "" ){
       data["finalConvertedAmount"] = this.convertCurrencyRate(final_amt,currencyRate)
     }
     data["discount_percent"] = disc_per;
@@ -1518,7 +1518,7 @@ export class LimsCalculationsService {
       total['sez_amount'] = this.getDecimalAmount(sez_amount);
       total['net_amount'] = this.getDecimalAmount(net_amount);
       total['net_payble'] = this.getDecimalAmount(net_payble);
-      
+
       if(field != null && field.field_name != null && field != ""){
         delete total[field.field_name]
       }
