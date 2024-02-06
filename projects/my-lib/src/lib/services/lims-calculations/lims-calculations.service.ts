@@ -746,7 +746,7 @@ export class LimsCalculationsService {
           templateValue['quotation_param_methods'].forEach((element:any) => {
             const new_element = { ...element };
             new_element.discount_percent = this.getDecimalAmount(+discount_percent);
-            this.calculateNetAmount(new_element, "qty", "","");
+            this.calculateNetAmount(new_element, "qty", "");
             quotation_param_methods.push(new_element);
           })
           templateValue['quotation_param_methods'].setValue(quotation_param_methods);
@@ -1325,7 +1325,7 @@ export class LimsCalculationsService {
       const data = JSON.parse(JSON.stringify(element));
       data['discount_percent'] = discount;
       data['qty'] = quantity;
-      this.calculateNetAmount(data, "discount_percent", "","");
+      this.calculateNetAmount(data, "discount_percent", "");
       updatedParamsList.push(data);
     });
     templateValue["quotation_param_methods"] = updatedParamsList;
@@ -1369,7 +1369,7 @@ export class LimsCalculationsService {
       const data = JSON.parse(JSON.stringify(element));
       data['discount_percent'] = discount;
       data['qty'] = quantity;
-      this.calculateNetAmount(data, "qty", "","");
+      this.calculateNetAmount(data, "qty", "");
       updatedParamsList.push(data)
     });
     templateValue["quotation_param_methods"] = updatedParamsList;
@@ -1518,6 +1518,7 @@ export class LimsCalculationsService {
       total['sez_amount'] = this.getDecimalAmount(sez_amount);
       total['net_amount'] = this.getDecimalAmount(net_amount);
       total['net_payble'] = this.getDecimalAmount(net_payble);
+      
       if(field != null && field.field_name != null && field != ""){
         delete total[field.field_name]
       }
