@@ -1,6 +1,6 @@
 {
   "name": "@core/web-core",
-  "version": "1.0.##VERSION##",
+  "version": "1.0.77",
   "peerDependencies": {
     "@angular/common": "~13.4.0",
     "@angular/core": "~13.4.0",
