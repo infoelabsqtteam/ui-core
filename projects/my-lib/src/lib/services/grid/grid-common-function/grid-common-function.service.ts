@@ -85,8 +85,13 @@ constructor(
         if (this.coreFunctionService.isNotBlank(field.show_if)) {
           if (!this.checkIfService.showIf(field, parentObject)) {
             field['display'] = false;
+            field['show'] = true;
           } else {
-            field['display'] = true;
+            if(field.hide != undefined && field.hide){
+              field['display'] = false;
+            }else{
+              field['display'] = true;
+            }
           }
         } else {
             if(field &&  field.hide) {
