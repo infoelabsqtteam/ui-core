@@ -69,12 +69,6 @@ export class StorageService {
   getModule(){
     return sessionStorage.getItem('MODULE');
   }
-  setTempGridColumn(columnId:any){
-    sessionStorage.setItem("PREFERENCE",columnId);
-  }
-  getTempGridColumn(){
-    return sessionStorage.getItem('PREFERENCE');
-  }
   setChildWindowUrl(url:string){
     localStorage.setItem("CHILD_WINDOW_URL",url);
   }
