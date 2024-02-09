@@ -35,6 +35,9 @@ export class CoreFunctionService {
               let menu = menuMap[mekey];
               if(menu && menu.details){
                 menuobj = menu.details;
+                if(menu?.templateTabMap){
+                  menuobj={...menuobj,templateTabs:Object.keys(menu.templateTabMap)};
+                }
               }
               let submenuList:any = [];
               if(menu && menu.submenuMap){
@@ -45,6 +48,9 @@ export class CoreFunctionService {
                     let submenu = submenuMap[smkey];
                     if(submenu && submenu.details){
                       submenuObj = submenu.details;
+                      if(submenu?.templateTabMap){
+                        submenuObj={...submenuObj,templateTabs:Object.keys(submenu.templateTabMap)};
+                      }
                     }
                     this.setTabOrPermission(submenu,permissionList);
                     submenuList.push(submenuObj);
