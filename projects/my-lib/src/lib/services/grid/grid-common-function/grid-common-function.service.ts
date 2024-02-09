@@ -85,8 +85,13 @@ constructor(
         if (this.coreFunctionService.isNotBlank(field.show_if)) {
           if (!this.checkIfService.showIf(field, parentObject)) {
             field['display'] = false;
+            field['show'] = true;
           } else {
-            field['display'] = true;
+            if(field.hide != undefined && field.hide){
+              field['display'] = false;
+            }else{
+              field['display'] = true;
+            }
           }
         } else {
             if(field &&  field.hide) {
@@ -100,6 +105,22 @@ constructor(
           field['field_class'] = field['field_class'].trim();
         }
         field['width'] = this.getGridColumnWidth(field,gridColumns);
+        if(field && field.type && field.type !=''){
+          switch(field.type.toLowerCase()){
+            case "info":
+            case "html" :
+            case "file":
+            case "template":
+            case "image":
+            case "icon":
+            case "download_file":
+            case "color":
+              field['hideCopy']=true;
+              break;
+            default:
+              break;
+        }
+      }
       };
     }
     return modifyGridColumns;
