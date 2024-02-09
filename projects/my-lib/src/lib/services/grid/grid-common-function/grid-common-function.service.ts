@@ -105,6 +105,22 @@ constructor(
           field['field_class'] = field['field_class'].trim();
         }
         field['width'] = this.getGridColumnWidth(field,gridColumns);
+        if(field && field.type && field.type !=''){
+          switch(field.type.toLowerCase()){
+            case "info":
+            case "html" :
+            case "file":
+            case "template":
+            case "image":
+            case "icon":
+            case "download_file":
+            case "color":
+              field['hideCopy']=true;
+              break;
+            default:
+              break;
+        }
+      }
       };
     }
     return modifyGridColumns;
