@@ -81,6 +81,7 @@ export class DataShareService {
   collectiondata:Subject<any> = new Subject<any>();
   childGrid:Subject<any> = new Subject<any>();
   childgridfields:any;
+  roleChange:Subject<any> = new Subject<any>();
 
   constructor() { }
 
@@ -340,6 +341,9 @@ export class DataShareService {
   }
   getChildGrid(){
     return this.childgridfields;
+  }
+  shareRoleChange(role:any){
+    this.roleChange.next(role);
   }
   //End For App
 
