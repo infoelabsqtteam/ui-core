@@ -30,6 +30,9 @@ export class TreeComponentService {
       const node = new TodoItemNode();
       node.item = key;
       node.reference = value['reference'];
+      if(value && value.criteria){
+        node['criteria'] = value.criteria;
+      }
       node._id = pId;
       if(value['pId']){
         node.pId = value['pId'];
