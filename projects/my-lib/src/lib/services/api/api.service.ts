@@ -1,3 +1,4 @@
+import { CoreFunctionService } from './../common-utils/core-function/core-function.service';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { map, tap, switchMap, mergeMap, catchError } from 'rxjs/operators';
@@ -18,7 +19,8 @@ constructor(
   private http:HttpClient,
   private envService: EnvService,
   private modalService: ModelService,
-  private stroageService: StorageService
+  private stroageService: StorageService,
+  private coreFunctionService:CoreFunctionService
  ) { }
 
 getStatiData(payloads:any){
@@ -193,15 +195,24 @@ resetMenuData(){
   this.dataShareService.shareMenuData([])
 }
 GetTempData(payload:any){
-  let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
-  this.http.post(api, payload).subscribe(
-    (respData) => {
-        this.dataShareService.shareTempData(respData)
-      },
-    (error) => {
-        console.log(error);
-      }
-  )
+  let moduleName = payload['module'];
+  let name = this.coreFunctionService.getTempNameFromPayload(payload);
+  let template = this.stroageService.getTemplate(name,moduleName);
+  if(template){
+    this.dataShareService.shareTempData([template]);
+  }else{
+    let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
+    this.http.post(api, payload).subscribe(
+      (respData) => {
+          this.dataShareService.shareTempData(respData);
+          let preparedTempList = this.coreFunctionService.prepareTemplate(respData,moduleName);
+          this.stroageService.storeAllTemplate(preparedTempList)
+        },
+      (error) => {
+          console.log(error);
+        }
+    )
+  }
 }
 resetTempData(){
   this.dataShareService.shareTempData([])
@@ -551,9 +562,21 @@ GetQr(payload:any){
   )
 }
 
+getAuditVersionList(payload:any){
+  let api = this.envService.getApi('AUDIT_VERSION_LIST');
+  this.http.get(api +"/"+ payload).subscribe(
+    (respData) => {
+      this.dataShareService.setAuditVersionList(respData);
+      },
+    (error) => {
+        console.log(error);
+      }
+  )
+}
+
 getAuditHistory(payload:any){
   let api = this.envService.getApi('AUDIT_HISTORY');
-  this.http.post(api +"/"+ payload['_id'], payload).subscribe(
+  this.http.post(api +"/"+ payload['path'], payload.data).subscribe(
     (respData) => {
       this.dataShareService.setAuditHistoryData(respData);
       },
@@ -708,12 +731,12 @@ getGridRunningData(payload:any){
       (error) => {
           console.log(error);
         }
-    ) 
+    )
   }
   GetChildGrid(payload:any){
     let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
     this.http.post(api, payload).subscribe(
-      (respData:any) => {        
+      (respData:any) => {
           this.dataShareService.setChildGrid(respData[0]);
         },
       (error) => {

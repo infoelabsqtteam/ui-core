@@ -85,16 +85,42 @@ constructor(
         if (this.coreFunctionService.isNotBlank(field.show_if)) {
           if (!this.checkIfService.showIf(field, parentObject)) {
             field['display'] = false;
+            field['show'] = true;
           } else {
-            field['display'] = true;
+            if(field.hide != undefined && field.hide){
+              field['display'] = false;
+            }else{
+              field['display'] = true;
+            }
           }
         } else {
-          field['display'] = true;
+            if(field &&  field.hide) {
+              field['display'] = false;
+            }
+            else{
+              field['display'] = true;
+            }
         }
         if(field['field_class']){
           field['field_class'] = field['field_class'].trim();
         }
         field['width'] = this.getGridColumnWidth(field,gridColumns);
+        if(field && field.type && field.type !=''){
+          switch(field.type.toLowerCase()){
+            case "info":
+            case "html" :
+            case "file":
+            case "template":
+            case "image":
+            case "icon":
+            case "download_file":
+            case "color":
+              field['hideCopy']=true;
+              break;
+            default:
+              break;
+        }
+      }
       };
     }
     return modifyGridColumns;
@@ -102,13 +128,15 @@ constructor(
   getGridColumnWidth(column:any,listOfGridFieldName:any) {
     if (column.width && column.width != '0') {
       return column.width;
-    } else {
-      if (listOfGridFieldName.length > 8) {
-        return '150px';
-      } else {
+    } 
+    // else {
+    //   if (listOfGridFieldName.length > 8) {
+    //     return '150px';
+    //   } 
+      else {
         return '';
       }
-    }
+    // }
   }
   updateGridDataToModifiedData(grid_row_selection:any,gridData:any,modifiedGridData:any,listOfGridFieldName:any){
     let gridSelectedData:any = [];
@@ -175,6 +203,8 @@ constructor(
               modifyData[fieldName] = modifyList;
               element.gridColumns = this.modifyGridColumns(gridColumns,object);
               modifyObject.field_index = i;
+            }else {
+              modifyData[fieldName] = cData;
             }
           }
         }else if(type && type.startsWith('list_of_fields') && element.datatype == "list_of_object_with_popup" && field_name == fieldName){
@@ -225,6 +255,7 @@ constructor(
       case "typeahead":
         if(item.datatype == "list_of_object"){
           if (Array.isArray(listOfField[item.field_name]) && listOfField[item.field_name].length > 0 && listOfField[item.field_name] != null && listOfField[item.field_name] != undefined && listOfField[item.field_name] != '') {
+            item['hideCopy']=true;
             return '<i class="fa fa-eye cursor-pointer"></i>';
           } else {
             return '-';
@@ -249,6 +280,7 @@ constructor(
       case "grid_selection":
       case "list_of_fields":
         if (Array.isArray(listOfField[item.field_name]) && listOfField[item.field_name].length > 0 && listOfField[item.field_name] != null && listOfField[item.field_name] != undefined && listOfField[item.field_name] != '') {
+          item['hideCopy']=true;
           return '<i class="fa fa-eye cursor-pointer"></i>';
         } else {
           return '-';
@@ -418,6 +450,11 @@ constructor(
     return gridColumns;
   }
 
+  isDate(date:any) {
+    let dateValue:any = new Date(date);
+    return (dateValue !== "Invalid Date") && !isNaN(dateValue);
+  }
+
   getValueForGrid(field:any, object:any) {
     let value:any = '';
     let fieldName: any= '';
@@ -445,6 +482,7 @@ constructor(
         }
         return returnValue
       case 'date':
+      case 'daterange':
         if(value && value != ''){
           if(this.storageService.checkPlatForm() == 'mobile'){
             returnValue =  this.datePipe.transform(value, 'mediumDate');
@@ -453,7 +491,7 @@ constructor(
           }
         }
         return returnValue;
-      case 'time': return this.datePipe.transform(value, 'h:mm a');
+      case 'time': return this.isDate(value) ? this.datePipe.transform(value, 'h:mm a') : value;
       case "boolean": return value ? "Yes" : "No";
       case "currency": return this.CurrencyPipe.transform(value, 'INR');
   	  case "dropdown": return value && value.name ? value.name : value;
@@ -577,7 +615,7 @@ constructor(
     switch (field.type.toLowerCase()) {
       case 'datetime': return this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
       case 'date': return this.datePipe.transform(value, 'dd/MM/yyyy');
-      case 'time': return this.datePipe.transform(value, 'h:mm a');
+      case 'time': return this.isDate(value) ? this.datePipe.transform(value, 'h:mm a') : value;
       case "boolean": return value ? "Yes" : "No";
       case "currency": return this.CurrencyPipe.transform(value, 'INR');
       case "info":
@@ -612,6 +650,81 @@ constructor(
     dataCount['gridCountData'] = totalDataCount;
     this.dataShareService.shareGridCountData(dataCount);
   }
+
+
+  compareAuditHistoryData(formFieldsData:any,currentObjectData:any,previousObjectData:any){
+      let formFields = formFieldsData;
+      let currentObj = {};
+      let previousObject = {};
+      for (let i = 0; i < formFields.length; i++ ) {
+        let field = formFields[i];
+        let isChanged = false;
+        if(field && field.field_name) {
+            currentObj = currentObjectData[field.field_name];
+            previousObject = previousObjectData[field.field_name];
+            if(currentObj != null && currentObj != undefined && typeof currentObj == 'object'){
+              currentObj = currentObjectData[field.field_name].name;
+              previousObject = previousObjectData[field.field_name].name;
+              if(currentObj != previousObject) {
+                isChanged = true;
+              }
+            }else {
+              if(currentObj != previousObject){
+                isChanged = true;
+              }
+            }
+            field['isChanged'] = isChanged; 
+            formFieldsData[i] = field;
+        }
+      }
+  }
+
+
+  copmareListOfFields(fields:any,currentObjectData:any,previousObjectData:any){
+    let currentData:any[] = currentObjectData[fields.field_name];
+    let previousData:any[] = previousObjectData[fields.field_name];
+    let currentObj:any;
+    let previousObject:any;
+    if(currentObjectData[fields.field_name] && currentObjectData[fields.field_name].length > 0) {
+      for (let i = 0; i < fields.list_of_fields.length; i++) {
+        let isChanged = false;
+        const field = fields.list_of_fields[i]
+        for (let j = 0; j < currentData.length; j++) {
+          let comparecurrentObj = currentData[j];
+            comparecurrentObj = comparecurrentObj[field.field_name];
+          let comparepreviousObject = previousData[j];
+            comparepreviousObject = comparepreviousObject[field.field_name];
+
+          if(comparecurrentObj != null && comparecurrentObj != undefined && typeof comparecurrentObj == 'object'){
+            currentObj = comparecurrentObj[field.field_name].name;
+            previousObject = comparepreviousObject[field.field_name].name;
+            if(comparecurrentObj != comparepreviousObject) {
+              isChanged = true;
+            }
+          }else {
+            if(comparecurrentObj != comparepreviousObject){
+              if(comparecurrentObj != null && comparecurrentObj != undefined && comparepreviousObject != null && comparepreviousObject != undefined ) {
+                isChanged = true;
+              }else {
+                isChanged = false;
+              }
+            }
+          }
+        }
+        field['isChanged'] = isChanged; 
+        fields[i] = field;
+      }
+    }
+  }
+
+
+
+
+
+
+
+
+
 
 
 }

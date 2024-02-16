@@ -70,7 +70,8 @@ export class CoreFunctionService {
         modules.push(moduleObj);
       });
     }
-    utvn['modules'] = modules;
+    let modifiedModules = this.setDefaultIndexForModules(modules);
+    utvn['modules'] = this.sortMenu(modifiedModules)
     utvn['permission'] = permissionList;
     utvn['user'] = user;
     return utvn;
@@ -103,6 +104,17 @@ export class CoreFunctionService {
       }
     }
   }
+  setDefaultIndexForModules(modules:any){
+    if(modules?.length>0){
+      let maxIndex = modules.length
+      modules.forEach((module:any) => {
+        if(!module?.index){
+        module["index"] = maxIndex;
+        }
+      })
+    }
+    return modules;
+  }
   sortMenu(menuList:any){
     let list:any=[];
     let mlist = menuList.sort((a:any,b:any) =>  a.index - b.index);
@@ -112,5 +124,64 @@ export class CoreFunctionService {
       });
     }
     return list;
+  }
+  convertListToColonString(list:any,type:any,key?:string){
+    let value = "";
+    if(type.toLowerCase() == 'text'){
+      if(list && list.length > 0){
+        for (let index = 0; index < list.length; index++) {
+          const str = list[index];
+          if((index + 1) == list.length){
+            value = value + str;
+          }else{
+            value = value  + str +':';
+          }
+        }
+      }
+    }
+    return value;
+  }
+  prepareTemplate(tempList:any,moduleName:string){
+    let preParedList:any = {};
+    if(tempList && tempList.length > 0){
+      tempList.forEach((temp:any) => {
+        let name = moduleName+"_"+temp.name;
+        preParedList[name] = temp;
+      });
+    }
+    return preParedList;
+  }
+  getTempNameFromPayload(payload:any){
+    let value = '';
+    if(Object.keys(payload).length > 0){
+      let crList = payload['crList'];
+      if(crList && crList.length > 0){
+        let criteria = crList[0];
+        value = criteria['fValue'];
+      }
+    }
+    return value;
+  }
+  getJsonSizeInKilobyte(obj:any){
+    const bytes = new TextEncoder().encode(JSON.stringify(obj)).length;
+    const kiloBytes = (bytes / 1024).toFixed(2);
+    //const megaBytes = kiloBytes / 1024;
+    return Number(kiloBytes);
+  }
+  removeSpaceFromString(str:string){
+    if(str && typeof str == "string"){
+      return str.trim();
+    }else{
+      return str;
+    }
+  }
+  checkBlankProperties(data:any) {
+    const objWithoutNull:any = {...data};
+    Object.keys(objWithoutNull).forEach(key => {
+      if (objWithoutNull[key] === "") {
+        objWithoutNull[key] = null;
+      }
+    });
+    return objWithoutNull;
   }
 }
