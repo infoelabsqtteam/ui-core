@@ -17,6 +17,7 @@ export class AuthDataShareService {
   userInfo:Subject<any> = new Subject();
   sessionexpired:Subject<any> = new Subject();
   resetPass:Subject<any> = new Subject();
+  authResponce:Subject<any> = new Subject();
 
 
   constructor() { }
@@ -60,6 +61,8 @@ export class AuthDataShareService {
   resetPassword(responce:any){
     this.resetPass.next(responce);
   }
-
+  setAuthenticationResponce(responce:any){
+    this.authResponce.next(responce);
+  }
 
 }

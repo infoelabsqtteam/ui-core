@@ -150,25 +150,29 @@ export class EnvService {
   }
 
   themeSettingList = [
-    {'propertyName':'--headerbg','key':'header_bg_color'},
-    {'propertyName':'--navtxtcolor','key':'header_txt_color'},
-    {'propertyName':'--navtxthovercolor','key':'header_txt_hover_color'},
-    {'propertyName':'--headericon','key':'header_icon_color'},
-    {'propertyName':'--headericonhover','key':'header_icon_hover_color'},
-    {'propertyName':'--buttonColor','key':'btn_color'},
-    {'propertyName':'--buttonHoverColor','key':'btn_hover_color'},
-    {'propertyName':'--footerbg','key':'footer_bg'},
-    {'propertyName':'--themecolor','key':'theme_color'},
-    {'propertyName':'--activebg','key':'active_bg_color'},
-    {'propertyName':'--popupHeaderBg','key':'popup_header_bg'},
-    {'propertyName':'--formLabelBg','key':'form_label_bg'}
+    {'propertyName':'--headerbg','key':'header_bg_color','default':'#fcfcfc'},
+    {'propertyName':'--navtxtcolor','key':'header_txt_color','default':'#222'},
+    {'propertyName':'--navtxthovercolor','key':'header_txt_hover_color','default':'#77bce8'},
+    {'propertyName':'--headericon','key':'header_icon_color','default':'#555'},
+    {'propertyName':'--headericonhover','key':'header_icon_hover_color','default':'#777'},
+    {'propertyName':'--buttonColor','key':'btn_color','default':'#2597de'},
+    {'propertyName':'--buttonHoverColor','key':'btn_hover_color','default':'#0b71b0'},
+    {'propertyName':'--footerbg','key':'footer_bg','default':'#77bce8'},
+    {'propertyName':'--themecolor','key':'theme_color','default':'#e8f5fd'},
+    {'propertyName':'--activebg','key':'active_bg_color','default':'#77bce8'},
+    {'propertyName':'--popupHeaderBg','key':'popup_header_bg','default':'#CEE7F7'},
+    {'propertyName':'--formLabelBg','key':'form_label_bg','default':'#E4F2FA'},
+    {'propertyName':'--fontColor','key':'txtColor','default':'#000'},
   ]
   setThemeSetting(settingObj:any) {
-    this.themeSettingList.forEach(Object => {
-      let propertyName = Object.propertyName;
-      let key = Object.key;
+    this.themeSettingList.forEach(object => {
+      let propertyName = object.propertyName;
+      let key = object.key;
+      let defaultValue = object.default;
       if(settingObj[key] && settingObj[key] != "" ) {
         document.documentElement.style.setProperty(propertyName, settingObj[key]);
+      }else{
+        document.documentElement.style.setProperty(propertyName, defaultValue);
       }
     });
   }
