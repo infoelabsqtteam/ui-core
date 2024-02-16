@@ -124,7 +124,7 @@ export class CheckIfService {
     }
     return check;
   }
-  checkDublicateOnForm(fields:any,value:any,list:any,i:any,showIfFieldList:any,custmizedFormValue:any,dataListForUpload:any,templateForm:FormGroup,parent?:any){
+  checkDublicateOnForm(fields:any,value:any,list:any,i:any,showIfFieldList:any,custmizedFormValue:any,dataListForUpload:any,templateForm:UntypedFormGroup,parent?:any){
     let checkDublic = {
       status : false,
       msg : ""
