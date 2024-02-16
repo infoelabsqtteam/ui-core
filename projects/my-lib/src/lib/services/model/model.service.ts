@@ -19,7 +19,7 @@ export class ModelService {
 
   open(id: string,object:object) {
       let modal: any = this.modals.filter(x => x.id === id)[0];
-      modal.showModal(object);
+            modal.showModal(object);
   }
   close(id: string) {
       let modal: any = this.modals.filter(x => x.id === id)[0];
