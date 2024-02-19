@@ -137,9 +137,14 @@ export class ApiCallService {
   }
   getPaylodWithCriteria(params:any, callback:any, criteria:any, object:any,data_template?:any) {
     const tabName =  this.storageService.GetActiveMenu();
+    let activeRole = this.storageService.getActiveRole();
     let tab = '';
+    let roleName = "";
     if(tabName && tabName.name && tabName.name != ''){
       tab = tabName.name;
+    }
+    if(activeRole && activeRole.name != ''){
+      roleName = activeRole.name;
     }
     let staticModal:any = {
       "key": this.commonFunctionService.getRefcode(),
@@ -149,6 +154,9 @@ export class ApiCallService {
       "crList": [],
       "module": this.storageService.getModule(),
       "tab": tab
+    }
+    if(roleName != ''){
+      staticModal['role'] = roleName;
     }
     if(data_template){
       staticModal['data_template'] = data_template;
