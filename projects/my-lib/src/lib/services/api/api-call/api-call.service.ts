@@ -586,6 +586,29 @@ export class ApiCallService {
     }
     return getFilterData;
   }
+
+
+  getDataForGridAdvanceFilter(page:any,tab:any,currentMenu:any,crList:any){
+    let grid_api_params_criteria = [];
+    if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
+      this.itemNumOfGrid = tab.grid.grid_page_size;
+    }
+    if(this.checkIfService.isGridFieldExist(tab,"api_params_criteria")){
+      grid_api_params_criteria = tab.grid.api_params_criteria;
+    }
+    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
+
+    if(crList && crList.length>0){
+      data.crList = crList;
+    }
+    const getAdFilterData = {
+      data: data,
+      path: null
+    }
+    return getAdFilterData;
+  }
+
+  
   getPage(page: number,tab:any,currentMenu:string,headElements:object,filterForm:object,selectContact:any) {
     return this.getDataForGrid(page,tab,currentMenu,headElements,filterForm,selectContact);
   }
