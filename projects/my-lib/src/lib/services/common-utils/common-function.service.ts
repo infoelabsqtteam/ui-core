@@ -1200,13 +1200,13 @@ export class CommonFunctionService {
     }
   }
 
-  copyGridCellText(value:any){     
+  copyGridCellText(value:any){
     if(value){
       navigator.clipboard.writeText(value);
       this.notificationService.notify("bg-success","Text Copied");
-    }  
+    }
   }
-  
+
   copyGridColumnText(head:any,data:any,elements?:any){
     let columnData = "";
     if(data.length>0){
@@ -1220,9 +1220,9 @@ export class CommonFunctionService {
             if(ele[field_name] && this.isArray(ele[field_name]) && ele[field_name].length > 0){
               childData= ele[field_name].map((chidData:any) =>{
                 return chidData[childFieldName];
-              }).join('\n').trim();  
+              }).join('\n').trim();
             }
-            return childData;      
+            return childData;
           }).join('\n').trim();
         }
       }else{

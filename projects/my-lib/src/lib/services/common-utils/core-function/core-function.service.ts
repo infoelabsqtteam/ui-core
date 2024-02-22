@@ -7,8 +7,8 @@ export class CoreFunctionService {
   commonOperators:any={
     eq :"EQUAL",
     in : "IN",
-    neq : "NOT EQAL",
-    stwic : "START WITH IGNORE CASE",
+    neq : "NOT EQUAL",
+    // stwic : "START WITH IGNORE CASE",
     cnts : "CONTAINS"
   };
 
@@ -20,9 +20,10 @@ export class CoreFunctionService {
       return false;
     }
   }
-  getModulesFormMapObject(obj:any){
+  getModulesFromMapObject(obj:any){
     let user = obj.user;
     let permissions = obj.permission;
+    let rollList = obj.rollList;
     let utvn:any = {};
     let modules:any = [];
     let permissionList = {};
@@ -81,6 +82,7 @@ export class CoreFunctionService {
     utvn['modules'] = this.sortMenu(modifiedModules)
     utvn['permission'] = permissionList;
     utvn['user'] = user;
+    utvn['rollList'] = rollList;
     return utvn;
   }
   setTabOrPermission(menu:any,permissionList:any){
@@ -191,7 +193,6 @@ export class CoreFunctionService {
     });
     return objWithoutNull;
   }
-
   getOperators(type:string){
     let operatorList = {...this.commonOperators};
     switch (type){
@@ -219,7 +220,7 @@ export class CoreFunctionService {
         break;
       default:
         break;
-    }     
+    }
     return this.sortOperators(operatorList);
   }
 
@@ -229,7 +230,7 @@ export class CoreFunctionService {
      sortedKeys.forEach(key => {
          sortedOperatorList[key] = operatorList[key];
      });
- 
+
      return sortedOperatorList;
   }
 }
