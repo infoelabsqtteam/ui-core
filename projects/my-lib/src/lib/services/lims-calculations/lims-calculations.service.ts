@@ -680,7 +680,7 @@ export class LimsCalculationsService {
   }
 
 
-  calculateNetAmount(data:any, fieldName:any, grid_cell_function:any,currencyRate?:any) {
+  calculateNetAmount(data:any, fieldName:any, grid_cell_function:any) {
     switch (grid_cell_function) {
       case "calculateQuotationParameterAmountForAutomotiveLims":
         this.calculateQuotationParameterAmountForAutomotiveLims(data, fieldName["field_name"]);
