@@ -197,26 +197,28 @@ export class CoreFunctionService {
     let operatorList = {...this.commonOperators};
     switch (type){
       case "date":
+        operatorList['cntsic'] = 'CONTAINS IGNORE CASE';
         operatorList['gte'] = "GREATER THAN EQUAL";
-        operatorList['lt'] = 'LESS THAN',
+        operatorList['lt'] = 'LESS THAN';
         operatorList['lte'] = "LESS THAN EQUAL";
-        operatorList['gt'] = 'GREATER THAN',
-        operatorList['gte'] = 'GREATER THAN EQUAL',
-        operatorList['drng'] = 'DATE RANGE'
+        operatorList['gt'] = 'GREATER THAN';
+        operatorList['gte'] = 'GREATER THAN EQUAL';
+        operatorList['drng'] = 'DATE RANGE';
         break;
       case "number":
-        operatorList['lt'] = 'LESS THAN',
+        operatorList['lt'] = 'LESS THAN';
         operatorList['lte'] = "LESS THAN EQUAL";
-        operatorList['gt'] = 'GREATER THAN',
-        operatorList['gte'] = 'GREATER THAN EQUAL'
+        operatorList['gt'] = 'GREATER THAN';
+        operatorList['gte'] = 'GREATER THAN EQUAL';
         break;
       case "string":
-        operatorList['stwic'] = "START WITH IGNORE CASE",
-        operatorList['edw'] = 'END WITH',
-        operatorList['edwic'] = 'END WITH IGNORE CASE',
-        operatorList['cntsic'] = 'CONTAINS IGNORE CASE',
-        operatorList['ncnts'] = 'NOT CONTAINS',
-        operatorList['ncntsic'] = 'NOT CONTAINS IGNORE CASE'
+        operatorList['stw'] = "START WITH";
+        operatorList['stwic'] = "START WITH IGNORE CASE";
+        operatorList['edw'] = 'END WITH';
+        operatorList['edwic'] = 'END WITH IGNORE CASE';
+        operatorList['cntsic'] = 'CONTAINS IGNORE CASE';
+        operatorList['ncnts'] = 'NOT CONTAINS';
+        operatorList['ncntsic'] = 'NOT CONTAINS IGNORE CASE';
         break;
       default:
         break;
