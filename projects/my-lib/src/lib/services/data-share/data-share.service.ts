@@ -64,6 +64,7 @@ export class DataShareService {
   applicationSettings:Subject<any> = new Subject<any>();
   userNotification:Subject<any> = new Subject<any>();
   data$ = this.userNotification.asObservable();
+  userNotificationList:Subject<any> = new Subject<any>();
   userPreference:Subject<any> = new Subject<any>();
   moduleIndex:Subject<any> = new Subject<any>();
   menuIndexs:Subject<any> = new Subject<any>();
@@ -294,6 +295,9 @@ export class DataShareService {
 
   shareUserNotification(responce:any){
         this.userNotification.next(responce);
+  }
+  shareUserNotificationList(responce:any){
+        this.userNotificationList.next(responce);
   }
   setUserPreference(userPreference:any){
     this.userPreference.next(userPreference);

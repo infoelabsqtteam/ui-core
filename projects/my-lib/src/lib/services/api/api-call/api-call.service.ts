@@ -541,18 +541,60 @@ export class ApiCallService {
     }
     this.apiService.getFavouriteData(payloadData);
   }
-  getUserNotification(pageNo:any){
+  getUserNotification(pageNo:any,crList?:any){
     let user = this.storageService.GetUserInfo();
     const userId = user._id;
     if(userId && userId != null && userId != ''){
       const criteria:any = "userId._id;eq;"+userId+";STATIC";
-      const payload = this.setPageNoAndSize(this.getPaylodWithCriteria('user_notification','',[criteria],{}),pageNo);
+      const criteria2:any = "notificationStatus;eq;UNREAD;STATIC";
+      console.log(criteria);
+      let criteraiList:any=[criteria,criteria2];
+      // criteraiList.push(criteria);
+      // if(crList && crList.length > 0){
+      //   crList.forEach((cr:any) => {
+      //     criteraiList.push(cr);
+      //   });
+      // }
+      const payload = this.setPageNoAndSize(this.getPaylodWithCriteria('user_notification_master','',criteraiList,{}),pageNo);
       const callPayload = {
         "path" : null,
         "data": payload
       }
       this.apiService.getUserNotification(callPayload);
+      console.log(callPayload);
     }
+  }
+
+  getUserNotificationList(pageNo:any){
+    let user = this.storageService.GetUserInfo();
+        const userId = user._id;
+        const criteria=[
+                {
+                   "fName":"userId._id",
+                   "fValue":userId,
+                   "operator":"eq"
+                },
+                {
+                   "fName":"notificationStatus",
+                   "fValue":"UNREAD",
+                   "operator":"eq"
+                }
+             ]
+        let payload:any = {
+            "key": this.commonFunctionService.getRefcode(),
+            "key2": this.storageService.getAppId(),
+            "value": "user_notification_master",
+            "log": this.storageService.getUserLog(),
+            "crList": criteria,
+            "pageNo":1,
+            "pageSize":3
+          }
+          const callPayload = {
+            "path" : null,
+            "data": payload
+          }
+          this.apiService.getUserNotificationList(callPayload);
+
   }
   getApplicationAllSettings() {
     const payload1 = this.setPageNoAndSize(this.getPaylodWithCriteria("application_setting", "", [], {}), 1);
