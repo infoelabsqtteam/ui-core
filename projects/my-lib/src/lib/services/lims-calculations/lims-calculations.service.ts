@@ -1,6 +1,6 @@
 import { ApiCallService } from './../api/api-call/api-call.service';
 import { Injectable, QueryList } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
+import { FormBuilder, UntypedFormGroup, UntypedFormControl, FormArray, Validators } from '@angular/forms';
 import { CommonFunctionService } from '../../services/common-utils/common-function.service';
 import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
 import { NotificationService } from '../notify/notification.service';
@@ -138,14 +138,14 @@ export class LimsCalculationsService {
       field: 'growth_per', value: value
     }
     fieldWithValueforgrowth.value.forEach((element:any) => {
-      (<FormGroup>templateForm.controls[fieldWithValueforgrowth.field]).controls[element.field].patchValue(element.value);
+      (<UntypedFormGroup>templateForm.controls[fieldWithValueforgrowth.field]).controls[element.field].patchValue(element.value);
     })
 
     const fieldWithValueforBudget = {
       field: 'budget_per', value: value1
     }
     fieldWithValueforBudget.value.forEach((element:any) => {
-      (<FormGroup>templateForm.controls[fieldWithValueforBudget.field]).controls[element.field].patchValue(element.value);
+      (<UntypedFormGroup>templateForm.controls[fieldWithValueforBudget.field]).controls[element.field].patchValue(element.value);
     })
   }
 
@@ -1365,7 +1365,7 @@ export class LimsCalculationsService {
     return this.calculateQquoteAmount(templateValue, { field_name: "quotation_param_methods" });
   }
 
-  calculateInvoiceOrderAmount(templateForm: FormGroup, field: any) {
+  calculateInvoiceOrderAmount(templateForm: UntypedFormGroup, field: any) {
     var net_amount = 0;
     var discount_amount = 0;
     var igst_amount = 0;
@@ -1404,10 +1404,10 @@ export class LimsCalculationsService {
     }
     return this.setValueInVieldsForChild(templateForm, fieldWithValue);
   }
-  setValueInVieldsForChild(templateForm: FormGroup, field: any) {
-    (<FormGroup>templateForm.controls['total_amount']).addControl('discount_amount', new FormControl(''))
+  setValueInVieldsForChild(templateForm: UntypedFormGroup, field: any) {
+    (<UntypedFormGroup>templateForm.controls['total_amount']).addControl('discount_amount', new UntypedFormControl(''))
     field.value.forEach((element:any) => {
-      (<FormGroup>templateForm.controls[field.field]).controls[element.field].patchValue(element.value);
+      (<UntypedFormGroup>templateForm.controls[field.field]).controls[element.field].patchValue(element.value);
     });
     return templateForm;
   }
@@ -1666,7 +1666,7 @@ break;
 
 }
 
-setValueInVields(templateForm: FormGroup, field: any) {
+setValueInVields(templateForm: UntypedFormGroup, field: any) {
   field.forEach((element: any) => {
     if(templateForm.controls[element.field]!==undefined){
       if(typeof(element.value) == 'string'){
@@ -1680,7 +1680,7 @@ setValueInVields(templateForm: FormGroup, field: any) {
   return templateForm;
 }
 
-create_professional_email(templateForm: FormGroup){
+create_professional_email(templateForm: UntypedFormGroup){
   let templateValue = templateForm.getRawValue();
   let name = templateValue.name;
   let prof_email = "";
