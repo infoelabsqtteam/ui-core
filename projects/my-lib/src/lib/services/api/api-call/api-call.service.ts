@@ -581,7 +581,7 @@ export class ApiCallService {
       }
       crList.push(tabFilterCrlist);
     }
-    this.getDataForGridAdvanceFilter(page,tab,currentMenu,crList);
+    return this.getDataForGridAdvanceFilter(page,tab,currentMenu,crList);
     // const getFilterData = {
     //   data: data,
     //   path: null
