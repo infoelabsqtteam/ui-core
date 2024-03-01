@@ -694,11 +694,12 @@ getUserNotification(payload:any){
       }
   )
 }
-getUserNotificationList(payload:any){
-  let api = this.envService.getApi('GET_GRID_DATA');
-  this.http.post(api + '/' + payload.path, payload.data).subscribe(
+
+getUserNotificationSetting(payload:any){
+  let api = this.envService.getApi('GET_NOTIFICATION_SETTING');
+  this.http.post(api , payload).subscribe(
     (respData) => {
-        this.dataShareService.shareUserNotificationList(respData)
+        this.dataShareService.shareUserNotificationSetting(respData)
       },
     (error) => {
         console.log(error);
