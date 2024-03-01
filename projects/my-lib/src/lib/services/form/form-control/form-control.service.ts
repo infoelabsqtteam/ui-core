@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormArray, FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormArray, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { CommonFunctionService } from '../../common-utils/common-function.service';
 import { FileHandlerService } from '../../fileHandler/file-handler.service';
 import { GridCommonFunctionService } from '../../grid/grid-common-function/grid-common-function.service';
@@ -17,7 +17,7 @@ export class FormControlService {
     private TreeComponentService:TreeComponentService
   ) { }
 
-  editeListFieldData(templateForm:FormGroup,custmizedFormValue:any,tableFields:any,field:any,index:any,listOfFieldsUpdateIndex:any,staticData:any,dataListForUpload:any){
+  editeListFieldData(templateForm:UntypedFormGroup,custmizedFormValue:any,tableFields:any,field:any,index:any,listOfFieldsUpdateIndex:any,staticData:any,dataListForUpload:any){
     let responce = {
       "listOfFieldUpdateMode":true,
       "listOfFieldsUpdateIndex":listOfFieldsUpdateIndex,
@@ -48,7 +48,7 @@ export class FormControlService {
                         if (!responce.custmizedFormValue[custmisedKey]) responce.custmizedFormValue[custmisedKey] = {};
                         responce.custmizedFormValue[custmisedKey][data.field_name] = object[data.field_name];
                       } else {
-                        (<FormGroup>responce.templateForm.controls[element.field_name]).controls[data.field_name].setValue(object[data.field_name]);
+                        (<UntypedFormGroup>responce.templateForm.controls[element.field_name]).controls[data.field_name].setValue(object[data.field_name]);
                       }
                       break;
                     case "list_of_checkbox":
@@ -73,7 +73,7 @@ export class FormControlService {
                         });
                       }
                       //this.templateForm.get(element.field_name).get(data.field_name).setValue(checkboxListValue);
-                      (<FormGroup>responce.templateForm.controls[element.field_name]).controls[data.field_name].setValue(checkboxListValue);
+                      (<UntypedFormGroup>responce.templateForm.controls[element.field_name]).controls[data.field_name].setValue(checkboxListValue);
                       break;
                     case "file":
                     case "input_with_uploadfile":
@@ -86,12 +86,12 @@ export class FormControlService {
                         //responce.dataListForUpload[custmizedKey][data.field_name] = JSON.parse(JSON.stringify(object[data.field_name]));
                         const value = this.fileHandlerService.modifyFileSetValue(object[data.field_name]);
                         //this.templateForm.get(element.field_name).get(data.field_name).setValue(value);
-                        (<FormGroup>responce.templateForm.controls[element.field_name]).controls[data.field_name].setValue(value);
+                        (<UntypedFormGroup>responce.templateForm.controls[element.field_name]).controls[data.field_name].setValue(value);
                       }
                       break;
                     default:
                       //this.templateForm.get(element.field_name).get(data.field_name).setValue(object[data.field_name]);
-                      (<FormGroup>responce.templateForm.controls[element.field_name]).controls[data.field_name].setValue(object[data.field_name]);
+                      (<UntypedFormGroup>responce.templateForm.controls[element.field_name]).controls[data.field_name].setValue(object[data.field_name]);
                       break;
                   }
                 })
@@ -105,7 +105,7 @@ export class FormControlService {
     }
     return responce;
   }
-  updateDataOnForm(templateForm:FormGroup,tableFields:any,formValue:any,formFieldButtons:any,custmizedFormValue:any,modifyCustmizedFormValue:any,selectedRow:any,dataListForUpload:any,treeViewData:any,staticData:any,longitude:any,latitude:any,zoom:any){
+  updateDataOnForm(templateForm:UntypedFormGroup,tableFields:any,formValue:any,formFieldButtons:any,custmizedFormValue:any,modifyCustmizedFormValue:any,selectedRow:any,dataListForUpload:any,treeViewData:any,staticData:any,longitude:any,latitude:any,zoom:any){
     let responce ={
       templateForm:templateForm,
       custmizedFormValue:custmizedFormValue,
@@ -214,7 +214,7 @@ export class FormControlService {
                         if (!responce.custmizedFormValue[fieldName]) responce.custmizedFormValue[fieldName] = {};
                         responce.custmizedFormValue[fieldName][data.field_name] = JSON.parse(JSON.stringify(object[data.field_name]));
                       }
-                      (<FormGroup>responce.templateForm.controls[fieldName]).controls[data.field_name].setValue('')
+                      (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[data.field_name].setValue('')
                       //(<FormGroup>this.templateForm.controls[element.field_name]).controls[data.field_name].patchValue('');
                     }
                     break;
@@ -225,13 +225,13 @@ export class FormControlService {
                           if (!responce.custmizedFormValue[fieldName]) responce.custmizedFormValue[fieldName] = {};
                           responce.custmizedFormValue[fieldName][data.field_name] = JSON.parse(JSON.stringify(object[data.field_name]));
                         }
-                        (<FormGroup>responce.templateForm.controls[fieldName]).controls[data.field_name].setValue('')
+                        (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[data.field_name].setValue('')
                         //(<FormGroup>this.templateForm.controls[element.field_name]).controls[data.field_name].patchValue('');
                       }
                     }else{
                       if(object && object[data.field_name] != null && object[data.field_name] != undefined){
                         const value = object[data.field_name];
-                        (<FormGroup>responce.templateForm.controls[fieldName]).controls[data.field_name].setValue(value)
+                        (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[data.field_name].setValue(value)
                         //(<FormGroup>this.templateForm.controls[element.field_name]).controls[data.field_name].patchValue(value);
                       }
                     }
@@ -243,13 +243,13 @@ export class FormControlService {
                       const value = this.fileHandlerService.modifyFileSetValue(object[data.field_name]);
                       let tooltipMsg = this.fileHandlerService.getFileTooltipMsg(object[data.field_name]);
                       element.list_of_fields[j]['tooltipMsg'] = tooltipMsg;
-                      (<FormGroup>responce.templateForm.controls[fieldName]).controls[data.field_name].setValue(value);
+                      (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[data.field_name].setValue(value);
                     }
                     break;
                   default:
                     if(object && object[data.field_name] != null && object[data.field_name] != undefined){
                       const value = object[data.field_name];
-                      (<FormGroup>responce.templateForm.controls[fieldName]).controls[data.field_name].setValue(value)
+                      (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[data.field_name].setValue(value)
                       //(<FormGroup>this.templateForm.controls[element.field_name]).controls[data.field_name].patchValue(value);
                     }
                     break;
@@ -288,7 +288,7 @@ export class FormControlService {
                     const value = JSON.parse(JSON.stringify(ChildFieldData[childFieldName]));
                     responce.custmizedFormValue[fieldName][childFieldName] = value;
                     //this.templateForm.get(fieldName).get(childFieldName).setValue('')
-                    (<FormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue('')
+                    (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue('')
                     //(<FormGroup>this.templateForm.controls[fieldName]).controls[childFieldName].patchValue('');
                   }
                   break;
@@ -298,13 +298,13 @@ export class FormControlService {
                       if (!responce.custmizedFormValue[fieldName]) responce.custmizedFormValue[fieldName] = {};
                       const value = JSON.parse(JSON.stringify(ChildFieldData[childFieldName]));
                       responce.custmizedFormValue[fieldName][childFieldName] = value;
-                      (<FormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value);
+                      (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value);
                       //(<FormGroup>this.templateForm.controls[fieldName]).controls[childFieldName].patchValue('');
                     }
                   }else{
                     if(ChildFieldData && ChildFieldData[childFieldName] != null && ChildFieldData[childFieldName] != undefined && ChildFieldData[childFieldName] != ''){
                       const value = ChildFieldData[childFieldName];
-                      (<FormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value)
+                      (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value)
                       //(<FormGroup>this.templateForm.controls[fieldName]).controls[childFieldName].patchValue(value);
                     }
                   }
@@ -318,15 +318,15 @@ export class FormControlService {
                     }else{
                       gvalue = 0;
                     }
-                    (<FormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(gvalue)
+                    (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(gvalue)
                     //(<FormGroup>this.templateForm.controls[fieldName]).controls[childFieldName].patchValue(gvalue);
                   }else if(ChildFieldData && ChildFieldData.hasOwnProperty(childFieldName)){
                     let gvalue = 0;
-                    (<FormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(gvalue)
+                    (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(gvalue)
                   }
                   break;
                 case "list_of_checkbox":
-                  (<FormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].patchValue([])
+                  (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].patchValue([])
                   if(parent){
                     responce.selectedRow[parent] = {}
                     responce.selectedRow[parent][fieldName] = ChildFieldData;
@@ -342,10 +342,10 @@ export class FormControlService {
                       const dateMonthYear = date.split('/');
                       const formatedDate = dateMonthYear[2]+"-"+dateMonthYear[1]+"-"+dateMonthYear[0];
                       const value = new Date(formatedDate);
-                      (<FormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value)
+                      (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value)
                     }else{
                       const value = formValue[fieldName][childFieldName] == null ? null : formValue[fieldName][childFieldName];
-                      (<FormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value);
+                      (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value);
                     }
                   }
                   break;
@@ -356,13 +356,13 @@ export class FormControlService {
                     const value = this.fileHandlerService.modifyFileSetValue(object[data.field_name]);
                     let tooltipMsg = this.fileHandlerService.getFileTooltipMsg(object[data.field_name]);
                     element.list_of_fields[j]['tooltipMsg'] = tooltipMsg;
-                    (<FormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value);
+                    (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value);
                   }
                   break;
                 default:
                   if(ChildFieldData && ChildFieldData[childFieldName] != null && ChildFieldData[childFieldName] != undefined && ChildFieldData[childFieldName] != ''){
                     const value = ChildFieldData[childFieldName];
-                    (<FormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value)
+                    (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value)
                     //(<FormGroup>this.templateForm.controls[fieldName]).controls[childFieldName].patchValue(value);
                   }
                   break;
@@ -404,18 +404,18 @@ export class FormControlService {
                     if(formValue[childFieldName] != null && formValue[childFieldName] != undefined && formValue[childFieldName] != ''){
                       responce.custmizedFormValue[childFieldName] = formValue[childFieldName]
                     }
-                    (<FormGroup>responce.templateForm.controls[step.field_name]).controls[childFieldName].setValue('');
+                    (<UntypedFormGroup>responce.templateForm.controls[step.field_name]).controls[childFieldName].setValue('');
                     break;
                   case "typeahead":
                     if(data.datatype == "list_of_object" || data.datatype == 'chips'){
                       if(formValue[childFieldName] != null && formValue[childFieldName] != undefined && formValue[childFieldName] != ''){
                         responce.custmizedFormValue[childFieldName] = formValue[childFieldName]
-                        (<FormGroup>responce.templateForm.controls[step.field_name]).controls[childFieldName].setValue('');
+                        (<UntypedFormGroup>responce.templateForm.controls[step.field_name]).controls[childFieldName].setValue('');
                       }
                     }else{
                       if(formValue[childFieldName] != null && formValue[childFieldName] != undefined && formValue[childFieldName] != ''){
                         const value = formValue[childFieldName];
-                        (<FormGroup>responce.templateForm.controls[step.field_name]).controls[childFieldName].setValue(value);
+                        (<UntypedFormGroup>responce.templateForm.controls[step.field_name]).controls[childFieldName].setValue(value);
                       }
                     }
                     break;
@@ -427,22 +427,22 @@ export class FormControlService {
                       }else{
                         gvalue = 0;
                       }
-                      (<FormGroup>responce.templateForm.controls[step.field_name]).controls[childFieldName].setValue(gvalue);
+                      (<UntypedFormGroup>responce.templateForm.controls[step.field_name]).controls[childFieldName].setValue(gvalue);
                     break;
                   case "list_of_checkbox":
-                    (<FormGroup>responce.templateForm.controls[step.field_name]).controls[childFieldName].patchValue([]);
+                    (<UntypedFormGroup>responce.templateForm.controls[step.field_name]).controls[childFieldName].patchValue([]);
                     break;
                   default:
                     if(formValue[childFieldName] != null && formValue[childFieldName] != undefined && formValue[childFieldName] != ''){
                       const value = formValue[childFieldName];
-                      (<FormGroup>responce.templateForm.controls[step.field_name]).controls[childFieldName].setValue(value);
+                      (<UntypedFormGroup>responce.templateForm.controls[step.field_name]).controls[childFieldName].setValue(value);
                     }
                     break;
                 }
                 if(data.tree_view_object && data.tree_view_object.field_name != ""){
                   let editeTreeModifyData = JSON.parse(JSON.stringify(data.tree_view_object));
                   const treeObject = responce.selectedRow[editeTreeModifyData.field_name];
-                  (<FormGroup>responce.templateForm.controls[step.field_name]).controls[editeTreeModifyData.field_name].setValue(treeObject);
+                  (<UntypedFormGroup>responce.templateForm.controls[step.field_name]).controls[editeTreeModifyData.field_name].setValue(treeObject);
 
                 }
               });
@@ -490,7 +490,7 @@ export class FormControlService {
           if (list_of_dates.length > 0) {
             list_of_dates.forEach((data) => {
               let childFieldName = data.field_name;
-              (<FormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(object[childFieldName]);
+              (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(object[childFieldName]);
             });
           }
         }
@@ -540,23 +540,23 @@ export class FormControlService {
       }
     }
   }
-  setCheckboxFileListValue(checkBoxFieldListValue:any,templateForm:FormGroup,staticData:any,selectedRow:any,updateMode:boolean) {
+  setCheckboxFileListValue(checkBoxFieldListValue:any,templateForm:UntypedFormGroup,staticData:any,selectedRow:any,updateMode:boolean) {
     let result = {
       templateForm:templateForm
     }
     checkBoxFieldListValue.forEach((element:any) => {
       let checkCreatControl: any;
       if (element.parent) {
-        checkCreatControl = (<FormGroup>result.templateForm.controls[element.parent]).controls[element.field_name];
+        checkCreatControl = (<UntypedFormGroup>result.templateForm.controls[element.parent]).controls[element.field_name];
       } else {
         checkCreatControl = result.templateForm.controls[element.field_name];
       }
       if (staticData[element.ddn_field] && checkCreatControl.controls && checkCreatControl.controls.length == 0) {
-        let checkArray: FormArray;
+        let checkArray: UntypedFormArray;
         if (element.parent) {
-          checkArray = (<FormGroup>result.templateForm.controls[element.parent]).controls[element.field_name] as FormArray;
+          checkArray = (<UntypedFormGroup>result.templateForm.controls[element.parent]).controls[element.field_name] as UntypedFormArray;
         } else {
-          checkArray = result.templateForm.controls[element.field_name] as FormArray;
+          checkArray = result.templateForm.controls[element.field_name] as UntypedFormArray;
         }
         staticData[element.ddn_field].forEach((data:any, i:any) => {
           if (updateMode) {
@@ -576,12 +576,12 @@ export class FormControlService {
               }
             }
             if (selected) {
-              checkArray.push(new FormControl(true));
+              checkArray.push(new UntypedFormControl(true));
             } else {
-              checkArray.push(new FormControl(false));
+              checkArray.push(new UntypedFormControl(false));
             }
           } else {
-            checkArray.push(new FormControl(false));
+            checkArray.push(new UntypedFormControl(false));
           }
         });
       }
@@ -602,7 +602,7 @@ export class FormControlService {
     return response
   }
 
-  editListOfString(parentfield: any,field: any,index: number,custmizedFormValue: any, templateForm: FormGroup ) {
+  editListOfString(parentfield: any,field: any,index: number,custmizedFormValue: any, templateForm: UntypedFormGroup ) {
     let response = {
       templateForm: templateForm
     }
@@ -614,7 +614,7 @@ export class FormControlService {
         if (parentfield) {
           const custmizedKey = parentfield ? this.commonFunctionService.custmizedKey(parentfield): null;
           const selectedValue = custmizedFormValueClone[custmizedKey][fieldName][index];
-          ( <FormGroup>response.templateForm.controls[parentfield.field_name]).controls[fieldName].setValue(selectedValue)
+          ( <UntypedFormGroup>response.templateForm.controls[parentfield.field_name]).controls[fieldName].setValue(selectedValue)
         } else {
           const selectedValue = custmizedFormValueClone[fieldName][index];
           response.templateForm.controls[fieldName].setValue(selectedValue)
