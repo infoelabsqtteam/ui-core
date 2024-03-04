@@ -581,7 +581,7 @@ export class ApiCallService {
       }
       crList.push(tabFilterCrlist);
     }
-    return this.getDataForGridAdvanceFilter(page,tab,currentMenu,crList);
+    return this.getDataForGridFilter(page,tab,currentMenu,crList);
     // const getFilterData = {
     //   data: data,
     //   path: null
@@ -590,7 +590,7 @@ export class ApiCallService {
   }
 
 
-  getDataForGridAdvanceFilter(page:any,tab:any,currentMenu:any,crList:any){
+  getDataForGridFilter(page:any,tab:any,currentMenu:any,crList:any){
     let grid_api_params_criteria = [];
     if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
       this.itemNumOfGrid = tab.grid.grid_page_size;
