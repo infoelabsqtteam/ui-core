@@ -603,11 +603,11 @@ export class ApiCallService {
     if(crList && crList.length>0){
       data.crList = crList;
     }
-    const getAdFilterData = {
+    const getFilterData = {
       data: data,
       path: null
     }
-    return getAdFilterData;
+    return getFilterData;
   }
 
   
