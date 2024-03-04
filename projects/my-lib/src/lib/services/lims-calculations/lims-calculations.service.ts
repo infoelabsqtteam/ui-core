@@ -1,6 +1,6 @@
 import { ApiCallService } from './../api/api-call/api-call.service';
 import { Injectable, QueryList } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
+import { FormBuilder, UntypedFormGroup, UntypedFormControl, FormArray, Validators } from '@angular/forms';
 import { CommonFunctionService } from '../../services/common-utils/common-function.service';
 import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
 import { NotificationService } from '../notify/notification.service';
@@ -138,14 +138,14 @@ export class LimsCalculationsService {
       field: 'growth_per', value: value
     }
     fieldWithValueforgrowth.value.forEach((element:any) => {
-      (<FormGroup>templateForm.controls[fieldWithValueforgrowth.field]).controls[element.field].patchValue(element.value);
+      (<UntypedFormGroup>templateForm.controls[fieldWithValueforgrowth.field]).controls[element.field].patchValue(element.value);
     })
 
     const fieldWithValueforBudget = {
       field: 'budget_per', value: value1
     }
     fieldWithValueforBudget.value.forEach((element:any) => {
-      (<FormGroup>templateForm.controls[fieldWithValueforBudget.field]).controls[element.field].patchValue(element.value);
+      (<UntypedFormGroup>templateForm.controls[fieldWithValueforBudget.field]).controls[element.field].patchValue(element.value);
     })
   }
 
@@ -183,11 +183,6 @@ export class LimsCalculationsService {
     } else {
       return;
     }
-  }
-
-  convertCurrencyRate(amount:any,currencyRate:any){
-    let convertedAmount =amount*currencyRate;
-    return this.getDecimalAmount(convertedAmount);
   }
 
   legacyQuotationParameterCalculation(data:any, fieldName:any) {
@@ -633,7 +628,7 @@ export class LimsCalculationsService {
 
 
 
-  calculate_invoice_amount_row_wise(data:any, fieldName:any,currencyRate?:any) {
+  calculate_invoice_amount_row_wise(data:any, fieldName:any) {
     let total = 0;
     let disc_per = 0;
     let disc_amt = 0;
@@ -678,9 +673,6 @@ export class LimsCalculationsService {
         final_amt = surcharge + net_amount;
         break;
     }
-    if(data.finalConvertedAmount && currencyRate &&currencyRate != "" ){
-      data["finalConvertedAmount"] = this.convertCurrencyRate(final_amt,currencyRate)
-    }
     data["discount_percent"] = disc_per;
     data["discount_amount"] = disc_amt;
     data["final_amount"] = final_amt;
@@ -688,7 +680,7 @@ export class LimsCalculationsService {
   }
 
 
-  calculateNetAmount(data:any, fieldName:any, grid_cell_function:any,currencyRate?:any) {
+  calculateNetAmount(data:any, fieldName:any, grid_cell_function:any) {
     switch (grid_cell_function) {
       case "calculateQuotationParameterAmountForAutomotiveLims":
         this.calculateQuotationParameterAmountForAutomotiveLims(data, fieldName["field_name"]);
@@ -706,7 +698,7 @@ export class LimsCalculationsService {
         break;
 
       case "calculate_invoice_amount_row_wise":
-        this.calculate_invoice_amount_row_wise(data, fieldName["field_name"],currencyRate);
+        this.calculate_invoice_amount_row_wise(data, fieldName["field_name"]);
         break;
 
       default:
@@ -1212,9 +1204,6 @@ export class LimsCalculationsService {
     } else {
       unit_price = templateValue["unit_price"];
     }
-    if(templateValue.currencyRate && templateValue.currencyRate != ""){
-      templateValue['convertedAmount']=this.convertCurrencyRate(final_amount,templateValue.currencyRate);
-    }
 
     templateValue['total'] = gross_amount;
     templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
@@ -1376,7 +1365,7 @@ export class LimsCalculationsService {
     return this.calculateQquoteAmount(templateValue, { field_name: "quotation_param_methods" });
   }
 
-  calculateInvoiceOrderAmount(templateForm: FormGroup, field: any) {
+  calculateInvoiceOrderAmount(templateForm: UntypedFormGroup, field: any) {
     var net_amount = 0;
     var discount_amount = 0;
     var igst_amount = 0;
@@ -1415,10 +1404,10 @@ export class LimsCalculationsService {
     }
     return this.setValueInVieldsForChild(templateForm, fieldWithValue);
   }
-  setValueInVieldsForChild(templateForm: FormGroup, field: any) {
-    (<FormGroup>templateForm.controls['total_amount']).addControl('discount_amount', new FormControl(''))
+  setValueInVieldsForChild(templateForm: UntypedFormGroup, field: any) {
+    (<UntypedFormGroup>templateForm.controls['total_amount']).addControl('discount_amount', new UntypedFormControl(''))
     field.value.forEach((element:any) => {
-      (<FormGroup>templateForm.controls[field.field]).controls[element.field].patchValue(element.value);
+      (<UntypedFormGroup>templateForm.controls[field.field]).controls[element.field].patchValue(element.value);
     });
     return templateForm;
   }
@@ -1434,9 +1423,6 @@ export class LimsCalculationsService {
     let final_amt = sum+net_amt;
     obj['sampling_charge'] = sum;
     obj['final_amount'] = final_amt;
-    if(obj.currencyRate && obj.currencyRate != ""){
-      obj['convertedAmount']=this.convertCurrencyRate(final_amt,obj.currencyRate);
-    }
    return obj;
   }
 
@@ -1496,9 +1482,6 @@ export class LimsCalculationsService {
         discount_percent = this.getDecimalAmount(100*discount_amount/gross_amount);
       }
       let total:any ={};
-      if(templateValue.currencyRate && templateValue.currencyRate != ""){
-        total['convertedAmount']=this.convertCurrencyRate(net_payble,templateValue.currencyRate);
-      }
       total['surcharge'] = this.getDecimalAmount(surcharge);
       total['igst_percent'] = this.getDecimalAmount(igst_percent);
       total['gst_percent'] = this.getDecimalAmount(gst_percent);
@@ -1587,9 +1570,6 @@ export class LimsCalculationsService {
         discount_percent = this.getDecimalAmount(100*discount_amount/gross_amount);
       }
       let total:any ={};
-      if(templateValue.currencyRate && templateValue.currencyRate != ""){
-        total['convertedAmount']=this.convertCurrencyRate(net_payble,templateValue.currencyRate);
-      }
       total['surcharge'] = this.getDecimalAmount(surcharge);
       total['igst_percent'] = this.getDecimalAmount(igst_percent);
       total['gst_percent'] = this.getDecimalAmount(gst_percent);
@@ -1686,7 +1666,7 @@ break;
 
 }
 
-setValueInVields(templateForm: FormGroup, field: any) {
+setValueInVields(templateForm: UntypedFormGroup, field: any) {
   field.forEach((element: any) => {
     if(templateForm.controls[element.field]!==undefined){
       if(typeof(element.value) == 'string'){
@@ -1700,7 +1680,7 @@ setValueInVields(templateForm: FormGroup, field: any) {
   return templateForm;
 }
 
-create_professional_email(templateForm: FormGroup){
+create_professional_email(templateForm: UntypedFormGroup){
   let templateValue = templateForm.getRawValue();
   let name = templateValue.name;
   let prof_email = "";
