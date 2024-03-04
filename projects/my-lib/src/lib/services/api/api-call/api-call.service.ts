@@ -609,8 +609,6 @@ export class ApiCallService {
     }
     return getFilterData;
   }
-
-  
   getPage(page: number,tab:any,currentMenu:string,headElements:object,filterForm:object,selectContact:any) {
     return this.getDataForGrid(page,tab,currentMenu,headElements,filterForm,selectContact);
   }

@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class CoreFunctionService {
-  commonOperators: any ={
+  commonOperators:any={
     eq :"EQUAL",
     in : "IN",
     neq : "NOT_EQUAL",
