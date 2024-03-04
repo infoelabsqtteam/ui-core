@@ -9,7 +9,7 @@ export class CoreFunctionService {
     in : "IN",
     neq : "NOT_EQUAL",
     // stwic : "START WITH IGNORE CASE",
-    cntsic : "CONTAINS_IGNORE_CASE"
+    cnts : "CONTAINS"
   };
 
   constructor() { }
@@ -197,7 +197,7 @@ export class CoreFunctionService {
     let operatorList = {...this.commonOperators};
     switch (type){
       case "date":
-        operatorList['cnts'] = 'CONTAINS';
+        operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
         operatorList['gte'] = "GREATER_THAN_EQUAL";
         operatorList['lt'] = 'LESS_THAN';
         operatorList['lte'] = "LESS_THAN_EQUAL";
@@ -216,7 +216,7 @@ export class CoreFunctionService {
         operatorList['stwic'] = "START_WITH_IGNORE_CASE";
         operatorList['edw'] = 'END_WITH';
         operatorList['edwic'] = 'END_WITH_IGNORE_CASE';
-        operatorList['cnts'] = 'CONTAINS';
+        operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
         operatorList['ncnts'] = 'NOT_CONTAINS';
         operatorList['ncntsic'] = 'NOT_CONTAINS_IGNORE_CASE';
         break;
