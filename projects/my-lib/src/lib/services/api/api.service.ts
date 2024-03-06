@@ -228,7 +228,7 @@ deleteGridRow(payload:any){
 
 SaveFormData(payload:any){
   let api = this.envService.getApi('SAVE_FORM_DATA');
-  this.saveCall(api+ '/' + payload.curTemp,payload)
+    this.saveCall(api+ '/' + payload.curTemp,payload)
 }
 SendEmail(payload:any){
   let api = this.envService.getApi('SEND_EMAIL');
@@ -695,9 +695,9 @@ getUserNotification(payload:any){
   )
 }
 
-getUserNotificationSetting(payload:any){
+getUserNotificationSetting(){
   let api = this.envService.getApi('GET_NOTIFICATION_SETTING');
-  this.http.post(api , payload).subscribe(
+  this.http.post(api,{}).subscribe(
     (respData) => {
         this.dataShareService.shareUserNotificationSetting(respData)
       },

@@ -547,8 +547,10 @@ export class ApiCallService {
     if(userId && userId != null && userId != ''){
       const criteria:any = "userId._id;eq;"+userId+";STATIC";
       const criteria2:any = "notificationStatus;eq;UNREAD;STATIC";
-      console.log(criteria);
       let criteraiList:any=[criteria,criteria2];
+      if(crList){
+        criteraiList=[criteria];
+      }
       // criteraiList.push(criteria);
       // if(crList && crList.length > 0){
       //   crList.forEach((cr:any) => {
@@ -556,18 +558,16 @@ export class ApiCallService {
       //   });
       // }
       const payload = this.setPageNoAndSize(this.getPaylodWithCriteria('user_notification_master','',criteraiList,{}),pageNo);
+      payload['pageSize']=10;
       const callPayload = {
         "path" : null,
         "data": payload
       }
       this.apiService.getUserNotification(callPayload);
-      console.log(callPayload);
     }
   }
   getUserNotificationSetting(){
-    const token=this.storageService.GetIdToken()
-    const reqBody = { key: token };
-    this.apiService.getUserNotificationSetting(reqBody);
+    this.apiService.getUserNotificationSetting();
   }
 
   // getUserNotificationList(pageNo:any){
