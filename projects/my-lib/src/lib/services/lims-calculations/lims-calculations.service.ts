@@ -1731,281 +1731,311 @@ populateParameterAmountWithSubsequent(data:any,net_amount:number,discount_percen
 }
 
 calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) {
-    let quantity = 0;
-    let discount_percent:any = 0;
-    let net_amount:any = 0;
-    let incoming_field = fieldName;
-    let sale_rate = data['sale_rate'];
-    let gross_amount = 0;
-    let effectiveTotal = 0;
-    let dis_amt:any = 0;
-    let subsequent_discount_amount:any=0;
-    let subsequent_discount_percent:any=0;
-    let totalDiscountAmount:any=0;
-    quantity = data.qty;
-    if (!this.coreFunctionService.isNotBlank(quantity)) {
-      quantity = 0;
-    }
-    if(quantity > 0){
-      if(data.no_of_injection2 && data.no_of_injection2 > 0 && quantity > 1){
-        gross_amount = ((quantity - 1) * data.no_of_injection2) + sale_rate;
-      }else{
-        gross_amount = quantity * sale_rate;
-      }
-    }
-
-    switch (incoming_field) {
-
-      case "qty":
-        //effectiveTotal = (+quantity) * (+data.offer_rate);
-        if(data.subsequent_offer_rate && data.subsequent_offer_rate > 0 && data.no_of_injection2 && data.no_of_injection2 > 0 && quantity > 1){
-          effectiveTotal = ((quantity - 1) * data.subsequent_offer_rate) + data.offer_rate;
-          if (sale_rate > 0) {
-            dis_amt = sale_rate - data.offer_rate;
-            discount_percent = this.getDecimalAmount(100 * dis_amt / sale_rate);
-          } else {
-            discount_percent = 0;
-            dis_amt = 0;
-          }
-          let subseqGrossAmount = ((quantity - 1) * data.no_of_injection2);
-          let subseqEffectiveAmount = ((quantity - 1) * data.subsequent_offer_rate);
-          if(subseqGrossAmount > 0){
-            subsequent_discount_amount = subseqGrossAmount - subseqEffectiveAmount;
-            subsequent_discount_percent = this.getDecimalAmount(100 * subsequent_discount_amount / subseqGrossAmount);
-          }else{
-            subsequent_discount_amount = 0;
-            subsequent_discount_percent = 0;
-          }
-        }else{
-          if(sale_rate && sale_rate > 0){
-            effectiveTotal = quantity * data.offer_rate;
-          }
-          dis_amt = gross_amount - effectiveTotal;
-          if (gross_amount > 0) {
-            discount_percent = this.getDecimalAmount(100 * dis_amt / gross_amount);
-          } else {
-            discount_percent = 0;
-          }
+  let quantity = 0;
+  let discount_percent:any = 0;
+  let net_amount:any = 0;
+  let incoming_field = fieldName;
+  let sale_rate = data['sale_rate'];
+  let gross_amount = 0;
+  let effectiveTotal = 0;
+  let dis_amt:any = 0;
+  let subsequent_discount_amount:any=0;
+  let subsequent_discount_percent:any=0;
+  let totalDiscountAmount:any=0;
+  let pricingType = data.pricingType != undefined && data.pricingType != '' ? data.pricingType : '';
+  quantity = data.qty;
+  if (!this.coreFunctionService.isNotBlank(quantity)) {
+    quantity = 0;
+  }
+  switch (incoming_field) {
+    case "qty":
+      if(pricingType == 'Parameter Wise Rate'){
+        if(sale_rate && sale_rate > 0){
+          gross_amount = quantity * sale_rate;
+          effectiveTotal = quantity * data.offer_rate;
         }
-
-        net_amount = effectiveTotal;
-        this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent)
-
-
-        break;
-      case "discount_percent":
-      case "subsequent_discount_percent":
-
-          if(sale_rate && sale_rate > 0){
-            discount_percent = data.discount_percent;
-            if (!this.coreFunctionService.isNotBlank(discount_percent)) {
-              discount_percent = 0;
-            }
-            let effectiveGrossAmount = 0;
-            if(data.no_of_injection2 && data.no_of_injection2 > 0 && quantity > 1){
-              effectiveGrossAmount = sale_rate;
-            }else{
-              effectiveGrossAmount = quantity * sale_rate;
-            }
-            dis_amt = this.getDecimalAmount(((+effectiveGrossAmount) * (+discount_percent)) / 100);
-            if(data.no_of_injection2 && data.no_of_injection2 > 0 && quantity > 1){
-              data['offer_rate'] = (effectiveGrossAmount - dis_amt);
-            }else{
-              data['offer_rate'] = (effectiveGrossAmount - dis_amt) / quantity;
-            }
-          }else{
-            discount_percent = 0;
-            dis_amt = 0;
-          }
-
-          if(data.no_of_injection2 && data.no_of_injection2 > 0){
-            subsequent_discount_percent = data.subsequent_discount_percent;
-            if (!this.coreFunctionService.isNotBlank(subsequent_discount_percent)) {
-              subsequent_discount_percent = 0;
-            }
-            let subsequentGrossAmount = 0;
-            if(quantity > 1){
-              subsequentGrossAmount = data.no_of_injection2 * (quantity -1);
-            }else{
-              subsequentGrossAmount = data.no_of_injection2;
-            }
-            subsequent_discount_amount = this.getDecimalAmount(((+subsequentGrossAmount) * (+subsequent_discount_percent)) / 100);
-            if(quantity > 1){
-              data['subsequent_offer_rate'] = (subsequentGrossAmount - subsequent_discount_amount) / (quantity-1);
-            }else{
-              data['subsequent_offer_rate'] = (subsequentGrossAmount - subsequent_discount_amount);
-            }
-          }else{
-            subsequent_discount_amount = 0;
-            subsequent_discount_percent = 0;
-          }
-
-
+        dis_amt = gross_amount - effectiveTotal;
+        if (gross_amount > 0) {
+          discount_percent = this.getDecimalAmount(100 * dis_amt / gross_amount);
+        } else {
+          discount_percent = 0;
+        }
+      }else if(pricingType == 'Column Wise Rate'){
         if(quantity > 1){
-          totalDiscountAmount = subsequent_discount_amount + dis_amt;
+          gross_amount = ((quantity - 1) * data.no_of_injection2) + sale_rate;
+          effectiveTotal = ((quantity - 1) * data.subsequent_offer_rate) + data.offer_rate;
+          dis_amt = sale_rate - data.offer_rate;
         }else{
-          totalDiscountAmount = dis_amt;
+          gross_amount = quantity * sale_rate;
+          effectiveTotal = quantity * data.offer_rate;
+          dis_amt = gross_amount - effectiveTotal;
         }
+        if (sale_rate > 0) {
+          discount_percent = this.getDecimalAmount(100 * dis_amt / sale_rate);
+        } else {
+          discount_percent = 0;
+          dis_amt = 0;
+        }
+        let subseqGrossAmount = ((quantity - 1) * data.no_of_injection2);
+        let subseqEffectiveAmount = ((quantity - 1) * data.subsequent_offer_rate);
+        if(subseqGrossAmount > 0){
+          subsequent_discount_amount = subseqGrossAmount - subseqEffectiveAmount;
+          subsequent_discount_percent = this.getDecimalAmount(100 * subsequent_discount_amount / subseqGrossAmount);
+        }else{
+          subsequent_discount_amount = 0;
+          subsequent_discount_percent = 0;
+        }
+      }        
+      net_amount = effectiveTotal;
+      this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent)
+      break;
 
-        net_amount = this.getDecimalAmount((+gross_amount) - totalDiscountAmount);
-        this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent);
-        break;
-
-      case "unit_price":
-        if(data.sale_rate && data.sale_rate > 0){
+    case "discount_percent":
+    case "subsequent_discount_percent":
+      if(pricingType == 'Parameter Wise Rate'){
+        if(sale_rate && sale_rate > 0){
+          gross_amount = quantity * sale_rate;
+          discount_percent = data.discount_percent;
+          if (!this.coreFunctionService.isNotBlank(discount_percent)) {
+            discount_percent = 0;
+          }
+          let effectiveGrossAmount = quantity * sale_rate;
+          dis_amt = this.getDecimalAmount(((+effectiveGrossAmount) * (+discount_percent)) / 100);
+          data['offer_rate'] = (effectiveGrossAmount - dis_amt) / quantity;
+        }else{
+          discount_percent = 0;
+          dis_amt = 0;
+        }
+      }else if(pricingType == 'Column Wise Rate'){
+        if(sale_rate && sale_rate > 0){
+          if(quantity > 1){
+            gross_amount = ((quantity - 1) * data.no_of_injection2) + sale_rate;
+          }else{
+            gross_amount = quantity * sale_rate;
+          }
           discount_percent = data.discount_percent;
           if (!this.coreFunctionService.isNotBlank(discount_percent)) {
             discount_percent = 0;
           }
           let effectiveGrossAmount = 0;
           if(quantity > 1){
-            if(data.no_of_injection2 && data.no_of_injection2 > 0){
-              effectiveGrossAmount = data.sale_rate;
-            }else{
-              effectiveGrossAmount = data.sale_rate * quantity;
-            }
+            effectiveGrossAmount = sale_rate;
           }else{
-            effectiveGrossAmount = data.sale_rate * quantity;
+            effectiveGrossAmount = quantity * sale_rate;
           }
           dis_amt = this.getDecimalAmount(((+effectiveGrossAmount) * (+discount_percent)) / 100);
-          let offerRate = 0;
           if(quantity > 1){
-            if(data.no_of_injection2 && data.no_of_injection2 > 0){
-              offerRate = data.sale_rate - dis_amt;
-            }else{
-              offerRate = data.sale_rate - (dis_amt / quantity);
-            }
+            data['offer_rate'] = (effectiveGrossAmount - dis_amt);
           }else{
-            offerRate = data.sale_rate - dis_amt;
+            data['offer_rate'] = (effectiveGrossAmount - dis_amt) / quantity;
           }
+        }else{
+          discount_percent = 0;
+          dis_amt = 0;
+        }
+        subsequent_discount_percent = data.subsequent_discount_percent;
+        if (!this.coreFunctionService.isNotBlank(subsequent_discount_percent)) {
+          subsequent_discount_percent = 0;
+        }
+        let subsequentGrossAmount = 0;
+        if(quantity > 1){
+          subsequentGrossAmount = data.no_of_injection2 * (quantity - 1);
+        }else{
+          subsequentGrossAmount = data.no_of_injection2;
+        }
+        subsequent_discount_amount = this.getDecimalAmount(((+subsequentGrossAmount) * (+subsequent_discount_percent)) / 100);
+        if(quantity > 1){
+          data['subsequent_offer_rate'] = (subsequentGrossAmount - subsequent_discount_amount) / (quantity-1);
+        }else{
+          data['subsequent_offer_rate'] = (subsequentGrossAmount - subsequent_discount_amount);
+        }
+      }
+      if(quantity > 1){
+        totalDiscountAmount = subsequent_discount_amount + dis_amt;
+      }else{
+        totalDiscountAmount = dis_amt;
+      }
+      net_amount = this.getDecimalAmount((+gross_amount) - totalDiscountAmount);
+      this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent);
+      break;
+
+    case "unit_price":
+      if(pricingType == 'Parameter Wise Rate'){
+        if(data.sale_rate && data.sale_rate > 0){
+          gross_amount = quantity * sale_rate;
+          discount_percent = data.discount_percent;
+          if (!this.coreFunctionService.isNotBlank(discount_percent)) {
+            discount_percent = 0;
+          }
+          let effectiveGrossAmount = data.sale_rate * quantity;
+          dis_amt = this.getDecimalAmount(((+effectiveGrossAmount) * (+discount_percent)) / 100);
+          let offerRate = data.sale_rate - (dis_amt / quantity);
           data['offer_rate'] = offerRate;
         }else{
           dis_amt = 0;
           discount_percent = 0;
           data['offer_rate'] = 0;
         }
-        if(data.no_of_injection2 && data.no_of_injection2 > 0){
-          subsequent_discount_percent = data.subsequent_discount_percent;
-          if (!this.coreFunctionService.isNotBlank(subsequent_discount_percent)) {
-            subsequent_discount_percent = 0;
-          }
-          let subsequentGrossAmount = 0;
+      }else if(pricingType == 'Column Wise Rate'){
+        if(data.sale_rate && data.sale_rate > 0){
           if(quantity > 1){
-            subsequentGrossAmount = data.no_of_injection2 * (quantity - 1);
+            gross_amount = ((quantity - 1) * data.no_of_injection2) + sale_rate;
           }else{
-            subsequentGrossAmount = data.no_of_injection2;
+            gross_amount = quantity * sale_rate;
           }
-          subsequent_discount_amount = this.getDecimalAmount(((+subsequentGrossAmount) * (+subsequent_discount_percent)) / 100);
-          let offerRate = 0;
+          discount_percent = data.discount_percent;
+          if (!this.coreFunctionService.isNotBlank(discount_percent)) {
+            discount_percent = 0;
+          }
+          let effectiveGrossAmount = 0;
           if(quantity > 1){
-            offerRate = data.no_of_injection2 - (subsequent_discount_amount / (quantity - 1));
+            effectiveGrossAmount = data.sale_rate;
           }else{
-            offerRate = data.no_of_injection2 - subsequent_discount_amount;
+            effectiveGrossAmount = data.sale_rate * quantity;
           }
-          data['subsequent_offer_rate'] = offerRate;
+          dis_amt = this.getDecimalAmount(((+effectiveGrossAmount) * (+discount_percent)) / 100);
+          let offerRate = data.sale_rate - dis_amt;
+          data['offer_rate'] = offerRate;
         }else{
+          dis_amt = 0;
+          discount_percent = 0;
+          data['offer_rate'] = 0;
+        }          
+        subsequent_discount_percent = data.subsequent_discount_percent;
+        if (!this.coreFunctionService.isNotBlank(subsequent_discount_percent)) {
           subsequent_discount_percent = 0;
-          subsequent_discount_amount = 0;
-          data['subsequent_offer_rate'] = 0;
         }
+        let subsequentGrossAmount = 0;
         if(quantity > 1){
-          totalDiscountAmount = dis_amt + subsequent_discount_amount;
+          subsequentGrossAmount = data.no_of_injection2 * (quantity - 1);
         }else{
-          totalDiscountAmount = dis_amt;
+          subsequentGrossAmount = data.no_of_injection2;
         }
-
-        net_amount = this.getDecimalAmount((+gross_amount) - totalDiscountAmount);
-        this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent);
-
-        break;
-
-      case "offer_rate":
-      case "subsequent_offer_rate":
-        let offer_rate = 0;
-        if(incoming_field == "subsequent_offer_rate"){
-          offer_rate = this.getDecimalAmount(data.subsequent_offer_rate);
+        subsequent_discount_amount = this.getDecimalAmount(((+subsequentGrossAmount) * (+subsequent_discount_percent)) / 100);
+        let offerRate = 0;
+        if(quantity > 1){
+          offerRate = data.no_of_injection2 - (subsequent_discount_amount / (quantity - 1));
         }else{
-          offer_rate = this.getDecimalAmount(data.offer_rate);
+          offerRate = data.no_of_injection2 - subsequent_discount_amount;
         }
-        if (!this.coreFunctionService.isNotBlank(offer_rate)) {
-          offer_rate = 0;
-        }
-        if (offer_rate) {
-          if(data.subsequent_offer_rate && data.subsequent_offer_rate > 0 && data.no_of_injection2 && data.no_of_injection2 > 0 && quantity > 1){
+        data['subsequent_offer_rate'] = offerRate;          
+      }
+      if(quantity > 1){
+        totalDiscountAmount = dis_amt + subsequent_discount_amount;
+      }else{
+        totalDiscountAmount = dis_amt;
+      }
+      net_amount = this.getDecimalAmount((+gross_amount) - totalDiscountAmount);
+      this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent);
+      break;
+
+    case "offer_rate":
+    case "subsequent_offer_rate":
+      let offer_rate = 0;
+      if(incoming_field == "subsequent_offer_rate"){
+        offer_rate = this.getDecimalAmount(data.subsequent_offer_rate);
+      }else{
+        offer_rate = this.getDecimalAmount(data.offer_rate);
+      }
+      if (!this.coreFunctionService.isNotBlank(offer_rate)) {
+        offer_rate = 0;
+      }
+      if (offer_rate) {
+        if(pricingType == 'Parameter Wise Rate'){
+          let effectiveGrossAmount = 0;
+          if(sale_rate && sale_rate > 0){
+            effectiveTotal = data.offer_rate * quantity;
+            effectiveGrossAmount = sale_rate * quantity;
+            dis_amt = effectiveGrossAmount - (data.offer_rate * quantity);
+          }else{
+            data["offer_rate"] = 0;
+          }
+          if (effectiveGrossAmount > 0) {
+            discount_percent = this.getDecimalAmount(100 * dis_amt / effectiveGrossAmount);
+          } else {
+            discount_percent = 0;
+          }
+        }else if(pricingType == 'Column Wise Rate'){
+          if(quantity > 1){
             effectiveTotal = ((quantity - 1) * data.subsequent_offer_rate) + data.offer_rate;
           }else{
-            if(sale_rate && sale_rate > 0){
-              effectiveTotal = quantity * data.offer_rate;
-            }
+            effectiveTotal = data.offer_rate * quantity;
           }
-          totalDiscountAmount = gross_amount - effectiveTotal
-          net_amount = gross_amount - totalDiscountAmount;
-          //if(incoming_field == 'offer_rate'){
-            let effectiveGrossAmount = 0;
-            if(sale_rate && sale_rate > 0){
-              if(data.no_of_injection2 && data.no_of_injection2 > 0){
-                effectiveGrossAmount = sale_rate;
-                dis_amt = effectiveGrossAmount - data.offer_rate;
-              }else{
-                effectiveGrossAmount = sale_rate * quantity;
-                dis_amt = effectiveGrossAmount - (data.offer_rate * quantity);
-              }
-            }else{
-              data["offer_rate"] = 0;
-            }
-            if (effectiveGrossAmount > 0) {
-              discount_percent = this.getDecimalAmount(100 * dis_amt / effectiveGrossAmount);
-            } else {
-              discount_percent = 0;
-            }
-
-          //}
-
-          //if (incoming_field == 'subsequent_offer_rate' && data.no_of_injection2 > 0) {
-            let subsequentGrossAmount = 0;
-            if(data.no_of_injection2 && data.no_of_injection2 > 0){
-              if(quantity == 1){
-                subsequentGrossAmount = data.no_of_injection2;
-                subsequent_discount_amount = this.getDecimalAmount(subsequentGrossAmount - data.subsequent_offer_rate);
-              }else{
-                subsequentGrossAmount = this.getDecimalAmount(gross_amount - effectiveGrossAmount);
-                subsequent_discount_amount = subsequentGrossAmount - ( effectiveTotal - data.offer_rate);
-              }
-            }else{
-              data["subsequent_offer_rate"] = 0;
-            }
-            if(subsequentGrossAmount > 0){
-              subsequent_discount_percent = this.getDecimalAmount(100 * subsequent_discount_amount / subsequentGrossAmount);
-            }else{
-              subsequent_discount_percent = 0;
-            }
-          //}
-          this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent);
-
-        }else{
-          if(incoming_field == "subsequent_offer_rate"){
-            data["subsequent_offer_rate"] = offer_rate;
+          let effectiveGrossAmount = 0;
+          if(sale_rate && sale_rate > 0){
+            effectiveGrossAmount = sale_rate;
+            dis_amt = effectiveGrossAmount - data.offer_rate;
           }else{
-            data["offer_rate"] = offer_rate;
+            data["offer_rate"] = 0;
+          }
+          if (effectiveGrossAmount > 0) {
+            discount_percent = this.getDecimalAmount(100 * dis_amt / effectiveGrossAmount);
+          } else {
+            discount_percent = 0;
+          }
+          let subsequentGrossAmount = 0;
+          if(data.no_of_injection2 && data.no_of_injection2 > 0){
+            if(quantity > 1){
+              subsequentGrossAmount = this.getDecimalAmount(gross_amount - effectiveGrossAmount);
+              subsequent_discount_amount = subsequentGrossAmount - ( effectiveTotal - data.offer_rate);
+            }else{
+              subsequentGrossAmount = data.no_of_injection2;
+              subsequent_discount_amount = this.getDecimalAmount(subsequentGrossAmount - data.subsequent_offer_rate);
+            }
+          }else{
+            data["subsequent_offer_rate"] = 0;
+          }
+          if(subsequentGrossAmount > 0){
+            subsequent_discount_percent = this.getDecimalAmount(100 * subsequent_discount_amount / subsequentGrossAmount);
+          }else{
+            subsequent_discount_percent = 0;
           }
         }
-        break;
-      case "discount_amount":
-      case "subsequent_discount_amount":
-        if(incoming_field == 'discount_amount'){
+        net_amount = gross_amount - (gross_amount - effectiveTotal);
+        this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent);
+      }else{
+        if(incoming_field == "subsequent_offer_rate"){
+          data["subsequent_offer_rate"] = offer_rate;
+        }else{
+          data["offer_rate"] = offer_rate;
+        }
+      }
+      break;
+
+    case "discount_amount":
+    case "subsequent_discount_amount":
+      if(incoming_field == 'discount_amount'){
+        if(pricingType == 'Parameter Wise Rate'){
+          if(sale_rate && sale_rate > 0){
+            dis_amt = data.discount_amount;
+            if (!this.coreFunctionService.isNotBlank(dis_amt)) {
+              dis_amt = 0;
+            }
+            let effectiveGrossAmount = quantity * sale_rate;
+            discount_percent = this.getDecimalAmount(((+dis_amt) * 100) / (+effectiveGrossAmount));
+            data['offer_rate'] = (effectiveGrossAmount - dis_amt) / quantity;
+            subsequent_discount_amount = data.subsequent_discount_amount;
+            subsequent_discount_percent = data.subsequent_discount_percent;
+          }else{
+            discount_percent = 0;
+            dis_amt = 0;
+            subsequent_discount_amount = data.subsequent_discount_amount;
+            subsequent_discount_percent = data.subsequent_discount_percent;
+          }
+        }else if(pricingType == 'Column Wise Rate'){
           if(sale_rate && sale_rate > 0){
             dis_amt = data.discount_amount;
             if (!this.coreFunctionService.isNotBlank(dis_amt)) {
               dis_amt = 0;
             }
             let effectiveGrossAmount = 0;
-            if(data.no_of_injection2 && data.no_of_injection2 > 0 && quantity > 1){
+            if(quantity > 1){
               effectiveGrossAmount = sale_rate;
             }else{
               effectiveGrossAmount = quantity * sale_rate;
             }
             discount_percent = this.getDecimalAmount(((+dis_amt) * 100) / (+effectiveGrossAmount));
-            if(data.no_of_injection2 && data.no_of_injection2 > 0 && quantity > 1){
+            if(quantity > 1){
               data['offer_rate'] = (effectiveGrossAmount - dis_amt);
             }else{
               data['offer_rate'] = (effectiveGrossAmount - dis_amt) / quantity;
@@ -2018,7 +2048,9 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
             subsequent_discount_amount = data.subsequent_discount_amount;
             subsequent_discount_percent = data.subsequent_discount_percent;
           }
-        }else{
+        }
+      }else{
+        if(pricingType == 'Column Wise Rate'){
           if(data.no_of_injection2 && data.no_of_injection2 > 0){
             subsequent_discount_amount = this.getDecimalAmount(data.subsequent_discount_amount);
             if (!this.coreFunctionService.isNotBlank(subsequent_discount_amount)) {
@@ -2045,103 +2077,103 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
             dis_amt = data.discount_amount;
           }
         }
-        if(quantity > 1){
-          totalDiscountAmount = subsequent_discount_amount + dis_amt;
-        }else{
-          totalDiscountAmount = dis_amt;
-        }
-
-        net_amount = this.getDecimalAmount((+gross_amount) - totalDiscountAmount);
-        this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent);
-
-        break;
-    }
-}
-calculateQuotationParameterAmountForAutomotiveLimsWithSubsequent(data:any, fieldName:any) {
-    let quantity = 0;
-    let discount_percent = 0;
-    let cost_rate = 0;
-    let net_amount:any = 0;
-    let param_quantom = 0;
-    let Base_quotation_rate = 0;
-    let incoming_field = fieldName;
-
-    let gross_amount = 0;
-    let dis_amt = 0;
-    switch (incoming_field) {
-      case "parameter_quantum":
-        let parameterQuantum = data.parameter_quantum;
-        if (!this.coreFunctionService.isNotBlank(parameterQuantum)) {
-          parameterQuantum = 0;
-        }
-        data['quantum_rate'] = (+data.quotation_rate) * (+parameterQuantum);
-        data['quotation_effective_rate'] = (+data.qty) * (+data.quantum_rate);
-        net_amount = +data.quotation_effective_rate
-        if (data.discount_percent) {
-          let discount = ((+data.quotation_effective_rate) * (+data.discount_percent)) / 100;
-          data['discount_amount'] = discount;
-          net_amount = (+data.quotation_effective_rate) - discount;
-        }
-        data['net_amount'] = net_amount
-
-        break;
-      case "qty":
-        let quantity = data.qty;
-        if (!this.coreFunctionService.isNotBlank(quantity)) {
-          quantity = 0;
-        }
-
-        data['quotation_effective_rate'] = (+quantity) * (+data.quantum_rate);
-        if (data.discount_percent) {
-          let discount = this.getDecimalAmount((+data.quotation_effective_rate) * (+data.discount_percent)) / 100;
-          data['discount_amount'] = discount;
-        }
-        net_amount = this.getDecimalAmount((+data.quotation_effective_rate) - data['discount_amount']);
-        data['net_amount'] = net_amount
-        data['total'] = +data.quotation_effective_rate;
-        data['qty'] = data.qty
-
-        break;
-      case "discount_percent":
-        let discount_per = data.discount_percent;
-        if (!this.coreFunctionService.isNotBlank(discount_per)) {
-          discount_per = 0;
-        }
-        data['quotation_effective_rate'] = (+data.qty) * (+data.quantum_rate);
-        net_amount = +data.quotation_effective_rate
-        let discount = this.getDecimalAmount(((+data.quotation_effective_rate) * (+discount_per)) / 100);
-        data['discount_amount'] = discount;
-        net_amount = this.getDecimalAmount((+data.quotation_effective_rate) - discount);
-        data['net_amount'] = net_amount
-        data['total'] = +data.quotation_effective_rate;
-        data['qty'] = data.qty;
-        data['discount_percent'] = +discount_per;
-
-        break;
-
-      case "discount_amount":
-        let discount_amt = data.discount_amount;
-        if (!this.coreFunctionService.isNotBlank(discount_amt)) {
-          discount_amt = 0;
-        }
-
-        net_amount = (+data.quotation_effective_rate) - (+discount_amt);
-        let discount_perc = this.getDecimalAmount(((+discount_amt) * 100) / (+data.quotation_effective_rate));
-        data['net_amount'] = net_amount;
-        data['discount_percent'] = discount_perc;
-        data['discount_amount'] = +data['discount_amount'];
-
-        break;
-      default:
-
-    }
-    if (data['qty'] > 0) {
-      data['per_sample_net_rate'] = this.getDecimalAmount(data['net_amount'] / data['qty']);
-    } else {
-      data['per_sample_net_rate'] = 0;
-    }
-    this.sanitizeParameterAmount(data);
+      }
+      if(quantity > 1){
+        totalDiscountAmount = subsequent_discount_amount + dis_amt;
+      }else{
+        totalDiscountAmount = dis_amt;
+      }
+      net_amount = this.getDecimalAmount((+gross_amount) - totalDiscountAmount);
+      this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent);
+      break;
   }
+}
+
+calculateQuotationParameterAmountForAutomotiveLimsWithSubsequent(data:any, fieldName:any) {
+  let quantity = 0;
+  let discount_percent = 0;
+  let cost_rate = 0;
+  let net_amount:any = 0;
+  let param_quantom = 0;
+  let Base_quotation_rate = 0;
+  let incoming_field = fieldName;
+
+  let gross_amount = 0;
+  let dis_amt = 0;
+  switch (incoming_field) {
+    case "parameter_quantum":
+      let parameterQuantum = data.parameter_quantum;
+      if (!this.coreFunctionService.isNotBlank(parameterQuantum)) {
+        parameterQuantum = 0;
+      }
+      data['quantum_rate'] = (+data.quotation_rate) * (+parameterQuantum);
+      data['quotation_effective_rate'] = (+data.qty) * (+data.quantum_rate);
+      net_amount = +data.quotation_effective_rate
+      if (data.discount_percent) {
+        let discount = ((+data.quotation_effective_rate) * (+data.discount_percent)) / 100;
+        data['discount_amount'] = discount;
+        net_amount = (+data.quotation_effective_rate) - discount;
+      }
+      data['net_amount'] = net_amount
+
+      break;
+    case "qty":
+      let quantity = data.qty;
+      if (!this.coreFunctionService.isNotBlank(quantity)) {
+        quantity = 0;
+      }
+
+      data['quotation_effective_rate'] = (+quantity) * (+data.quantum_rate);
+      if (data.discount_percent) {
+        let discount = this.getDecimalAmount((+data.quotation_effective_rate) * (+data.discount_percent)) / 100;
+        data['discount_amount'] = discount;
+      }
+      net_amount = this.getDecimalAmount((+data.quotation_effective_rate) - data['discount_amount']);
+      data['net_amount'] = net_amount
+      data['total'] = +data.quotation_effective_rate;
+      data['qty'] = data.qty
+
+      break;
+    case "discount_percent":
+      let discount_per = data.discount_percent;
+      if (!this.coreFunctionService.isNotBlank(discount_per)) {
+        discount_per = 0;
+      }
+      data['quotation_effective_rate'] = (+data.qty) * (+data.quantum_rate);
+      net_amount = +data.quotation_effective_rate
+      let discount = this.getDecimalAmount(((+data.quotation_effective_rate) * (+discount_per)) / 100);
+      data['discount_amount'] = discount;
+      net_amount = this.getDecimalAmount((+data.quotation_effective_rate) - discount);
+      data['net_amount'] = net_amount
+      data['total'] = +data.quotation_effective_rate;
+      data['qty'] = data.qty;
+      data['discount_percent'] = +discount_per;
+
+      break;
+
+    case "discount_amount":
+      let discount_amt = data.discount_amount;
+      if (!this.coreFunctionService.isNotBlank(discount_amt)) {
+        discount_amt = 0;
+      }
+
+      net_amount = (+data.quotation_effective_rate) - (+discount_amt);
+      let discount_perc = this.getDecimalAmount(((+discount_amt) * 100) / (+data.quotation_effective_rate));
+      data['net_amount'] = net_amount;
+      data['discount_percent'] = discount_perc;
+      data['discount_amount'] = +data['discount_amount'];
+
+      break;
+    default:
+  }
+  if (data['qty'] > 0) {
+    data['per_sample_net_rate'] = this.getDecimalAmount(data['net_amount'] / data['qty']);
+  } else {
+    data['per_sample_net_rate'] = 0;
+  }
+  this.sanitizeParameterAmount(data);
+}
+
 calculateParameterLimsSegmentWiseForSubsequent(lims_segment: any, data: any, fieldName: string) {
   switch (lims_segment) {
     case 'standard':
@@ -2151,7 +2183,6 @@ calculateParameterLimsSegmentWiseForSubsequent(lims_segment: any, data: any, fie
       this.calculateQuotationParameterAmountForAutomotiveLimsWithSubsequent(data, fieldName)
       break
   }
-
 }
 
 calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: any) {
@@ -2172,24 +2203,21 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
   if (this.coreFunctionService.isNotBlank(templateValue['discount_percent'])) {
     current_disount = templateValue['discount_percent'];
   }
-
   if (this.coreFunctionService.isNotBlank(templateValue.qty)) {
     qty = templateValue.qty;
   }
-
   if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
     templateValue['quotation_param_methods'].forEach((element:any) => {
-      let data = { ...element };
-      paramArray.push(data);
+      if(element.pricingType != undefined && element.pricingType != ''){
+        let data = { ...element };
+        paramArray.push(data);
+      }      
     });
   }
-
-
-
   if (templateValue['sampling_charge'] && templateValue['sampling_charge'] != null) {
     sampling_amount = templateValue['sampling_charge'];
   }
-  // if(gross_amount>0){
+
   if (true) {
     switch (field_name) {
       case 'parameter_array':
@@ -2229,7 +2257,6 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
               discount_amount = discount_amount + data['discount_amount'];
             });
           }
-
         }
         discount_percent = this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
         templateValue['discount_amount'] = discount_amount;
@@ -2265,12 +2292,10 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
           data.subsequent_discount_percent = this.getDecimalAmount(+discount_percent);
           this.calculateParameterLimsSegmentWiseForSubsequent(lims_segment, data, "discount_percent");
         })
-
         templateValue['unit_price'] = net_amount / templateValue['qty'];
         templateValue['net_amount'] = net_amount;
         templateValue['discount_percent'] = discount_percent;
         break;
-
 
       case 'net_amount':
         discount_percent = 0;
@@ -2279,8 +2304,6 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
           this.calculateParameterLimsSegmentWiseForSubsequent(lims_segment, data, "qty");
           gross_amount = gross_amount + data['total'];
         })
-
-
         discount_amount = gross_amount - net_amount;
         discount_percent = this.getDiscountPercentage(current_disount, discount_amount, gross_amount, qty)
         paramArray.forEach((data:any) => {
@@ -2288,7 +2311,6 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
           data.subsequent_discount_percent = this.getDecimalAmount(+discount_percent);
           this.calculateParameterLimsSegmentWiseForSubsequent(lims_segment, data, "discount_percent");
         })
-
         templateValue["discount_percent"] = discount_percent;
         templateValue["discount_amount"] = discount_amount;
         templateValue['unit_price'] = net_amount / templateValue['qty'];
@@ -2300,7 +2322,6 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
           unit_price = this.getDecimalAmount(templateValue.unit_price);
         }
         net_amount = qty * unit_price;
-
         paramArray.forEach((data:any) => {
           this.calculateParameterLimsSegmentWiseForSubsequent(lims_segment, data, "qty");
           gross_amount = gross_amount + data['total'];
@@ -2357,35 +2378,29 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
         templateValue['discount_amount'] = discount_amount;
         templateValue['net_amount'] = net_amount;
         templateValue['discount_percent'] = discount_percent;
-
+      }
     }
 
+    final_amount = net_amount + sampling_amount;
+    if (templateValue['qty'] > 0) {
+      unit_price = this.getDecimalAmount(net_amount / templateValue['qty']);
+    } else {
+      unit_price = templateValue["unit_price"];
+    }
+    templateValue['total'] = this.getDecimalAmount(gross_amount);
+    templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
+    templateValue['net_amount'] = this.getDecimalAmount(net_amount);
+    templateValue['discount_percent'] = this.getDecimalAmount(discount_percent);
+    templateValue['final_amount'] = this.getDecimalAmount(final_amount);
+    templateValue['unit_price'] = this.getDecimalAmount(unit_price);
+    if (paramArray.length > 0) {
+      templateValue['quotation_param_methods'] = paramArray;
+    }
+    return templateValue;
   }
-
-  final_amount = net_amount + sampling_amount;
-  if (templateValue['qty'] > 0) {
-    unit_price = this.getDecimalAmount(net_amount / templateValue['qty']);
-  } else {
-    unit_price = templateValue["unit_price"];
-  }
-
-  templateValue['total'] = this.getDecimalAmount(gross_amount);
-  templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
-  templateValue['net_amount'] = this.getDecimalAmount(net_amount);
-  templateValue['discount_percent'] = this.getDecimalAmount(discount_percent);
-  templateValue['final_amount'] = this.getDecimalAmount(final_amount);
-  templateValue['unit_price'] = this.getDecimalAmount(unit_price);
-  if (paramArray.length > 0) {
-    templateValue['quotation_param_methods'] = paramArray;
-  }
-
-  return templateValue;
-
-}
-
+  
 /**
  * End point for subsequet calculation for quotation
  */
-
 
 }
