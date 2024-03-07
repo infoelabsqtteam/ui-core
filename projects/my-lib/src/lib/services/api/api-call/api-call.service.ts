@@ -563,7 +563,7 @@ export class ApiCallService {
         "path" : null,
         "data": payload
       }
-      this.apiService.getUserNotification(callPayload);
+      this.apiService.getUserNotification(callPayload,crList);
     }
   }
   getUserNotificationSetting(){
