@@ -8,6 +8,8 @@ import { serverHostList } from './serverHostList';
 import { StorageService } from '../../services/storage/storage.service';
 import { CoreFunctionService } from '../../services/common-utils/core-function/core-function.service';
 import { PLATFORM_NAME } from '../../shared/platform';
+import { AwsSecretManagerService } from '../api/aws-secret-manager/aws-secret-manager.service';
+import { DataShareService } from '../data-share/data-share.service';
 
 
 @Injectable({
@@ -19,6 +21,8 @@ export class EnvService {
     @Inject(DOCUMENT) private document: Document,
     private storageService: StorageService,
     private coreFunctionService:CoreFunctionService,
+    private awsSecretManagerService : AwsSecretManagerService,
+    private dataShareService : DataShareService
   ) { }
   
 
@@ -115,7 +119,8 @@ export class EnvService {
       hostname = this.getHostName('hostname');
       key_Name = 'clientEndpoint';
     }
-    let value:any = '';   
+    let value:any = '';  
+    this.awsSecretManagerService.getSecret("lims.itclabs.com") 
     if(hostname == 'localhost'){
       value = this.storageService.getClientCodeEnviorment().serverhost;
     }else if(serverHostList && serverHostList.length > 0){
