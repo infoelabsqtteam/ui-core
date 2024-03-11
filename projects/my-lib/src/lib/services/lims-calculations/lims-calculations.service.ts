@@ -1727,7 +1727,8 @@ populateParameterAmountWithSubsequent(data:any,net_amount:number,discount_percen
   data['qty'] = this.getDecimalAmount(quantity);
   data['total'] = this.getDecimalAmount(gross_amount);
   data['quotation_effective_rate'] =  this.getDecimalAmount(gross_amount);
-
+  data['offer_rate'] =  this.getDecimalAmount(data['offer_rate']);
+  data['subsequent_offer_rate'] =  this.getDecimalAmount(data['subsequent_offer_rate']);
 }
 
 calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) {
@@ -1776,8 +1777,15 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
           discount_percent = 0;
           dis_amt = 0;
         }
-        let subseqGrossAmount = ((quantity - 1) * data.no_of_injection2);
-        let subseqEffectiveAmount = ((quantity - 1) * data.subsequent_offer_rate);
+        let subseqGrossAmount = 0;
+        let subseqEffectiveAmount = 0;
+        if(quantity > 1){
+          subseqGrossAmount = ((quantity - 1) * data.no_of_injection2);
+          subseqEffectiveAmount = ((quantity - 1) * data.subsequent_offer_rate);
+        }else{
+          subseqGrossAmount = (quantity * data.no_of_injection2);
+          subseqEffectiveAmount = (quantity * data.subsequent_offer_rate);
+        }        
         if(subseqGrossAmount > 0){
           subsequent_discount_amount = subseqGrossAmount - subseqEffectiveAmount;
           subsequent_discount_percent = this.getDecimalAmount(100 * subsequent_discount_amount / subseqGrossAmount);
@@ -2199,13 +2207,6 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
   let field_name = field.field_name;
   let qty = 0;
   let product_wise_pricing = templateValue['product_wise_pricing'];
-  let current_disount = 0;
-  if (this.coreFunctionService.isNotBlank(templateValue['discount_percent'])) {
-    current_disount = templateValue['discount_percent'];
-  }
-  if (this.coreFunctionService.isNotBlank(templateValue.qty)) {
-    qty = templateValue.qty;
-  }
   if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
     templateValue['quotation_param_methods'].forEach((element:any) => {
       if(element.pricingType != undefined && element.pricingType != ''){
@@ -2214,11 +2215,17 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
       }      
     });
   }
-  if (templateValue['sampling_charge'] && templateValue['sampling_charge'] != null) {
-    sampling_amount = templateValue['sampling_charge'];
-  }
-
-  if (true) {
+  if (paramArray.length > 0) {
+    let current_disount = 0;
+    if (this.coreFunctionService.isNotBlank(templateValue['discount_percent'])) {
+      current_disount = templateValue['discount_percent'];
+    }
+    if (this.coreFunctionService.isNotBlank(templateValue.qty)) {
+      qty = templateValue.qty;
+    }
+    if (templateValue['sampling_charge'] && templateValue['sampling_charge'] != null) {
+      sampling_amount = templateValue['sampling_charge'];
+    }
     switch (field_name) {
       case 'parameter_array':
         unit_price = 0;
@@ -2379,22 +2386,22 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
         templateValue['net_amount'] = net_amount;
         templateValue['discount_percent'] = discount_percent;
       }
-    }
 
-    final_amount = net_amount + sampling_amount;
-    if (templateValue['qty'] > 0) {
-      unit_price = this.getDecimalAmount(net_amount / templateValue['qty']);
-    } else {
-      unit_price = templateValue["unit_price"];
-    }
-    templateValue['total'] = this.getDecimalAmount(gross_amount);
-    templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
-    templateValue['net_amount'] = this.getDecimalAmount(net_amount);
-    templateValue['discount_percent'] = this.getDecimalAmount(discount_percent);
-    templateValue['final_amount'] = this.getDecimalAmount(final_amount);
-    templateValue['unit_price'] = this.getDecimalAmount(unit_price);
-    if (paramArray.length > 0) {
-      templateValue['quotation_param_methods'] = paramArray;
+      final_amount = net_amount + sampling_amount;
+      if (templateValue['qty'] > 0) {
+        unit_price = this.getDecimalAmount(net_amount / templateValue['qty']);
+      } else {
+        unit_price = templateValue["unit_price"];
+      }
+      templateValue['total'] = this.getDecimalAmount(gross_amount);
+      templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
+      templateValue['net_amount'] = this.getDecimalAmount(net_amount);
+      templateValue['discount_percent'] = this.getDecimalAmount(discount_percent);
+      templateValue['final_amount'] = this.getDecimalAmount(final_amount);
+      templateValue['unit_price'] = this.getDecimalAmount(unit_price);
+      if (paramArray.length > 0) {
+        templateValue['quotation_param_methods'] = paramArray;
+      }
     }
     return templateValue;
   }
