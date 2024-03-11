@@ -1829,7 +1829,7 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
           if(quantity > 1){
             effectiveGrossAmount = sale_rate;
           }else{
-            effectiveGrossAmount = quantity * sale_rate;
+            effectiveGrossAmount = data.sale_rate * quantity;
           }
           dis_amt = this.getDecimalAmount(((+effectiveGrossAmount) * (+discount_percent)) / 100);
           if(quantity > 1){
