@@ -102,11 +102,11 @@ export class EnvService {
     let serverHostName = this.getHostKeyValue('serverEndpoint');
     //let themedata = this.getHostKeyValue('theme_setting');    
     //this.setApplicationSetting();
-    if(serverHostName != '' || serverHostName != setHostName) {      
-      const hostName = serverHostName +'/rest/';
-      this.storageService.setHostNameDinamically(hostName);
-      //this.setThemeSetting(themedata);
-    }
+    // if(serverHostName != '' || serverHostName != setHostName) {      
+    //   const hostName = serverHostName +'/rest/';
+    //   this.storageService.setHostNameDinamically(hostName);
+    //   //this.setThemeSetting(themedata);
+    // }
   }
   
   getHostKeyValue(keyName:string){
@@ -120,10 +120,14 @@ export class EnvService {
       key_Name = 'clientEndpoint';
     }
     let value:any = '';  
-    this.awsSecretManagerService.getSecret("lims.itclabs.com") 
+    // let test = this.awsSecretManagerService.getSecret("lims.itclabs.com") 
     if(hostname == 'localhost'){
       value = this.storageService.getClientCodeEnviorment().serverhost;
-    }else if(serverHostList && serverHostList.length > 0){
+    }else{
+      value = this.dataShareService.getServerHostName();
+    }
+    this.convertToDictionary(serverHostList);
+    if(serverHostList && serverHostList.length > 0 && key_Name == 'clientCode'){
       for (let index = 0; index < serverHostList.length; index++) {
         const element:any = serverHostList[index];
         if(hostname == element[key_Name]){
@@ -138,9 +142,26 @@ export class EnvService {
         }        
       }
     }
+    // if(serverHostList && serverHostList.length > 0){
+    //   for (let index = 0; index < serverHostList.length; index++) {
+    //     const element:any = serverHostList[index];
+    //     if(hostname == element[key_Name]){
+    //       if(keyName == "object"){
+    //         value = element;
+    //         break;
+    //       }else{
+    //         value = element[keyName];
+    //         break;
+    //       }
+          
+    //     }        
+    //   }
+    // }
+
     return value;
   }
   getHostName(key:string){
+    console.log(this.storageService.getProdType());
     let mydocument:any = this.document;
     return mydocument.location[key];
   }
@@ -207,6 +228,31 @@ export class EnvService {
   getVerifyType(){
     return this.storageService.getClientCodeEnviorment().verify_type;
   }
-  
-  
+
+  convertToDictionary(inputList: any) {
+    let response:any={};
+    const nonprod: { [key: string]: string } = {};
+    let prod:{ [key: string]: string } = {};
+    inputList.forEach((item:any) => {
+      if (item.clientCode || item.clientEndpoint && item.serverEndpoint) {
+      if(item.serverEndpoint.includes('prod')){
+          prod[item.clientEndpoint] = item.serverEndpoint;
+          if(item.clientCode){
+            prod[item.clientCode] = item.serverEndpoint;
+          }
+        }else{
+          nonprod[item.clientEndpoint] = item.serverEndpoint;
+          if(item.clientCode){
+            nonprod[item.clientCode] = item.serverEndpoint;
+          }
+        } 
+      }
+    });
+
+    response.prod = prod;
+    response.nonprod = nonprod;
+          console.log(response);
+    return response;
+  }
+
 }

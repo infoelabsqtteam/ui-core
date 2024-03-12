@@ -36,31 +36,32 @@ export class AwsSecretManagerService {
     );
   }
 
-  secret_name = "nonprod/ui"
 
+  async getSecret(prod:boolean,key:string){
 
-  async getSecret(key:string){
+    let secret_name = '';
+    prod ? secret_name = "prod/ui" :secret_name = "nonprod/ui";
 
-    let response
+    let response;
     try {
       response = await this.client.send(
         new GetSecretValueCommand({
-          SecretId: this.secret_name,
+          SecretId: secret_name,
           VersionStage: "AWSCURRENT",
         })
         );
-      } catch (error) {
+    } catch (error) {
         console.log(error);
-      }
-      
-      const secretString = response.SecretString;
-      const secretObject = JSON.parse(secretString);
-      const secretValue = secretObject[key];
-      console.log(secretValue);
-      console.log(secretObject);
-      // this.dataShareService.setHostName(secretValue);
-      // this.storageService.setHostNameDinamically(secretValue+"/rest/");
-      return secretValue;
     }
+        
+    const secretString = response.SecretString;
+    const secretObject = JSON.parse(secretString);
+    const secretValue = secretObject[key];
+    // console.log(secretValue);
+    // console.log(secretObject);
+    this.dataShareService.setServerHostName(secretValue);
+    this.storageService.setHostNameDinamically(secretValue+"/rest/");
+    return secretValue;
+  }
   
 }
