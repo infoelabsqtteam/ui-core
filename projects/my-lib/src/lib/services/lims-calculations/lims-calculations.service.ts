@@ -2417,6 +2417,7 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
           if (paramArray.length > 0) {
             paramArray.forEach((data:any) => {
               data['discount_percent'] = discount_percent;
+              data['subsequent_discount_percent'] = discount_percent;
               this.calculateParameterLimsSegmentWiseForSubsequent(lims_segment, data, "unit_price");
             });
           }
