@@ -126,7 +126,6 @@ export class EnvService {
     }else{
       value = this.dataShareService.getServerHostName();
     }
-    this.convertToDictionary(serverHostList);
     if(serverHostList && serverHostList.length > 0 && key_Name == 'clientCode'){
       for (let index = 0; index < serverHostList.length; index++) {
         const element:any = serverHostList[index];

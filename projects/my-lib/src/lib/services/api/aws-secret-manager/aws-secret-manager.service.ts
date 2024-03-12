@@ -37,10 +37,9 @@ export class AwsSecretManagerService {
   }
 
 
-  async getSecret(prod:boolean,key:string){
+  async getSecret(key:string){
 
-    let secret_name = '';
-    prod ? secret_name = "prod/ui" :secret_name = "nonprod/ui";
+    let secret_name = 'prod/ui';
 
     let response;
     try {
@@ -57,8 +56,6 @@ export class AwsSecretManagerService {
     const secretString = response.SecretString;
     const secretObject = JSON.parse(secretString);
     const secretValue = secretObject[key];
-    // console.log(secretValue);
-    // console.log(secretObject);
     this.dataShareService.setServerHostName(secretValue);
     this.storageService.setHostNameDinamically(secretValue+"/rest/");
     return secretValue;
