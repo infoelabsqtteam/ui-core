@@ -566,7 +566,7 @@ export class ApiCallService {
       this.apiService.getUserNotification(callPayload,crList);
     }
   }
-  getUserNotificationSetting(){
+    getUserNotificationSetting(){
     this.apiService.getUserNotificationSetting();
   }
 

@@ -591,8 +591,22 @@ getAplicationsThemeSetting(payload:object) {
   this.http.post(api, payload).subscribe(
     (respData) => {
       if(JSON.stringify(respData) != "{}"){
-        this.dataShareService.setThemeSetting(respData)
+      this.dataShareService.setThemeSetting(respData)
       }
+      },
+    (error) => {
+        console.log(error);
+      }
+  )
+}
+getData(payload:object) {
+  let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
+  this.http.post(api, payload).subscribe(
+    (respData) => {
+      console.log("res",respData);
+      // if(JSON.stringify(respData) != "{}"){
+      this.dataShareService.shareUserNotification(respData)
+      // }
       },
     (error) => {
         console.log(error);
