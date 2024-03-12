@@ -2258,7 +2258,7 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
     sampling_amount = templateValue['sampling_charge'];
   }
   // if(gross_amount>0){
-  if (true) {
+  if (paramArray.length > 0) {
     switch (field_name) {
       case 'parameter_array':
         unit_price = 0;
@@ -2427,25 +2427,26 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
         templateValue['discount_percent'] = discount_percent;
 
     }
+    final_amount = net_amount + sampling_amount;
+    if (templateValue['qty'] > 0) {
+      unit_price = this.getDecimalAmount(net_amount / templateValue['qty']);
+    } else {
+      unit_price = templateValue["unit_price"];
+    }
+
+    templateValue['total'] = this.getDecimalAmount(gross_amount);
+    templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
+    templateValue['net_amount'] = this.getDecimalAmount(net_amount);
+    templateValue['discount_percent'] = this.getDecimalAmount(discount_percent);
+    templateValue['final_amount'] = this.getDecimalAmount(final_amount);
+    templateValue['unit_price'] = this.getDecimalAmount(unit_price);
+    if (paramArray.length > 0) {
+      templateValue['quotation_param_methods'] = paramArray;
+    }
 
   }
 
-  final_amount = net_amount + sampling_amount;
-  if (templateValue['qty'] > 0) {
-    unit_price = this.getDecimalAmount(net_amount / templateValue['qty']);
-  } else {
-    unit_price = templateValue["unit_price"];
-  }
-
-  templateValue['total'] = this.getDecimalAmount(gross_amount);
-  templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
-  templateValue['net_amount'] = this.getDecimalAmount(net_amount);
-  templateValue['discount_percent'] = this.getDecimalAmount(discount_percent);
-  templateValue['final_amount'] = this.getDecimalAmount(final_amount);
-  templateValue['unit_price'] = this.getDecimalAmount(unit_price);
-  if (paramArray.length > 0) {
-    templateValue['quotation_param_methods'] = paramArray;
-  }
+  
 
   return templateValue;
 
