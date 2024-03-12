@@ -161,7 +161,6 @@ export class EnvService {
     return value;
   }
   getHostName(key:string){
-    console.log(this.storageService.getProdType());
     let mydocument:any = this.document;
     return mydocument.location[key];
   }
