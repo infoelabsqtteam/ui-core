@@ -120,7 +120,6 @@ export class EnvService {
       key_Name = 'clientEndpoint';
     }
     let value:any = '';  
-    // let test = this.awsSecretManagerService.getSecret("lims.itclabs.com") 
     if(hostname == 'localhost'){
       value = this.storageService.getClientCodeEnviorment().serverhost;
     }else{
@@ -225,32 +224,6 @@ export class EnvService {
   }
   getVerifyType(){
     return this.storageService.getClientCodeEnviorment().verify_type;
-  }
-
-  convertToDictionary(inputList: any) {
-    let response:any={};
-    const nonprod: { [key: string]: string } = {};
-    let prod:{ [key: string]: string } = {};
-    inputList.forEach((item:any) => {
-      if (item.clientCode || item.clientEndpoint && item.serverEndpoint) {
-      if(item.serverEndpoint.includes('prod')){
-          prod[item.clientEndpoint] = item.serverEndpoint;
-          if(item.clientCode){
-            prod[item.clientCode] = item.serverEndpoint;
-          }
-        }else{
-          nonprod[item.clientEndpoint] = item.serverEndpoint;
-          if(item.clientCode){
-            nonprod[item.clientCode] = item.serverEndpoint;
-          }
-        } 
-      }
-    });
-
-    response.prod = prod;
-    response.nonprod = nonprod;
-          console.log(response);
-    return response;
   }
 
 }

@@ -11,16 +11,6 @@ import { Common } from '../../../shared/enums/common.enum';
 })
 export class AwsSecretManagerService {
 
-  
-
-  config = {
-    credentials: {
-      accessKeyId: this.encryptionService.decryptRequest(Common.AWS_ACCESSKEYID),
-      secretAccessKey: this.encryptionService.decryptRequest(Common.AWS_SECRETKEY),
-    },
-    region: this.encryptionService.decryptRequest(Common.AWS_REGION)
-}
-  
   private client:any
 
   constructor(
@@ -28,7 +18,13 @@ export class AwsSecretManagerService {
     private dataShareService : DataShareService,
     private encryptionService : EncryptionService
   ) {    
-     this.client = new SecretsManagerClient( this.config );
+      this.client = new SecretsManagerClient({
+          region: this.encryptionService.decryptRequest(Common.AWS_REGION),
+          credentials: {
+          accessKeyId: this.encryptionService.decryptRequest(Common.AWS_ACCESSKEYID),
+          secretAccessKey: this.encryptionService.decryptRequest(Common.AWS_SECRETKEY),
+        }
+      });
   }
 
 
