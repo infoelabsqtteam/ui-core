@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { StorageService } from '../../storage/storage.service';
 import { DataShareService } from '../../data-share/data-share.service';
+import { EncryptionService } from '../../encryption/encryption.service';
+import { Common } from '../../../shared/enums/common.enum';
 
 
 @Injectable({
@@ -13,27 +15,20 @@ export class AwsSecretManagerService {
 
   config = {
     credentials: {
-      accessKeyId: 'AKIAUIGGVCG3LNWR6ZCC',
-      secretAccessKey: '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',
+      accessKeyId: this.encryptionService.decryptRequest(Common.AWS_ACCESSKEYID),
+      secretAccessKey: this.encryptionService.decryptRequest(Common.AWS_SECRETKEY),
     },
-    region: 'ap-south-1'
+    region: this.encryptionService.decryptRequest(Common.AWS_REGION)
 }
   
   private client:any
 
   constructor(
     private storageService : StorageService,
-    private dataShareService : DataShareService
+    private dataShareService : DataShareService,
+    private encryptionService : EncryptionService
   ) {    
-     this.client = new SecretsManagerClient( this.config
-    //   {
-    //   region: 'ap-south-1',
-    //   credentials: {
-    //     accessKeyId: 'AKIAUIGGVCG3LNWR6ZCC',
-    //     secretAccessKey: '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'
-    //   }
-    // }
-    );
+     this.client = new SecretsManagerClient( this.config );
   }
 
 
