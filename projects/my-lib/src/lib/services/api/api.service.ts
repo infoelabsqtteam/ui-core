@@ -599,20 +599,6 @@ getAplicationsThemeSetting(payload:object) {
       }
   )
 }
-getData(payload:object) {
-  let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
-  this.http.post(api, payload).subscribe(
-    (respData) => {
-      console.log("res",respData);
-      // if(JSON.stringify(respData) != "{}"){
-      this.dataShareService.shareUserNotification(respData)
-      // }
-      },
-    (error) => {
-        console.log(error);
-      }
-  )
-}
 getAplicationsSetting(payload:object) {
   let api = this.envService.getApi('GET_CUSTOM_TEMPLATE');
   this.http.post(api, payload).subscribe(
@@ -701,11 +687,6 @@ getUserNotification(payload:any,crList?:any){
   let api = this.envService.getApi('GET_GRID_DATA');
   this.http.post(api + '/' + payload.path, payload.data).subscribe(
     (respData:any) => {
-      if(crList){
-        respData['type']="All";
-      }else{
-        respData['type']="Unread";
-      }
         this.dataShareService.shareUserNotification(respData)
       },
     (error) => {
