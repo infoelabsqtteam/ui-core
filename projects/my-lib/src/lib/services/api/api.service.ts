@@ -228,7 +228,7 @@ deleteGridRow(payload:any){
 
 SaveFormData(payload:any){
   let api = this.envService.getApi('SAVE_FORM_DATA');
-    this.saveCall(api+ '/' + payload.curTemp,payload)
+  this.saveCall(api+ '/' + payload.curTemp,payload)
 }
 SendEmail(payload:any){
   let api = this.envService.getApi('SEND_EMAIL');
@@ -591,7 +591,7 @@ getAplicationsThemeSetting(payload:object) {
   this.http.post(api, payload).subscribe(
     (respData) => {
       if(JSON.stringify(respData) != "{}"){
-      this.dataShareService.setThemeSetting(respData)
+        this.dataShareService.setThemeSetting(respData)
       }
       },
     (error) => {
@@ -683,10 +683,10 @@ getFavouriteData(payload:any){
   )
 }
 
-getUserNotification(payload:any,crList?:any){
+getUserNotification(payload:any){
   let api = this.envService.getApi('GET_GRID_DATA');
   this.http.post(api + '/' + payload.path, payload.data).subscribe(
-    (respData:any) => {
+    (respData) => {
         this.dataShareService.shareUserNotification(respData)
       },
     (error) => {

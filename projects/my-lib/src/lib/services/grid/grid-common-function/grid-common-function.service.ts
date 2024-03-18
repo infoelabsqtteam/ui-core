@@ -545,9 +545,9 @@ constructor(
       case "redirect":
         if (value && value != '') {
           if(this.storageService.checkPlatForm() == 'mobile'){
-            return '<a href="javascript:void(0)">Click</a>';
+            return '<i class="fa fa-external-link" aria-hidden="true"></i>';
           }else{
-            return '<a href="javascript:void(0)">Click</a>';
+            return '<i class="fa fa-external-link" aria-hidden="true"></i>';
           }
         }else{
           return '-';
