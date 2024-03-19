@@ -545,9 +545,10 @@ export class ApiCallService {
     let user = this.storageService.GetUserInfo();
     const userId = user._id;
     if(userId && userId != null && userId != ''){
+      let criteraiList:any=[];
       const criteria:any = "userId._id;eq;"+userId+";STATIC";
       const criteria2:any = "notificationStatus;eq;UNREAD;STATIC";
-      let criteraiList:any=[criteria,criteria2];
+      criteraiList=[criteria,criteria2];
       const payload = this.setPageNoAndSize(this.getPaylodWithCriteria('user_notification_master','',criteraiList,{}),pageNo);
       const callPayload = {
         "path" : null,
