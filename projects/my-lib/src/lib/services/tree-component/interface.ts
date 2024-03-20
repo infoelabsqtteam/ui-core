@@ -5,6 +5,7 @@
     "children": TodoItemNode[];
     "item": string;
     "reference":any;
+    "criteria":any;
     "pId":string;
     "pIndex":string;
     "_id":string;
