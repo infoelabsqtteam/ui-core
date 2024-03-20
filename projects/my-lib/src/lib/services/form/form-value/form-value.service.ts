@@ -422,7 +422,7 @@ export class FormValueService {
         let mod={
             reference:{
               name:module.name,
-              _id:module._ids
+              _id:module._id
             },
             menus:this.menuOrModuleCommonService.getMenuDetails(module?.menu_list),
             notification:module.notification
