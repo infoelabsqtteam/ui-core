@@ -487,6 +487,70 @@ constructor(
     }
     return tabList;
   };
+
+  getMenuDetails(module: any) {
+    let obj: any = {};
+    if (module) {
+        module.forEach((menu: any) => {
+            let menuName = menu?.keyName;
+            let menuDetails: any = {};
+            let reference: any = {
+                name: menu?.name,
+                _id: menu?._id
+            }
+            if (menu) {
+                if (menu?.templateTabs) {
+                    menuDetails = {
+                        reference,
+                        templateTabs: this.getTempDetails(menu.templateTabs)
+                    }
+                    obj[menuName] = menuDetails;
+                } else if (menu?.submenu) {
+                    menuDetails = {
+                        reference,
+                        submenus: this.getMenuDetails(menu.submenu)
+                    }
+                  obj[menuName] = menuDetails;
+                }
+            }
+        })
+
+        return obj;
+    }
+}
+
+
+getTempDetails(tabs:any){
+  let obj:any={};
+  tabs.forEach((tab:any)=>{
+    if(tab){
+      let tabName=tab.keyName;
+      let tabDetails={
+        reference:{
+          name:tab.name,
+          _id:tab._id
+        },
+        activeAlerts:this.getActiveAlerts(tab)
+      }
+      obj[tabName]=tabDetails;
+    }
+  })
+  return obj;
+}
+
+getActiveAlerts(tab:any){
+  let arr=[];
+  if(tab?.email){
+    arr.push('EMAIL');
+  }
+  if(tab?.whatsapp){
+    arr.push('WHATSAPP');
+  }
+  if(tab?.sms){
+    arr.push('SMS');
+  }
+  return arr;
+}
   // End For APP
 
 }
