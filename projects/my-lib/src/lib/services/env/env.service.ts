@@ -10,6 +10,7 @@ import { CoreFunctionService } from '../../services/common-utils/core-function/c
 import { PLATFORM_NAME } from '../../shared/platform';
 import { AwsSecretManagerService } from '../api/aws-secret-manager/aws-secret-manager.service';
 import { DataShareService } from '../data-share/data-share.service';
+import { ApiCallService } from '../api/api-call/api-call.service';
 
 
 @Injectable({
@@ -22,7 +23,8 @@ export class EnvService {
     private storageService: StorageService,
     private coreFunctionService:CoreFunctionService,
     private awsSecretManagerService : AwsSecretManagerService,
-    private dataShareService : DataShareService
+    private dataShareService : DataShareService,
+    private apiCallService : ApiCallService
   ) { }
   
 
@@ -33,8 +35,9 @@ export class EnvService {
       baseUrl = this.storageService.getHostNameDinamically()
     }else{
       // baseUrl = environment.serverhost
-      baseUrl = this.getHostKeyValue('serverEndpoint') +'/rest/';
-      this.setDinamicallyHost();
+      // baseUrl = this.getHostKeyValue('serverEndpoint') +'/rest/';
+      // this.setDinamicallyHost();
+      baseUrl = this.dataShareService.getServerHostName() +'/rest/';
     }
     return baseUrl;
   }
@@ -158,6 +161,25 @@ export class EnvService {
 
     return value;
   }
+
+  async getAppSettingAsync (){
+
+    let hostname:any ="";
+    if(this.storageService.checkPlatForm() == 'mobile'){
+      hostname = this.storageService.getClientName();
+    }else{
+      hostname = this.getHostName('hostname');
+    }
+    if(hostname == 'localhost'){
+      hostname = this.storageService.getClientCodeEnviorment().serverhost;
+      this.storageService.setHostNameDinamically(hostname+"/rest/");
+    }else{
+      await this.awsSecretManagerService.getSecret(hostname);
+    }
+    this.apiCallService.getApplicationAllSettings();
+    
+   }
+
   getHostName(key:string){
     let mydocument:any = this.document;
     return mydocument.location[key];
