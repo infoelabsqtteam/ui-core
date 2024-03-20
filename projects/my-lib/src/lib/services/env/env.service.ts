@@ -34,10 +34,10 @@ export class EnvService {
     if(this.coreFunctionService.isNotBlank(host)){
       baseUrl = this.storageService.getHostNameDinamically()
     }else{
+      baseUrl = this.dataShareService.getServerHostName() +'/rest/';
       // baseUrl = environment.serverhost
       // baseUrl = this.getHostKeyValue('serverEndpoint') +'/rest/';
       // this.setDinamicallyHost();
-      baseUrl = this.dataShareService.getServerHostName() +'/rest/';
     }
     return baseUrl;
   }
@@ -100,9 +100,9 @@ export class EnvService {
     return false;
   }
 
-  setDinamicallyHost(){
-    let setHostName = this.storageService.getHostNameDinamically();
-    let serverHostName = this.getHostKeyValue('serverEndpoint');
+  // setDinamicallyHost(){
+  //   let setHostName = this.storageService.getHostNameDinamically();
+  //   let serverHostName = this.getHostKeyValue('serverEndpoint');
     //let themedata = this.getHostKeyValue('theme_setting');    
     //this.setApplicationSetting();
     // if(serverHostName != '' || serverHostName != setHostName) {      
@@ -110,7 +110,7 @@ export class EnvService {
     //   this.storageService.setHostNameDinamically(hostName);
     //   //this.setThemeSetting(themedata);
     // }
-  }
+  // }
   
   getHostKeyValue(keyName:string){
     let hostname:any ="";
