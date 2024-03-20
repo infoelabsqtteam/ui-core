@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { StorageService } from '../../services/storage/storage.service';
 import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
@@ -590,7 +590,7 @@ export class CommonFunctionService {
     return result;
   }
 
-  populate_fields_for_report(templateForm: FormGroup) {
+  populate_fields_for_report(templateForm: UntypedFormGroup) {
     // templateForm.controls['reporting_fax'].setValue(templateForm.value['fax']);
     templateForm.controls['reporting_mobile'].setValue(templateForm.value['mobile']);
     templateForm.controls['reporting_tel'].setValue(templateForm.value['phone']);
