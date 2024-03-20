@@ -8,6 +8,9 @@ import { serverHostList } from './serverHostList';
 import { StorageService } from '../../services/storage/storage.service';
 import { CoreFunctionService } from '../../services/common-utils/core-function/core-function.service';
 import { PLATFORM_NAME } from '../../shared/platform';
+import { AwsSecretManagerService } from '../api/aws-secret-manager/aws-secret-manager.service';
+import { DataShareService } from '../data-share/data-share.service';
+import { ApiCallService } from '../api/api-call/api-call.service';
 
 
 @Injectable({
@@ -19,6 +22,9 @@ export class EnvService {
     @Inject(DOCUMENT) private document: Document,
     private storageService: StorageService,
     private coreFunctionService:CoreFunctionService,
+    private awsSecretManagerService : AwsSecretManagerService,
+    private dataShareService : DataShareService,
+    private apiCallService : ApiCallService
   ) { }
   
 
@@ -28,9 +34,10 @@ export class EnvService {
     if(this.coreFunctionService.isNotBlank(host)){
       baseUrl = this.storageService.getHostNameDinamically()
     }else{
+      baseUrl = this.dataShareService.getServerHostName() +'/rest/';
       // baseUrl = environment.serverhost
-      baseUrl = this.getHostKeyValue('serverEndpoint') +'/rest/';
-      this.setDinamicallyHost();
+      // baseUrl = this.getHostKeyValue('serverEndpoint') +'/rest/';
+      // this.setDinamicallyHost();
     }
     return baseUrl;
   }
@@ -93,17 +100,17 @@ export class EnvService {
     return false;
   }
 
-  setDinamicallyHost(){
-    let setHostName = this.storageService.getHostNameDinamically();
-    let serverHostName = this.getHostKeyValue('serverEndpoint');
+  // setDinamicallyHost(){
+  //   let setHostName = this.storageService.getHostNameDinamically();
+  //   let serverHostName = this.getHostKeyValue('serverEndpoint');
     //let themedata = this.getHostKeyValue('theme_setting');    
     //this.setApplicationSetting();
-    if(serverHostName != '' || serverHostName != setHostName) {      
-      const hostName = serverHostName +'/rest/';
-      this.storageService.setHostNameDinamically(hostName);
-      //this.setThemeSetting(themedata);
-    }
-  }
+    // if(serverHostName != '' || serverHostName != setHostName) {      
+    //   const hostName = serverHostName +'/rest/';
+    //   this.storageService.setHostNameDinamically(hostName);
+    //   //this.setThemeSetting(themedata);
+    // }
+  // }
   
   getHostKeyValue(keyName:string){
     let hostname:any ="";
@@ -115,10 +122,13 @@ export class EnvService {
       hostname = this.getHostName('hostname');
       key_Name = 'clientEndpoint';
     }
-    let value:any = '';   
+    let value:any = '';  
     if(hostname == 'localhost'){
       value = this.storageService.getClientCodeEnviorment().serverhost;
-    }else if(serverHostList && serverHostList.length > 0){
+    }else{
+      value = this.dataShareService.getServerHostName();
+    }
+    if(serverHostList && serverHostList.length > 0 && key_Name == 'clientCode'){
       for (let index = 0; index < serverHostList.length; index++) {
         const element:any = serverHostList[index];
         if(hostname == element[key_Name]){
@@ -133,8 +143,43 @@ export class EnvService {
         }        
       }
     }
+    // if(serverHostList && serverHostList.length > 0){
+    //   for (let index = 0; index < serverHostList.length; index++) {
+    //     const element:any = serverHostList[index];
+    //     if(hostname == element[key_Name]){
+    //       if(keyName == "object"){
+    //         value = element;
+    //         break;
+    //       }else{
+    //         value = element[keyName];
+    //         break;
+    //       }
+          
+    //     }        
+    //   }
+    // }
+
     return value;
   }
+
+  async getAppSettingAsync (){
+
+    let hostname:any ="";
+    if(this.storageService.checkPlatForm() == 'mobile'){
+      hostname = this.storageService.getClientName();
+    }else{
+      hostname = this.getHostName('hostname');
+    }
+    if(hostname == 'localhost'){
+      hostname = this.storageService.getClientCodeEnviorment().serverhost;
+      this.storageService.setHostNameDinamically(hostname+"/rest/");
+    }else{
+      await this.awsSecretManagerService.getSecret(hostname);
+    }
+    this.apiCallService.getApplicationAllSettings();
+    
+   }
+
   getHostName(key:string){
     let mydocument:any = this.document;
     return mydocument.location[key];
@@ -202,6 +247,5 @@ export class EnvService {
   getVerifyType(){
     return this.storageService.getClientCodeEnviorment().verify_type;
   }
-  
-  
+
 }
