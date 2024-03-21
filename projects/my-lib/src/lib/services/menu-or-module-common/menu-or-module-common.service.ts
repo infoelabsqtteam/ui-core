@@ -7,7 +7,7 @@ import { PermissionService } from '../permission/permission.service';
 import { StorageService } from '../storage/storage.service';
 import { CommonAppDataShareService } from '../data-share/common-app-data-share/common-app-data-share.service';
 import { UserPrefrenceService } from '../userPrefrence/user-prefrence.service';
-
+import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -21,7 +21,8 @@ constructor(
   private apiService:ApiService,
   private router:Router,
   private commonAppDataShareService: CommonAppDataShareService,
-  private userPrefrenceService: UserPrefrenceService
+  private userPrefrenceService: UserPrefrenceService,
+  private coreFunctionService: CoreFunctionService,
 ) { }
 
   // modifyModuleListWithPermission(moduleList:any){
@@ -429,6 +430,127 @@ constructor(
       return {};
     }
   }
+  getModulesFromObject(obj: any) {
+    let modules: any[] = [];
+    
+    const processModule = (moduleKey: string, module: any) => {
+      let moduleObj: any = { keyName: moduleKey };
+      if (module.reference) {
+        moduleObj = { ...moduleObj, ...module.reference };
+      }
+      moduleObj.notification = module.notification || false;
+      moduleObj.menu_list = this.getMenuList(module.menus);
+      modules.push(moduleObj);
+    };
+  
+    if (obj.notifications) {
+      obj = obj.notifications;
+      if (obj && Object.keys(obj).length > 0) {
+        Object.entries<any>(obj).forEach(([moduleKey, module]) => {
+          processModule(moduleKey, module);
+        });
+      }
+    }
+  
+    return modules;
+  }
+
+  getMenuList = (menus: any) => {
+    let menuList: any[] = [];
+    if (menus) {
+      Object.entries<any>(menus).forEach(([menuKey, menu]) => {
+        let menuObj: any = { keyName: menuKey };
+        if (menu.reference) {
+          menuObj = { ...menuObj, ...menu.reference };
+        }
+        menuObj.submenu = this.getMenuList(menu.submenus);
+        if(!menuObj?.submenu){menuObj.templateTabs = this.getTabList(menu.templateTabs);} 
+        menuList.push(menuObj);
+      });
+    }
+    return menuList.length > 0 ? this.coreFunctionService.sortMenu(menuList) : null;
+  };
+
+  getTabList = (tabs: any) => {
+    let tabList: any[] = [];
+    if (tabs) {
+      Object.entries<any>(tabs).forEach(([tabKey, tab]) => {
+        let tabObj: any = { keyName: tabKey };
+        if (tab.reference) {
+          tabObj = { ...tabObj, ...tab.reference };
+        }
+        tabObj.email = tab.activeAlerts?.includes("EMAIL") || false;
+        tabObj.whatsapp = tab.activeAlerts?.includes("WHATSAPP") || false;
+        tabObj.sms = tab.activeAlerts?.includes("SMS") || false;
+        tabList.push(tabObj);
+      });
+    }
+    return tabList;
+  };
+
+  getMenuDetails(module: any) {
+    let obj: any = {};
+    if (module) {
+        module.forEach((menu: any) => {
+            let menuName = menu?.keyName;
+            let menuDetails: any = {};
+            let reference: any = {
+                name: menu?.name,
+                _id: menu?._id
+            }
+            if (menu) {
+                if (menu?.templateTabs) {
+                    menuDetails = {
+                        reference,
+                        templateTabs: this.getTempDetails(menu.templateTabs)
+                    }
+                    obj[menuName] = menuDetails;
+                } else if (menu?.submenu) {
+                    menuDetails = {
+                        reference,
+                        submenus: this.getMenuDetails(menu.submenu)
+                    }
+                  obj[menuName] = menuDetails;
+                }
+            }
+        })
+
+        return obj;
+    }
+}
+
+
+getTempDetails(tabs:any){
+  let obj:any={};
+  tabs.forEach((tab:any)=>{
+    if(tab){
+      let tabName=tab.keyName;
+      let tabDetails={
+        reference:{
+          name:tab.name,
+          _id:tab._id
+        },
+        activeAlerts:this.getActiveAlerts(tab)
+      }
+      obj[tabName]=tabDetails;
+    }
+  })
+  return obj;
+}
+
+getActiveAlerts(tab:any){
+  let arr=[];
+  if(tab?.email){
+    arr.push('EMAIL');
+  }
+  if(tab?.whatsapp){
+    arr.push('WHATSAPP');
+  }
+  if(tab?.sms){
+    arr.push('SMS');
+  }
+  return arr;
+}
   // End For APP
 
 }

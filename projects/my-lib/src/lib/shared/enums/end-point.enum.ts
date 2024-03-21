@@ -63,5 +63,6 @@ export enum EndPoint {
     DOC_PERMISSION = 'vdrn/svper',
     AUDIT_HISTORY = "getAuditHistory",
     AUDIT_VERSION_LIST = "getAuditVersionList",
-    DOWNLOAD_MANUAL= "s3/getSignedS3Url"
+    DOWNLOAD_MANUAL= "s3/getSignedS3Url",
+    GET_NOTIFICATION_SETTING= "rpts/getNotification"
 }
