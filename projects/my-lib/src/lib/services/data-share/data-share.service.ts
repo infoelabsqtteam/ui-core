@@ -9,7 +9,7 @@ export class DataShareService {
   sharedData:Subject<any> = new Subject();
   currentPage: Subject<any> = new Subject();
   currentpage:string = '';
-  serverHostname : string ='';
+  serverHostname : Subject<any> = new BehaviorSubject<any>(null);
   staticData: Subject<any> = new BehaviorSubject<any>(null);
   setStaticData={};
   gridCountData: Subject<any> = new BehaviorSubject<any>(null);
@@ -332,6 +332,9 @@ export class DataShareService {
   shareGridRunningData(responce:any){
     this.gridRunningData.next(responce);
   }
+  shareServerHostName(serverHostname:any){
+    this.serverHostname.next(serverHostname);
+  }
    //For App
   collectionData(responce:any){
     this.collectiondata.next(responce);
@@ -347,11 +350,5 @@ export class DataShareService {
     this.roleChange.next(role);
   }
   //End For App
-  setServerHostName(serverHostname:string){
-    this.serverHostname = serverHostname;
-  }
-  getServerHostName(){
-    return this.serverHostname;
-  }
 
 }
