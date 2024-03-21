@@ -332,6 +332,9 @@ export class DataShareService {
   shareGridRunningData(responce:any){
     this.gridRunningData.next(responce);
   }
+  shareServerHostName(serverHostname:any){
+    this.serverHostname.next(serverHostname);
+  }
    //For App
   collectionData(responce:any){
     this.collectiondata.next(responce);
@@ -347,14 +350,5 @@ export class DataShareService {
     this.roleChange.next(role);
   }
   //End For App
-  // setServerHostName(serverHostname:string){
-  //   this.serverHostname = serverHostname;
-  // }
-  // getServerHostName(){
-  //   return this.serverHostname;
-  // }
-  shareServerHostName(serverHostname:any){
-    this.serverHostname.next(serverHostname);
-  }
 
 }
