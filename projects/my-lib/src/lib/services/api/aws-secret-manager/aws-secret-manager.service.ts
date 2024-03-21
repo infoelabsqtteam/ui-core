@@ -4,6 +4,8 @@ import { StorageService } from '../../storage/storage.service';
 import { DataShareService } from '../../data-share/data-share.service';
 import { EncryptionService } from '../../encryption/encryption.service';
 import { Common } from '../../../shared/enums/common.enum';
+import { ApiCallService } from '../api-call/api-call.service';
+import { EnvService } from '../../env/env.service';
 
 
 @Injectable({
@@ -11,14 +13,16 @@ import { Common } from '../../../shared/enums/common.enum';
 })
 export class AwsSecretManagerService {
 
-  private client:any
+  private awsClient:any
 
   constructor(
     private storageService : StorageService,
     private dataShareService : DataShareService,
-    private encryptionService : EncryptionService
+    private encryptionService : EncryptionService,
+    private apiCallService : ApiCallService,
+    private envService : EnvService
   ) {    
-      this.client = new SecretsManagerClient({
+      this.awsClient = new SecretsManagerClient({
           region: this.encryptionService.decryptRequest(Common.AWS_REGION),
           credentials: {
           accessKeyId: this.encryptionService.decryptRequest(Common.AWS_ACCESSKEYID),
@@ -28,28 +32,45 @@ export class AwsSecretManagerService {
   }
 
 
-  async getSecret(key:string){
-
-    let secret_name = 'prod/ui';
-
-    let response;
-    try {
-      response = await this.client.send(
-        new GetSecretValueCommand({
-          SecretId: secret_name,
-          VersionStage: "AWSCURRENT",
-        })
-        );
-    } catch (error) {
-        console.log(error);
+  getServerAndAppSetting (){
+    let hostname:any ="";
+    if(this.storageService.checkPlatForm() == 'mobile'){
+      hostname = this.storageService.getClientName();
+    }else{
+      hostname = this.envService.getHostName('hostname');
     }
-        
-    const secretString = response.SecretString;
-    const secretObject = JSON.parse(secretString);
-    const secretValue = secretObject[key];
-    this.dataShareService.setServerHostName(secretValue);
-    this.storageService.setHostNameDinamically(secretValue+"/rest/");
-    return secretValue;
+    if(hostname == 'localhost'){
+      hostname = this.storageService.getClientCodeEnviorment().serverhost;
+      this.storageService.setHostNameDinamically(hostname+"/rest/");
+      this.dataShareService.shareServerHostName(hostname);
+      this.apiCallService.getApplicationAllSettings();
+    }else{
+      this.getServerHostFromAwsSecretManager(hostname);
+    }
+   }
+
+
+  getServerHostFromAwsSecretManager (key: string) {
+    let secret_name = 'prod/ui';
+    
+    this.awsClient.send(
+      new GetSecretValueCommand({
+        SecretId: secret_name,
+        VersionStage: "AWSCURRENT",
+      })
+    ).then(
+      (response:any) => {
+        const secretString = response.SecretString;
+        const secretObject = JSON.parse(secretString);
+        const secretValue = secretObject[key];
+        this.storageService.setHostNameDinamically(secretValue+"/rest/");
+        this.dataShareService.shareServerHostName(secretValue);
+        this.apiCallService.getApplicationAllSettings();
+      },
+      (error:Error) => {
+        console.log(error);
+      }
+    );
   }
   
 }
