@@ -76,18 +76,27 @@ export class AuthService implements OnInit{
     this.resetData()
     this.redirectToSignPage();
   }
+
   GetUserInfoFromToken(payload:any, loginRedirect?:string){
     let response = {
       status: '',
       class: '',
       msg: ''
     };
-    let api = this.envService.getAuthApi('GET_USER_PERMISSION');
-    const reqBody = { key: payload };
+    let api = "";
+    let reqBody = {};
+    if(payload && payload.roleName && payload.roleName != ''){
+      api = this.envService.getAuthApi('GET_USER_PERMISSION')+"/"+payload.roleName;
+      reqBody = { key: payload.token };
+    }else{
+      api = this.envService.getAuthApi('GET_USER_PERMISSION')+"/"+null;
+      reqBody = { key: payload };
+    }
+
     this.http.post(api, reqBody).subscribe(
       (respData:any) =>{
         if (respData && respData.user) {
-          let modifyData = this.coreFunctionService.getModulesFormMapObject(respData);
+          let modifyData = this.coreFunctionService.getModulesFromMapObject(respData);
           this.storageService.SetUserInfo(modifyData);
           this.storageService.GetUserInfo();
           this.envService.setRequestType('PRIVATE');
@@ -97,6 +106,8 @@ export class AuthService implements OnInit{
           this.apiCallService.getUserPrefrerence(respData.user);
           this.apiCallService.getUserNotification(1);
           this.redirectionWithMenuType(loginRedirect);
+          response.status = "success";
+          this.authDataShareService.setUserInfo(response);
         } else {
             this.envService.setRequestType('PUBLIC');
             this.redirectToSignPage();

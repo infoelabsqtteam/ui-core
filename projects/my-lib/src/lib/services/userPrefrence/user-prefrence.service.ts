@@ -21,11 +21,14 @@ export class UserPrefrenceService {
         let payloadData;
   
         switch (fieldName) {
-          case 'favouriteMenus':
+          case 'preferenceMap':
             payloadData = this.modifiedMenuObj(data, fieldName, parent);
             break;
           case 'tab':
             payloadData = this.addOrRemoveTabs(data);
+            break;
+          case 'preference':
+            payloadData = this.saveColumn(data);
             break;
           default:
             payloadData = this.storageService.getUserPreference();
@@ -48,18 +51,18 @@ export class UserPrefrenceService {
     let menuIndexs = this.dataShareService.getMenuOrSubmenuIndexs();
     let modules = this.storageService.GetModules();
     let extractedMenu = this.extractMenuDetails(tab, modules, menuIndexs);
-    let userPreference = this.updateFavTabs(extractedMenu, tab);
+    // let userPreference = this.updateFavTabs(extractedMenu, tab);
+    let userPreference = this.createUserPreference('preferenceMap')
+    userPreference['preferenceMap'] = extractedMenu;
     return userPreference;
   }
   // Modifies the user preference object with the provided data
   modifiedMenuObj(data: any, fieldName: string, parent?: string) {
     let modifiedMenuObj = this.prepareMenuJson(data, fieldName, parent);
-    let userPreference = { ...this.storageService.getUserPreference() };
-    userPreference[fieldName] = this.mergeMenus(
-      userPreference[fieldName],
-      modifiedMenuObj,
-      parent
-    );
+    // let userPreference = this.storageService.getUserPreference();
+    // userPreference[fieldName] = this.mergeMenus(userPreference[fieldName],modifiedMenuObj,parent);
+    let userPreference =  this.createUserPreference(fieldName);
+    userPreference[fieldName] = modifiedMenuObj;
     return userPreference;
   }
   // Prepares a menu object from menu items
@@ -67,20 +70,18 @@ export class UserPrefrenceService {
     const menu: any = {};
     const itemsArray = Array.isArray(menuItems) ? menuItems : [menuItems];
     itemsArray.forEach((item) => {
+      const moduleName:string | null = this.storageService.getModule();
       const menuReference = {
         ...this.commonFunctionService.getReferenceObject(item),
         allSelected: true,
       };
 
       let menuData: any;
-      let userPreference = this.storageService.getUserPreference();
-      if (!userPreference) {
-        userPreference = this.createUserPreference(fieldName);
-      }
-      let menus = userPreference[fieldName];
-      if (parent && menus) {
+      // let menus = userPreference[fieldName];
+      if (parent) {
         // If parent exists and has a submenu, add the current menu to the existing submenu
         let refObj: any = {
+          favourite: item.favourite,
           reference: {
             ...this.commonFunctionService.getReferenceObject(menuItems),
             allSelected: true,
@@ -89,19 +90,36 @@ export class UserPrefrenceService {
         let parObjRef: any = this.commonFunctionService.getReferenceObject(parent);
         menuData = {
           reference: parObjRef,
+          favourite: item.favourite,
           submenus: {
             [menuItems.name]: refObj,
           },
         };
-        menu[parent.name] = menuData;
-        return menu;
+        if(moduleName!=null){
+          menu[moduleName]={
+            favourite: item.favourite,
+            reference : this.getModuleRef(moduleName),
+            menus:{
+              [parent.name] : menuData
+            }
+          }
+          return menu;
+        }
       } else {
         menuData = {
           reference: menuReference,
-          submenus: null,
+          favourite: item.favourite,
         };
-        menu[item.name] = menuData;
-        return menu;
+        if(moduleName!== null){
+          menu[moduleName]={
+            reference : this.getModuleRef(moduleName),
+            favourite: item.favourite,
+            menus:{
+              [item.name] : menuData
+            }
+          }
+          return menu;
+        }
       }
     });
     return menu;
@@ -117,6 +135,15 @@ export class UserPrefrenceService {
     uref[fieldName] = {}
     return uref;
   }
+  //Get Module Reference by Module Name
+  getModuleRef(moduleName:any){
+    let Allmodules = this.storageService.GetModules();
+    let module = Allmodules.filter((module:any)=>{
+      return module.name == moduleName;
+    })
+    return this.commonFunctionService.getReferenceObject(module[0]);
+  }
+
   // GetTemplateTabs in current Menu
   getTemplateTabs(){
     const tabsData = this.dataShareService.getTempData();
@@ -154,12 +181,15 @@ export class UserPrefrenceService {
     }, {});
   }
   // Creates a reference object for a tab
-  getTabRef(tab: any) {
+  getTabRef(tab: any,optKey?:string) {
     let res: any = {};
     if (tab && tab.tab_name != '' && tab.tab_name != null) {
-      const tabReference = {
+      const tabReference:any = {
         reference: this.commonFunctionService.getReferenceObject(tab),
       };
+      if(optKey!= '' && optKey!= undefined){
+        tabReference[optKey] = tab.favourite;
+      }
       res[tab.tab_name] = tabReference;
     }
     return res;
@@ -261,7 +291,7 @@ export class UserPrefrenceService {
   }
   // Checks if a menu should be added based on the febMenu condition
   checkFebMenuAddOrNot(menu: any, parent: any) {
-    let userFebMenu = this.getUserPreferenceByFieldName('favouriteMenus');
+    let userFebMenu = this.getUserPreferenceByFieldName('preferenceMap');
     if (!menu || typeof menu !== 'object' || Object.keys(menu).length === 0) {
       return false;
     }
@@ -364,32 +394,46 @@ export class UserPrefrenceService {
   ) {
     const { menuIndex, submenuIndex, moduleIndex } = indices;
     let newMenu: any = {};
-    let tabRef = this.getTabRef(tab);
-
+    let tabRef = this.getTabRef(tab,'favourite');
+    let moduleRef = this.commonFunctionService.getReferenceObject(data[moduleIndex]);
+    let isFavExist = tab.favourite;
     if (submenuIndex != -1) {
       let submenu =
         data[moduleIndex]?.['menu_list'][menuIndex]?.['submenu']?.[
           submenuIndex
         ];
       let parent = data[moduleIndex]?.['menu_list'][menuIndex];
-      newMenu[parent.name] = {
-        reference: this.commonFunctionService.getReferenceObject(parent),
-        submenus: {
-          [submenu.name]: {
-            reference: {
-              ...this.commonFunctionService.getReferenceObject(submenu),
-              allSelected: false,
-            },
-            templateTabs: tabRef,
-          },
+      newMenu[moduleRef.name] = {
+        favourite: isFavExist,
+        reference : moduleRef,
+        menus:{
+            [parent.name] : {
+              reference: this.commonFunctionService.getReferenceObject(parent),
+              favourite: isFavExist,
+              submenus: {
+                [submenu.name]: {
+                  favourite: isFavExist,
+                  reference: {
+                    ...this.commonFunctionService.getReferenceObject(submenu),
+                  },
+                  templateTabs: tabRef,
+                },
+          }
         },
-      };
+      }
+    };
     } else {
       let menu = data[moduleIndex]?.['menu_list'][menuIndex];
-      newMenu[menu.name] = {
-        reference: { ...this.commonFunctionService.getReferenceObject(menu), allSelected: false },
+      newMenu[moduleRef.name]={
+        favourite: isFavExist,
+        reference : moduleRef,
+        menus: {
+        [menu.name] : {
+        favourite: isFavExist,
+        reference: { ...this.commonFunctionService.getReferenceObject(menu)},
         templateTabs: tabRef,
-      };
+      }}
+    };
     }
     return newMenu;
   }
@@ -397,9 +441,9 @@ export class UserPrefrenceService {
   updateFavTabs(newMenus: any, tab: any) {
     let existingUserPreferences = this.storageService.getUserPreference();
     if(!existingUserPreferences){
-      existingUserPreferences = this.createUserPreference('favouriteMenus');
+      existingUserPreferences = this.createUserPreference('preferenceMap');
     }
-    let existingMenus = existingUserPreferences['favouriteMenus'];
+    let existingMenus = existingUserPreferences['preferenceMap'];
     let updatedMenus = { ...existingMenus };
     let favExist = !tab.favourite
 
@@ -492,13 +536,13 @@ export class UserPrefrenceService {
       }
     }
     updatedMenus = this.deleteEmptyMenus(updatedMenus);
-    existingUserPreferences['favouriteMenus'] = updatedMenus;
+    existingUserPreferences['preferenceMap'] = updatedMenus;
 
     return existingUserPreferences;
   }
   // Check the tab id in local USER_PREF
   checkFebTabAddOrNot(tab: any) {
-    const menus = this.storageService.getUserPreference()?.['favouriteMenus'] || {};
+    const menus = this.storageService.getUserPreference()?.['preferenceMap'] || {};
     return this.isIdExistInTemplateTabs(menus, tab._id);
   }
   isIdExistInTemplateTabs(obj: any, targetId: string): boolean {
@@ -596,5 +640,156 @@ export class UserPrefrenceService {
     return uRef
   }
 
+  saveColumn(data:any){
+    let {columns,form,formTable}=data;
+    const checkedFields=columns.filter((col:any)=>col.display==true);
+    let {menuIndex, submenuIndex, moduleIndex}= this.dataShareService.getMenuOrSubmenuIndexs();
+    const allModuleData=this.storageService.GetModules();
+    let selectedModule= allModuleData[moduleIndex];
+    let selectedMenu= allModuleData[moduleIndex]?.["menu_list"][menuIndex];
+    let selectedSubMenu= null;
+    let allTempleteTabs= this.dataShareService.getTempData()[0]?.["templateTabs"];
+    let activeMenu=this.storageService.GetActiveMenu() ///get active tab 
+    let selectedTab= allTempleteTabs?.find((tab:any)=>tab.tab_name== activeMenu?.name);
+    let selectedGrid= selectedTab.grid
 
+    if(submenuIndex!= -1){
+       selectedSubMenu= allModuleData[moduleIndex]?.["menu_list"][menuIndex]?.["submenu"][submenuIndex];
+    }
+
+    let forms;
+    let grids;
+    if(form && formTable){
+      selectedGrid=formTable.grid;
+       forms= {
+        [form["name"]]:{
+          reference : this.commonFunctionService.getReferenceObject(form),
+          grids:{
+            [selectedGrid["name"]]:{
+              reference : this.commonFunctionService.getReferenceObject(selectedGrid),
+              "fields":checkedFields.map((col:any) =>{
+                return { field_name: col.field_name, 
+                }
+              })
+            }
+  
+          }
+       }
+      }
+    }else{
+        grids={
+          [selectedGrid["name"]]:{
+            reference : this.commonFunctionService.getReferenceObject(selectedGrid),
+            "fields":checkedFields.map((col:any) =>{
+              return { field_name: col.field_name, 
+              }
+            })
+          }
+
+        }
+    }
+    let preference;
+    let templateTabs={
+      [selectedTab["tab_name"]]:{
+        reference : {
+          _id:selectedTab["_id"],
+          name: selectedTab["tab_name"]
+        },
+        ...(form && {forms}),
+        ...(form == undefined && {grids})
+     }
+    }
+    if(submenuIndex != -1){
+      preference={
+        [selectedModule["name"]]:{
+          reference : this.commonFunctionService.getReferenceObject(selectedModule),
+          menus:{
+               [selectedMenu["name"]]:{
+               reference : this.commonFunctionService.getReferenceObject(selectedMenu),
+               submenus: {
+                  [selectedSubMenu["name"]]: {
+                    reference: this.commonFunctionService.getReferenceObject(selectedSubMenu),
+                    templateTabs,
+                  }
+               }
+         }
+        }
+      }
+    }
+    }
+    else{
+      preference={
+        [selectedModule["name"]]:{
+          reference : this.commonFunctionService.getReferenceObject(selectedModule),
+          menus:{
+               [selectedMenu["name"]]:{
+               reference : this.commonFunctionService.getReferenceObject(selectedMenu),
+               templateTabs:{
+                [selectedTab["tab_name"]]:{
+                  reference : {
+                    _id:selectedTab["_id"],
+                    name: selectedTab["tab_name"]
+                  },
+                  ...(form && {forms}),
+                  ...(form == undefined && {grids})
+                
+               }
+              }
+         }
+        }
+      }
+    }
+    }
+
+    let userRef = this.commonFunctionService.getReferenceObject(
+      this.storageService.GetUserInfo()
+    );
+  
+    let payload={
+      preferenceMap : preference,
+      userId: userRef
+    }
+    
+    return payload;
+  }
+
+  addHideKeyInExistingTab(columns:any,fId:String,fieldName:String){
+      let tabName=this.storageService.GetActiveMenu().name;
+      let template=this.dataShareService.getTempData();
+      let tabs = template[0].templateTabs;
+      let selectTabIndex=this.commonFunctionService.getIndexInArrayById(tabs,tabName,'tab_name')
+      let tab = tabs[selectTabIndex];
+      let grid=tab.grid;
+      let gridColumns=grid.gridColumns;
+      if(fId && fieldName){
+        let forms=tab.forms;
+        if(typeof forms== 'object' && Object.keys(forms).length>0){
+          Object.keys(forms).forEach((key:any)=>{
+            let form=forms[key];
+            if(form._id== fId){
+                let formFields=form.tableFields;
+                formFields.forEach((field:any)=>{
+                  if(field.field_name == fieldName){
+                      if(field.gridColumns && field.gridColumns.length>0){
+                        gridColumns=field.gridColumns;
+                      }
+                  }
+                })
+            }
+          })
+        }
+      }
+      if( gridColumns && gridColumns.length>0 && columns.length>0){
+        columns.forEach((col:any,index:any)=>{
+          if(col.display){
+            gridColumns[index]['hide']=false;
+
+          }
+          else{
+            gridColumns[index]['hide']=true;
+
+          }
+        })
+      }
+    }
 }

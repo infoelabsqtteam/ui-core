@@ -85,16 +85,42 @@ constructor(
         if (this.coreFunctionService.isNotBlank(field.show_if)) {
           if (!this.checkIfService.showIf(field, parentObject)) {
             field['display'] = false;
+            field['show'] = true;
           } else {
-            field['display'] = true;
+            if(field.hide != undefined && field.hide){
+              field['display'] = false;
+            }else{
+              field['display'] = true;
+            }
           }
         } else {
-          field['display'] = true;
+            if(field &&  field.hide) {
+              field['display'] = false;
+            }
+            else{
+              field['display'] = true;
+            }
         }
         if(field['field_class']){
           field['field_class'] = field['field_class'].trim();
         }
         field['width'] = this.getGridColumnWidth(field,gridColumns);
+        if(field && field.type && field.type !=''){
+          switch(field.type.toLowerCase()){
+            case "info":
+            case "html" :
+            case "file":
+            case "template":
+            case "image":
+            case "icon":
+            case "download_file":
+            case "color":
+              field['hideCopy']=true;
+              break;
+            default:
+              break;
+        }
+      }
       };
     }
     return modifyGridColumns;
@@ -177,6 +203,8 @@ constructor(
               modifyData[fieldName] = modifyList;
               element.gridColumns = this.modifyGridColumns(gridColumns,object);
               modifyObject.field_index = i;
+            }else {
+              modifyData[fieldName] = cData;
             }
           }
         }else if(type && type.startsWith('list_of_fields') && element.datatype == "list_of_object_with_popup" && field_name == fieldName){
@@ -227,6 +255,7 @@ constructor(
       case "typeahead":
         if(item.datatype == "list_of_object"){
           if (Array.isArray(listOfField[item.field_name]) && listOfField[item.field_name].length > 0 && listOfField[item.field_name] != null && listOfField[item.field_name] != undefined && listOfField[item.field_name] != '') {
+            item['hideCopy']=true;
             return '<i class="fa fa-eye cursor-pointer"></i>';
           } else {
             return '-';
@@ -251,6 +280,7 @@ constructor(
       case "grid_selection":
       case "list_of_fields":
         if (Array.isArray(listOfField[item.field_name]) && listOfField[item.field_name].length > 0 && listOfField[item.field_name] != null && listOfField[item.field_name] != undefined && listOfField[item.field_name] != '') {
+          item['hideCopy']=true;
           return '<i class="fa fa-eye cursor-pointer"></i>';
         } else {
           return '-';
@@ -420,6 +450,11 @@ constructor(
     return gridColumns;
   }
 
+  isDate(date:any) {
+    let dateValue:any = new Date(date);
+    return (dateValue !== "Invalid Date") && !isNaN(dateValue);
+  }
+
   getValueForGrid(field:any, object:any) {
     let value:any = '';
     let fieldName: any= '';
@@ -456,7 +491,7 @@ constructor(
           }
         }
         return returnValue;
-      case 'time': return this.datePipe.transform(value, 'h:mm a');
+      case 'time': return this.isDate(value) ? this.datePipe.transform(value, 'h:mm a') : value;
       case "boolean": return value ? "Yes" : "No";
       case "currency": return this.CurrencyPipe.transform(value, 'INR');
   	  case "dropdown": return value && value.name ? value.name : value;
@@ -580,7 +615,7 @@ constructor(
     switch (field.type.toLowerCase()) {
       case 'datetime': return this.datePipe.transform(value, 'dd/MM/yyyy h:mm a');
       case 'date': return this.datePipe.transform(value, 'dd/MM/yyyy');
-      case 'time': return this.datePipe.transform(value, 'h:mm a');
+      case 'time': return this.isDate(value) ? this.datePipe.transform(value, 'h:mm a') : value;
       case "boolean": return value ? "Yes" : "No";
       case "currency": return this.CurrencyPipe.transform(value, 'INR');
       case "info":

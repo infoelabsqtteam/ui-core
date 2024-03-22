@@ -6,6 +6,7 @@ import { CoreFunctionService } from '../common-utils/core-function/core-function
 import { ApiService } from '../api/api.service';
 import { ModelService } from '../model/model.service';
 import { EnvService } from '../env/env.service';
+import { NotificationService } from '../notify/notification.service';
 
 
 @Injectable({
@@ -21,7 +22,8 @@ export class CommonFunctionService {
     private datePipe: DatePipe,
     private apiService:ApiService,
     private coreFunctionService:CoreFunctionService,
-    private envService:EnvService
+    private envService:EnvService,
+    private notificationService:NotificationService,
     ) {
     this.userInfo = this.storageService.GetUserInfo();
   }
@@ -1198,4 +1200,37 @@ export class CommonFunctionService {
     }
   }
 
+  copyGridCellText(value:any){
+    if(value){
+      navigator.clipboard.writeText(value);
+      this.notificationService.notify("bg-success","Text Copied");
+    }
+  }
+
+  copyGridColumnText(head:any,data:any,elements?:any){
+    let columnData = "";
+    if(data.length>0){
+      let field_name=head.field_name;
+      if(head.type == "info" && elements && elements.length>0){
+        if(head.gridColumns){
+          let childGridColumn = head.gridColumns;
+          let childFieldName = childGridColumn[0]['field_name'];
+          columnData=elements.map((ele:any)=>{
+            let childData;
+            if(ele[field_name] && this.isArray(ele[field_name]) && ele[field_name].length > 0){
+              childData= ele[field_name].map((chidData:any) =>{
+                return chidData[childFieldName];
+              }).join('\n').trim();
+            }
+            return childData;
+          }).join('\n').trim();
+        }
+      }else{
+        columnData=data.map((ele:any)=>{
+          if(ele[field_name]!=undefined) return ele[field_name];
+        }).join('\n').trim();
+      }
+      navigator.clipboard.writeText(columnData);
+    }
+  }
 }
