@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { link } from 'fs';
 
 @Injectable({
   providedIn: 'root'
@@ -193,7 +194,7 @@ export class CoreFunctionService {
     });
     return objWithoutNull;
   }
-  getOperators(type:string){
+  getOperators(type:string,dataTye?:string){
     let operatorList = {...this.commonOperators};
     switch (type){
       case "date":
@@ -221,7 +222,12 @@ export class CoreFunctionService {
       default:
         break;
     }
-    return this.sortOperators(operatorList);
+    let sortValue = this.sortOperators(operatorList);
+    if(dataTye == 'list'){
+      return this.mapObjectToListOfString(sortValue);
+    }else{
+      return sortValue;
+    }
   }
 
   sortOperators(operatorList:any){
@@ -232,5 +238,14 @@ export class CoreFunctionService {
      });
 
      return sortedOperatorList;
+  }
+  mapObjectToListOfString(mapObject:any){
+    let List:any = [];
+    if(mapObject && Object.keys(mapObject).length > 0){
+      Object.keys(mapObject).forEach((key)=>{
+        List.push(mapObject[key]);
+      })
+    }
+    return List;
   }
 }
