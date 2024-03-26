@@ -41,18 +41,18 @@ export class AwsSecretManagerService {
     }
     if(hostname == 'localhost'){
       hostname = this.storageService.getClientCodeEnviorment().serverhost;
-      this.storageService.setHostNameDinamically(hostname+"/rest/");
-      this.dataShareService.shareServerHostName(hostname);
-      this.apiCallService.getApplicationAllSettings();
     }else{
-      this.getServerHostFromAwsSecretManager(hostname);
+      hostname = this.getServerHostFromAwsSecretManager(hostname);
     }
+    this.storageService.setHostNameDinamically(hostname+"/rest/");
+    this.dataShareService.shareServerHostName(hostname);
+    this.apiCallService.getApplicationAllSettings();
    }
 
 
   getServerHostFromAwsSecretManager (key: string) {
     let secret_name = 'prod/ui';
-    
+    let secretValue
     this.awsClient.send(
       new GetSecretValueCommand({
         SecretId: secret_name,
@@ -62,15 +62,13 @@ export class AwsSecretManagerService {
       (response:any) => {
         const secretString = response.SecretString;
         const secretObject = JSON.parse(secretString);
-        const secretValue = secretObject[key];
-        this.storageService.setHostNameDinamically(secretValue+"/rest/");
-        this.dataShareService.shareServerHostName(secretValue);
-        this.apiCallService.getApplicationAllSettings();
+        secretValue = secretObject[key];
       },
       (error:Error) => {
         console.log(error);
       }
     );
+    return secretValue;
   }
   
 }
