@@ -32,7 +32,7 @@ export class AwsSecretManagerService {
   }
 
 
-  getServerAndAppSetting (){
+ async getServerAndAppSetting (){
     let hostname:any ="";
     if(this.storageService.checkPlatForm() == 'mobile'){
       hostname = this.storageService.getClientName();
@@ -42,18 +42,20 @@ export class AwsSecretManagerService {
     if(hostname == 'localhost'){
       hostname = this.storageService.getClientCodeEnviorment().serverhost;
     }else{
-      hostname = this.getServerHostFromAwsSecretManager(hostname);
+      hostname =await this.getServerHostFromAwsSecretManager(hostname);
     }
-    this.storageService.setHostNameDinamically(hostname+"/rest/");
-    this.dataShareService.shareServerHostName(hostname);
-    this.apiCallService.getApplicationAllSettings();
+    if(hostname && hostname!=''){
+      this.storageService.setHostNameDinamically(hostname+"/rest/");
+      this.dataShareService.shareServerHostName(hostname);
+      this.apiCallService.getApplicationAllSettings();
+    }
    }
 
 
-  getServerHostFromAwsSecretManager (key: string) {
+  async getServerHostFromAwsSecretManager (key: string) {
     let secret_name = 'prod/ui';
     let secretValue
-    this.awsClient.send(
+    await this.awsClient.send(
       new GetSecretValueCommand({
         SecretId: secret_name,
         VersionStage: "AWSCURRENT",
