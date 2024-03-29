@@ -1760,6 +1760,7 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
     let subsequent_discount_amount:any=0;
     let subsequent_discount_percent:any=0;
     let totalDiscountAmount:any=0;
+    let slabRatesArray:any = [];
     let pricingType = data.pricingType != undefined && data.pricingType != '' ? data.pricingType : '';
     quantity = data.qty;
     if (!this.coreFunctionService.isNotBlank(quantity)) {
@@ -1819,7 +1820,19 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
             subsequent_discount_amount = 0;
             subsequent_discount_percent = 0;
           }
-        }        
+        }else if(pricingType == 'Slab Wise Rate'){
+          sale_rate = this.getSlabWiseSaleRate(data);
+          if(sale_rate && sale_rate > 0){
+            gross_amount = quantity * sale_rate;
+            effectiveTotal = quantity * data.offer_rate;
+          }
+          dis_amt = gross_amount - effectiveTotal;
+          if (gross_amount > 0) {
+            discount_percent = this.getDecimalAmount(100 * dis_amt / gross_amount);
+          } else {
+            discount_percent = 0;
+          }
+        }
         net_amount = effectiveTotal;
         this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent)
         break;
@@ -1883,6 +1896,21 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
             data['subsequent_offer_rate'] = (subsequentGrossAmount - subsequent_discount_amount) / (quantity-1);
           }else{
             data['subsequent_offer_rate'] = (subsequentGrossAmount - subsequent_discount_amount);
+          }
+        }else if(pricingType == 'Slab Wise Rate'){
+          sale_rate = this.getSlabWiseSaleRate(data);
+          if(sale_rate && sale_rate > 0){
+            gross_amount = quantity * sale_rate;
+            discount_percent = data.discount_percent;
+            if (!this.coreFunctionService.isNotBlank(discount_percent)) {
+              discount_percent = 0;
+            }
+            let effectiveGrossAmount = quantity * sale_rate;
+            dis_amt = this.getDecimalAmount(((+effectiveGrossAmount) * (+discount_percent)) / 100);
+            data['offer_rate'] = (effectiveGrossAmount - dis_amt) / quantity;
+          }else{
+            discount_percent = 0;
+            dis_amt = 0;
           }
         }
         if(quantity > 1){
@@ -1954,6 +1982,23 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
             offerRate = data.no_of_injection2 - subsequent_discount_amount;
           }
           data['subsequent_offer_rate'] = offerRate;          
+        }else if(pricingType == 'Slab Wise Rate'){
+          sale_rate = this.getSlabWiseSaleRate(data);
+          if(data.sale_rate && data.sale_rate > 0){
+            gross_amount = quantity * sale_rate;
+            discount_percent = data.discount_percent;
+            if (!this.coreFunctionService.isNotBlank(discount_percent)) {
+              discount_percent = 0;
+            }
+            let effectiveGrossAmount = data.sale_rate * quantity;
+            dis_amt = this.getDecimalAmount(((+effectiveGrossAmount) * (+discount_percent)) / 100);
+            let offerRate = data.sale_rate - (dis_amt / quantity);
+            data['offer_rate'] = offerRate;
+          }else{
+            dis_amt = 0;
+            discount_percent = 0;
+            data['offer_rate'] = 0;
+          }
         }
         if(quantity > 1){
           totalDiscountAmount = dis_amt + subsequent_discount_amount;
@@ -2025,6 +2070,21 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
             }else{
               subsequent_discount_percent = 0;
             }
+          }else if(pricingType == 'Slab Wise Rate'){
+            sale_rate = this.getSlabWiseSaleRate(data);
+            let effectiveGrossAmount = 0;
+            if(sale_rate && sale_rate > 0){
+              effectiveTotal = data.offer_rate * quantity;
+              effectiveGrossAmount = sale_rate * quantity;
+              dis_amt = effectiveGrossAmount - (data.offer_rate * quantity);
+            }else{
+              data["offer_rate"] = 0;
+            }
+            if (effectiveGrossAmount > 0) {
+              discount_percent = this.getDecimalAmount(100 * dis_amt / effectiveGrossAmount);
+            } else {
+              discount_percent = 0;
+            }
           }
           net_amount = gross_amount - (gross_amount - effectiveTotal);
           this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent);
@@ -2083,6 +2143,24 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
               subsequent_discount_amount = data.subsequent_discount_amount;
               subsequent_discount_percent = data.subsequent_discount_percent;
             }
+          }else if(pricingType == 'Slab Wise Rate'){
+            sale_rate = this.getSlabWiseSaleRate(data);
+            if(sale_rate && sale_rate > 0){
+              dis_amt = data.discount_amount;
+              if (!this.coreFunctionService.isNotBlank(dis_amt)) {
+                dis_amt = 0;
+              }
+              let effectiveGrossAmount = quantity * sale_rate;
+              discount_percent = this.getDecimalAmount(((+dis_amt) * 100) / (+effectiveGrossAmount));
+              data['offer_rate'] = (effectiveGrossAmount - dis_amt) / quantity;
+              subsequent_discount_amount = data.subsequent_discount_amount;
+              subsequent_discount_percent = data.subsequent_discount_percent;
+            }else{
+              discount_percent = 0;
+              dis_amt = 0;
+              subsequent_discount_amount = data.subsequent_discount_amount;
+              subsequent_discount_percent = data.subsequent_discount_percent;
+            }
           }
         }else{
           if(pricingType == 'Column Wise Rate'){
@@ -2123,6 +2201,19 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
         break;
     }
 }
+
+private getSlabWiseSaleRate(data: any) {
+  let sale_rate:any = 0;
+  if (data.slabRateParamCount > 0 && data.slabRates.length > 0) {
+    data.slabRates.forEach((slabRate: any) => {
+      if (slabRate != '' && slabRate.from >= data.slabRateParamCount && slabRate.to <= data.slabRateParamCount) {
+        sale_rate = slabRate.rate;
+      }
+    });
+  }
+  return sale_rate;
+}
+
 calculateQuotationParameterAmountForAutomotiveLimsWithSubsequent(data:any, fieldName:any) {
     let quantity = 0;
     let discount_percent = 0;
@@ -2244,16 +2335,32 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
   }
 
   if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
+    let slabRateParamCount:number=0;
     templateValue['quotation_param_methods'].forEach((element:any) => {
       if(element.pricingType != undefined && element.pricingType != ''){
+        if(element.pricingType == 'Slab Wise Rate'){
+          slabRateParamCount++;
+          element.slabRateParamCount = slabRateParamCount;
+        }else{
+          element.slabRateParamCount = 0;
+        }      
         let data = { ...element };
         paramArray.push(data);
       }  
     });
+    //For Slab Wise Rate
+    let parameterIndex:number=0;
+    paramArray.forEach((data:any) => {
+      if(data.pricingType == 'Slab Wise Rate'){
+        if(parameterIndex == 0){
+          data.slabRateParamCount = slabRateParamCount;
+          parameterIndex++;
+        }else{
+          data.slabRateParamCount = 0;
+        }
+      }
+    });
   }
-
-
-
   if (templateValue['sampling_charge'] && templateValue['sampling_charge'] != null) {
     sampling_amount = templateValue['sampling_charge'];
   }
