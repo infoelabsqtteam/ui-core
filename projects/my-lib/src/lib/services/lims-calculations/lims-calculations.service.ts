@@ -2202,18 +2202,6 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
     }
 }
 
-private getSlabWiseSaleRate(data: any) {
-  let sale_rate:any = 0;
-  if (data.slabRateParamCount > 0 && data.slabRates.length > 0) {
-    data.slabRates.forEach((slabRate: any) => {
-      if (slabRate != '' && slabRate.from >= data.slabRateParamCount && slabRate.to <= data.slabRateParamCount) {
-        sale_rate = slabRate.rate;
-      }
-    });
-  }
-  return sale_rate;
-}
-
 calculateQuotationParameterAmountForAutomotiveLimsWithSubsequent(data:any, fieldName:any) {
     let quantity = 0;
     let discount_percent = 0;
@@ -2333,34 +2321,9 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
   if (this.coreFunctionService.isNotBlank(templateValue.qty)) {
     qty = templateValue.qty;
   }
+  //Customizing the Order Test parameters
+  this.customizeOrderTestParameters(templateValue, paramArray);
 
-  if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
-    let slabRateParamCount:number=0;
-    templateValue['quotation_param_methods'].forEach((element:any) => {
-      if(element.pricingType != undefined && element.pricingType != ''){
-        if(element.pricingType == 'Slab Wise Rate'){
-          slabRateParamCount++;
-          element.slabRateParamCount = slabRateParamCount;
-        }else{
-          element.slabRateParamCount = 0;
-        }      
-        let data = { ...element };
-        paramArray.push(data);
-      }  
-    });
-    //For Slab Wise Rate
-    let parameterIndex:number=0;
-    paramArray.forEach((data:any) => {
-      if(data.pricingType == 'Slab Wise Rate'){
-        if(parameterIndex == 0){
-          data.slabRateParamCount = slabRateParamCount;
-          parameterIndex++;
-        }else{
-          data.slabRateParamCount = 0;
-        }
-      }
-    });
-  }
   if (templateValue['sampling_charge'] && templateValue['sampling_charge'] != null) {
     sampling_amount = templateValue['sampling_charge'];
   }
@@ -2560,6 +2523,65 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
 
 }
 
+  private getSlabWiseSaleRate(data: any) {
+    let cal_sale_rate:any = 0;
+    if (data.slabRates.length > 0) {
+      if(data.slabRateParamCount == 0){
+        data['net_amount'] = 0;
+        data['per_sample_net_rate'] = 0;
+        data['discount_percent'] = 0;
+        data['discount_amount'] = 0;
+        data['quotation_effective_rate'] = 0;
+        data['offer_rate'] = 0;
+        data['sale_rate'] = 0;
+      }else{
+        let sale_rate = data['sale_rate'];
+        let offer_rate = data['offer_rate'];
+        data.slabRates.forEach((slabRate: any) => {
+          if (slabRate != '' && data.slabRateParamCount >= slabRate.from   && data.slabRateParamCount <= slabRate.to) {
+            cal_sale_rate = slabRate.rate;
+          }
+        });
+        data['sale_rate'] = cal_sale_rate;
+        if(cal_sale_rate == sale_rate){
+          data['offer_rate'] = offer_rate > 0 ? offer_rate : sale_rate;
+        }else{
+          data['offer_rate'] = cal_sale_rate;
+        }        
+      }
+    }
+    return cal_sale_rate;
+  }
+
+  private customizeOrderTestParameters(templateValue: any, paramArray: any) {
+    if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
+      let slabRateParamCount: number = 0;
+      templateValue['quotation_param_methods'].forEach((element: any) => {
+        if (element.pricingType != undefined && element.pricingType != '') {
+          if (element.pricingType == 'Slab Wise Rate') {
+            slabRateParamCount++;
+          }
+        }
+      });
+      let parameterIndex: number = 0;
+      templateValue['quotation_param_methods'].forEach((element: any) => {
+        if (element.pricingType != undefined && element.pricingType != '') {
+          if (element.pricingType == 'Slab Wise Rate') {
+            if (parameterIndex == 0) {
+              element.slabRateParamCount = slabRateParamCount;
+            }else{
+              element.slabRateParamCount = 0;
+            }
+            parameterIndex++;
+          } else {
+            element.slabRateParamCount = 0;
+          }
+          let data = { ...element };
+          paramArray.push(data);
+        }
+      });
+    }
+  }
 /**
  * End point for subsequet calculation for quotation
  */
