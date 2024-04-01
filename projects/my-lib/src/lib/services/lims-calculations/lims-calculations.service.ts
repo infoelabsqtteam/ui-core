@@ -1760,7 +1760,6 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
     let subsequent_discount_amount:any=0;
     let subsequent_discount_percent:any=0;
     let totalDiscountAmount:any=0;
-    let slabRatesArray:any = [];
     let pricingType = data.pricingType != undefined && data.pricingType != '' ? data.pricingType : '';
     quantity = data.qty;
     if (!this.coreFunctionService.isNotBlank(quantity)) {
