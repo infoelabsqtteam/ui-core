@@ -318,7 +318,7 @@ export class FormValueService {
 
       }
     }
-    if(getLocation){
+    if(getLocation && valueOfForm['locationDetail'] == ''){
       if(center !=null && center.lat !=null){
         valueOfForm['locationDetail'] = {
           'latitude' : center.lat,
