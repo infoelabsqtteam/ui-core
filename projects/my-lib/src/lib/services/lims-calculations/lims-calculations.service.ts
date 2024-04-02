@@ -1930,7 +1930,7 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
         if (!this.coreFunctionService.isNotBlank(offer_rate)) {
           offer_rate = 0;
         }
-        if (offer_rate) {
+        // if (offer_rate >= 0 ) {
           if(data.subsequent_offer_rate && data.subsequent_offer_rate > 0 && data.no_of_injection2 && data.no_of_injection2 > 0 && quantity > 1){
             effectiveTotal = ((quantity - 1) * data.subsequent_offer_rate) + data.offer_rate;
           }else{
@@ -1982,13 +1982,13 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
           //}
           this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent);
 
-        }else{
-          if(incoming_field == "subsequent_offer_rate"){
-            data["subsequent_offer_rate"] = offer_rate;
-          }else{
-            data["offer_rate"] = offer_rate;
-          }
-        }
+        // }else{
+        //   if(incoming_field == "subsequent_offer_rate"){
+        //     data["subsequent_offer_rate"] = offer_rate;
+        //   }else{
+        //     data["offer_rate"] = offer_rate;
+        //   }
+        // }
         break;
       case "discount_amount":
       case "subsequent_discount_amount":
