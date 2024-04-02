@@ -156,6 +156,9 @@ export class EnvService {
     let mydocument:any = this.document;
     return mydocument.location[key];
   }
+  getServerHostname(){
+    return this.serverHostname;
+  }
 
   setGoogleLocation(geolocation:any){
     (Common as any).GOOGLE_MAP_IN_FORM = geolocation;
