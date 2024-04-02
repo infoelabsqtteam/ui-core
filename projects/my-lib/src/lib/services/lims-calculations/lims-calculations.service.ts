@@ -184,7 +184,6 @@ export class LimsCalculationsService {
       return;
     }
   }
-
   legacyQuotationParameterCalculation(data:any, fieldName:any) {
     let quantity = 0;
     let discount_percent = 0;
@@ -1204,7 +1203,6 @@ export class LimsCalculationsService {
     } else {
       unit_price = templateValue["unit_price"];
     }
-
     templateValue['total'] = gross_amount;
     templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
     templateValue['net_amount'] = this.getDecimalAmount(net_amount);
