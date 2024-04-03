@@ -481,9 +481,7 @@ export class FormControlService {
           if(datatype == "object"){
             responce.longitude = object?.longitude;
             responce.latitude = object?.latitude;
-            responce['address'] = object?.address;
-            responce['date'] = object?.date;
-            responce['time'] = object?.time;
+            responce['locationDetail'] = object;
             responce.templateForm.controls[fieldName].setValue(object?.address);
           }else{
             responce.templateForm.controls[fieldName].setValue(object)
