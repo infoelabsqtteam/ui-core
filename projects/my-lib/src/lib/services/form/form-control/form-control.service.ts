@@ -478,7 +478,14 @@ export class FormControlService {
             responce.getAddress = true;
             //this.getAddress(responce.latitude,responce.longitude)
           }
-          responce.templateForm.controls[fieldName].setValue(object)
+          if(datatype == "object"){
+            responce.longitude = object?.longitude;
+            responce.latitude = object?.latitude;
+            responce['locationDetail'] = object;
+            responce.templateForm.controls[fieldName].setValue(object?.address);
+          }else{
+            responce.templateForm.controls[fieldName].setValue(object)
+          } 
         }
         break;
       case "daterange":
