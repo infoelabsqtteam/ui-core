@@ -479,7 +479,10 @@ export class FormControlService {
             //this.getAddress(responce.latitude,responce.longitude)
           }
           if(datatype == "object"){
-            responce.templateForm.controls[fieldName].setValue(object?.address)
+            responce.longitude = object?.longitude;
+            responce.latitude = object?.latitude;
+            responce['address'] = object?.address;
+            responce.templateForm.controls[fieldName].setValue(object?.address);
           }else{
             responce.templateForm.controls[fieldName].setValue(object)
           } 
