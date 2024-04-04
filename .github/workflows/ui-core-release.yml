@@ -22,6 +22,10 @@ jobs:
 
     - name: Set Git Env
       run: echo $GITHUB_ENV
+      
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
  
     - name: List of the GitHub Actions environment variables on Ubunt
       run: env  
@@ -29,13 +33,21 @@ jobs:
     - name: Set up Node
       uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        node-version: '16'
     
-    - name: Installing source NPM dependencies...
-      run: npm install
+    # - name: Installing source NPM dependencies...
+    #   run: npm install
       
-    - name: Installing Angular
-      run: npm install -g @angular/cli@13.0.0
+    # - name: Installing Angular
+    #   run: npm install -g @angular/cli@15.2.10
+
+    - name: Installing NPM and Angular
+      run: |         
+        CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ui-libs --domain-owner 292474393014 --region ap-south-1 --query authorizationToken --output text`
+        aws codeartifact login --tool npm --repository ui-library --domain ui-libs --domain-owner 292474393014 --region ap-south-1
+        echo $CODEARTIFACT_AUTH_TOKEN        
+        npm install -g @angular/cli@15.2.10
+        npm install
     
     - name: Set Node Options
       run: echo "NODE_OPTIONS=--max_old_space_size=${{ secrets.RAM }}" >> $GITHUB_ENV
