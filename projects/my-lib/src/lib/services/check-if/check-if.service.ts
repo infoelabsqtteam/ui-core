@@ -634,8 +634,6 @@ export class CheckIfService {
         alreadyDataAddedlist.forEach((element:any) => {
           if(element._id && element._id == incomingData._id){
             alreadyExist =  true;
-          }else if(element[primary_key] == incomingData[primary_key]){
-            alreadyExist =  true;
           }
         });
       }
