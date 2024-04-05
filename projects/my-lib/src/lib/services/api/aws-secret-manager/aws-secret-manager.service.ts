@@ -51,7 +51,7 @@ export class AwsSecretManagerService {
       this.dataShareService.shareServerHostName(hostname);
       this.apiCallService.getApplicationAllSettings();
     } else{
-      this.notificationService.notify("bg-danger","Please update the serverHost in server");
+      this.notificationService.notify("bg-danger","Please contact to Admin");
     }
    }
 
