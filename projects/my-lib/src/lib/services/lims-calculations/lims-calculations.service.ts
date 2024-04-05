@@ -878,13 +878,11 @@ export class LimsCalculationsService {
     let discount_amount = 0;
     let taxable_amount = 0;
     let net_amount = 0;
-    if(calculate_on_field['field_name'] == "net_amount"){
-      net_amount = templateValue['total_amount']['net_amount'];
-    }
     let parentObjectValue = templateValue[calculate_on_field.parent];
     if (this.coreFunctionService.isNotBlank(parentObjectValue)) {
       if (this.coreFunctionService.isNotBlank(parentObjectValue[calculate_on_field.field_name])){
           taxable_amount = parentObjectValue[calculate_on_field.field_name];
+          net_amount = taxable_amount;
       }
     }
     templateValue = this.update_invoice_totatl(templateValue, gross_amount, discount_amount, discount_percent, net_amount, surcharge, taxable_amount);
