@@ -10,6 +10,7 @@ export class DataShareService {
   currentPage: Subject<any> = new Subject();
   currentpage:string = '';
   serverHostname : Subject<any> = new BehaviorSubject<any>(null);
+  getServerEndPoint : Subject<any> = new BehaviorSubject<any>(null);
   staticData: Subject<any> = new BehaviorSubject<any>(null);
   setStaticData={};
   gridCountData: Subject<any> = new BehaviorSubject<any>(null);
