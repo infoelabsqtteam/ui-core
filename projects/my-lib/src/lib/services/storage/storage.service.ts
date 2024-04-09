@@ -568,7 +568,7 @@ export class StorageService {
     let domainName = this.document.location['hostname'];
 
     localStorage.setItem(this.HOST_NAME, host);
-    if(domainName!="localhost"){
+    if(domainName!="localhost" && this.cookiesService.isCookieExpired(domainName)){
       this.cookiesService.setCookieByName(domainName,host,30);
     }
   }
