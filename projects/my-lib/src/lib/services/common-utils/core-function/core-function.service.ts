@@ -8,7 +8,7 @@ export class CoreFunctionService {
     eq :"EQUAL",
     in : "IN",
     neq : "NOT_EQUAL",
-    // stwic : "START WITH IGNORE CASE",
+    // stwic : "STARTS_WITH_IGNORE_CASE",
     cnts : "CONTAINS"
   };
 
@@ -198,24 +198,23 @@ export class CoreFunctionService {
     switch (type){
       case "date":
         operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
-        operatorList['gte'] = "GREATER_THAN_EQUAL";
         operatorList['lt'] = 'LESS_THAN';
-        operatorList['lte'] = "LESS_THAN_EQUAL";
+        operatorList['lte'] = "RANGE_BORDER_LESS_THAN_INCLUSIVE";
         operatorList['gt'] = 'GREATER_THAN';
-        operatorList['gte'] = 'GREATER_THAN_EQUAL';
+        operatorList['gte'] = 'RANGE_BORDER_GREATER_THAN_INCLUSIVE';
         operatorList['drng'] = 'DATE_RANGE';
         break;
       case "number":
         operatorList['lt'] = 'LESS_THAN';
-        operatorList['lte'] = "LESS_THAN_EQUAL";
+        operatorList['lte'] = "RANGE_BORDER_LESS_THAN_INCLUSIVE";
         operatorList['gt'] = 'GREATER_THAN';
-        operatorList['gte'] = 'GREATER_THAN_EQUAL';
+        operatorList['gte'] = 'RANGE_BORDER_GREATER_THAN_INCLUSIVE';
         break;
       case "string":
-        operatorList['stw'] = "START_WITH";
-        operatorList['stwic'] = "START_WITH_IGNORE_CASE";
-        operatorList['edw'] = 'END_WITH';
-        operatorList['edwic'] = 'END_WITH_IGNORE_CASE';
+        operatorList['stw'] = "STARTS_WITH";
+        operatorList['stwic'] = "STARTS_WITH_IGNORE_CASE";
+        operatorList['edw'] = 'ENDS_WITH';
+        operatorList['edwic'] = 'ENDS_WITH_IGNORE_CASE';
         operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
         operatorList['ncnts'] = 'NOT_CONTAINS';
         operatorList['ncntsic'] = 'NOT_CONTAINS_IGNORE_CASE';
