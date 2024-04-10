@@ -202,7 +202,6 @@ export class CoreFunctionService {
         operatorList['lte'] = "RANGE_BORDER_LESS_THAN_INCLUSIVE";
         operatorList['gt'] = 'GREATER_THAN';
         operatorList['gte'] = 'RANGE_BORDER_GREATER_THAN_INCLUSIVE';
-        operatorList['drng'] = 'DATE_RANGE';
         break;
       case "number":
         operatorList['lt'] = 'LESS_THAN';
