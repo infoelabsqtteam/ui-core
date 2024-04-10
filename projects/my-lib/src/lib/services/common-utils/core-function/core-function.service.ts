@@ -199,15 +199,15 @@ export class CoreFunctionService {
       case "date":
         operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
         operatorList['lt'] = 'LESS_THAN';
-        operatorList['lte'] = "RANGE_BORDER_LESS_THAN_INCLUSIVE";
+        operatorList['lte'] = "LESS_THAN_EQUAL";
         operatorList['gt'] = 'GREATER_THAN';
-        operatorList['gte'] = 'RANGE_BORDER_GREATER_THAN_INCLUSIVE';
+        operatorList['gte'] = 'GREATER_THAN_EQUAL';
         break;
       case "number":
         operatorList['lt'] = 'LESS_THAN';
-        operatorList['lte'] = "RANGE_BORDER_LESS_THAN_INCLUSIVE";
+        operatorList['lte'] = "LESS_THAN_EQUAL";
         operatorList['gt'] = 'GREATER_THAN';
-        operatorList['gte'] = 'RANGE_BORDER_GREATER_THAN_INCLUSIVE';
+        operatorList['gte'] = 'GREATER_THAN_EQUAL';
         break;
       case "string":
         operatorList['stw'] = "STARTS_WITH";
