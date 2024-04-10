@@ -877,7 +877,7 @@ export class LimsCalculationsService {
     let discount_percent = 0;
     let discount_amount = 0;
     let taxable_amount = 0;
-    let net_amount:number = 0;
+    let net_amount = 0;
     let parentObjectValue = templateValue[calculate_on_field.parent];
     if (this.coreFunctionService.isNotBlank(parentObjectValue)) {
       if (this.coreFunctionService.isNotBlank(parentObjectValue[calculate_on_field.field_name])){
