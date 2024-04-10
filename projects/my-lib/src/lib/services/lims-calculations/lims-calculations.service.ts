@@ -2505,7 +2505,7 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
 
   private getSlabWiseSaleRate(data: any) {
     let cal_sale_rate:any = 0;
-    if (data.slabRates.length > 0) {
+    if (data.slabRates != undefined && data.slabRates != '' && data.slabRates.length > 0) {
       if(data.slabRateParamCount == 0){
         data['net_amount'] = 0;
         data['per_sample_net_rate'] = 0;
@@ -2535,31 +2535,40 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
 
   private customizeOrderTestParameters(templateValue: any, paramArray: any) {
     if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
-      let slabRateParamCount: number = 0;
+      this.mapSlabWiseCategoryParameterCount(templateValue);
       templateValue['quotation_param_methods'].forEach((element: any) => {
         if (element.pricingType != undefined && element.pricingType != '') {
-          if (element.pricingType == 'Slab Wise Rate') {
-            slabRateParamCount++;
-          }
-        }
-      });
-      let parameterIndex: number = 0;
-      templateValue['quotation_param_methods'].forEach((element: any) => {
-        if (element.pricingType != undefined && element.pricingType != '') {
-          if (element.pricingType == 'Slab Wise Rate') {
-            if (parameterIndex == 0) {
-              element.slabRateParamCount = slabRateParamCount;
-            }else{
-              element.slabRateParamCount = 0;
-            }
-            parameterIndex++;
-          } else {
-            element.slabRateParamCount = 0;
-          }
           let data = { ...element };
           paramArray.push(data);
         }
       });
+      console.log(paramArray);
+    }
+  }
+
+  private mapSlabWiseCategoryParameterCount(templateValue: any) {
+    if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
+      const mappedCategoryWiseList: any = [];
+      const quotationParamMethods = templateValue['quotation_param_methods'].filter((element: any) => element.pricingType != undefined && element.pricingType != '' && element.pricingType == 'Slab Wise Rate').reduce((groupArray: any, element: any) => {
+        const key = element.param_category.name;
+        if (!groupArray[key]) {
+          groupArray[key] = [];
+        }
+        groupArray[key].push(element);
+        return groupArray;
+      }, {});
+      if(quotationParamMethods && Object.keys(quotationParamMethods).length > 0){
+        Object.keys(quotationParamMethods).forEach((categoryName: any) => {
+          templateValue['quotation_param_methods'].forEach((element: any) => {
+            if (categoryName != '' && element.param_category != '' && element.param_category.name == categoryName) {
+              if (!mappedCategoryWiseList.includes(categoryName)) {
+                element['slabRateParamCount'] = quotationParamMethods[categoryName].length;
+                mappedCategoryWiseList.push(categoryName);
+              }
+            }
+          });
+        });
+      }
     }
   }
 /**
