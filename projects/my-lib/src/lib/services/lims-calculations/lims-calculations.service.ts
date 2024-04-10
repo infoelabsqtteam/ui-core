@@ -882,6 +882,9 @@ export class LimsCalculationsService {
     if (this.coreFunctionService.isNotBlank(parentObjectValue)) {
       if (this.coreFunctionService.isNotBlank(parentObjectValue[calculate_on_field.field_name])){
           taxable_amount = parentObjectValue[calculate_on_field.field_name];
+          if(taxable_amount && typeof taxable_amount === 'number' ) {
+            net_amount = taxable_amount;
+          }
       }
     }
     templateValue = this.update_invoice_totatl(templateValue, gross_amount, discount_amount, discount_percent, net_amount, surcharge, taxable_amount);
