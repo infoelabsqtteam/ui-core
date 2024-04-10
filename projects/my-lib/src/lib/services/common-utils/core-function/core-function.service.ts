@@ -5,11 +5,11 @@ import { Injectable } from '@angular/core';
 })
 export class CoreFunctionService {
   commonOperators:any={
-    eq :"EQUAL",
-    in : "IN",
-    neq : "NOT_EQUAL",
-    // stwic : "STARTS_WITH_IGNORE_CASE",
-    cnts : "CONTAINS"
+    eq :"Equal",
+    in : "In",
+    neq : "Not Equal",
+    // stwic : "Starts With Ignore Case",
+    cnts : "Contains"
   };
 
   constructor() { }
@@ -197,26 +197,26 @@ export class CoreFunctionService {
     let operatorList = {...this.commonOperators};
     switch (type){
       case "date":
-        operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
-        operatorList['lt'] = 'LESS_THAN';
-        operatorList['lte'] = "LESS_THAN_EQUAL";
-        operatorList['gt'] = 'GREATER_THAN';
-        operatorList['gte'] = 'GREATER_THAN_EQUAL';
+        operatorList['cntsic'] = 'Contains Ignore Case';
+        operatorList['lt'] = 'Less Than';
+        operatorList['lte'] = "Less Than Equal";
+        operatorList['gt'] = 'Greater Than';
+        operatorList['gte'] = 'Greater Than Equal';
         break;
       case "number":
-        operatorList['lt'] = 'LESS_THAN';
-        operatorList['lte'] = "LESS_THAN_EQUAL";
-        operatorList['gt'] = 'GREATER_THAN';
-        operatorList['gte'] = 'GREATER_THAN_EQUAL';
+        operatorList['lt'] = 'Less Than';
+        operatorList['lte'] = "Less Than Equal";
+        operatorList['gt'] = 'Greater Than';
+        operatorList['gte'] = 'Greater Than Equal';
         break;
       case "string":
-        operatorList['stw'] = "STARTS_WITH";
-        operatorList['stwic'] = "STARTS_WITH_IGNORE_CASE";
-        operatorList['edw'] = 'ENDS_WITH';
-        operatorList['edwic'] = 'ENDS_WITH_IGNORE_CASE';
-        operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
-        operatorList['ncnts'] = 'NOT_CONTAINS';
-        operatorList['ncntsic'] = 'NOT_CONTAINS_IGNORE_CASE';
+        operatorList['stw'] = "Starts With";
+        operatorList['stwic'] = "Starts With Ignore Case";
+        operatorList['edw'] = 'Ends With';
+        operatorList['edwic'] = 'Ends With Ignore Case';
+        operatorList['cntsic'] = 'Contains Ignore Case';
+        operatorList['ncnts'] = 'Not Contains';
+        operatorList['ncntsic'] = 'Not Contains Ignore Case';
         break;
       default:
         break;
