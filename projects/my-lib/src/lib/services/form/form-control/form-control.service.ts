@@ -465,26 +465,7 @@ export class FormControlService {
       case "gmap":
       case "gmapview":
         if(object != null && object != undefined){
-          let value = object;
-          if(datatype == "object") {
-            if(object['longitude']){
-              responce.longitude = object['longitude'];
-            }
-            if(object['latitude']){
-              responce.latitude = object['latitude'];
-            }
-            if(object['zoom']){
-              responce.zoom = object['zoom'];
-            }
-            if(responce.longitude != 0 && responce.latitude != 0){
-              responce.getAddress = true;
-              //this.getAddress(responce.latitude,responce.longitude)
-            }
-            if(object.address) {
-              value = object.address;
-            }
-          }else {
-            if(formValue['longitude']){
+          if(formValue['longitude']){
             responce.longitude = formValue['longitude'];
           }
           if(formValue['latitude']){
@@ -497,10 +478,7 @@ export class FormControlService {
             responce.getAddress = true;
             //this.getAddress(responce.latitude,responce.longitude)
           }
-          
-          }
-          responce.templateForm.controls[fieldName].setValue(value) 
-          
+          responce.templateForm.controls[fieldName].setValue(object) 
         }
         break;
       case "daterange":
