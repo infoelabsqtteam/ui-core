@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
+import { Operator } from '../../operator/operator.service';
+import { OperatorType } from '../../../shared/enums/operator_type.enum';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CoreFunctionService {
-  commonOperators:any={
-    eq :"EQUAL",
-    in : "IN",
-    neq : "NOT_EQUAL",
-    // stwic : "STARTS_WITH_IGNORE_CASE",
-    cnts : "CONTAINS"
-  };
+  // commonOperators:any={
+  //   eq :"EQUAL",
+  //   in : "IN",
+  //   neq : "NOT_EQUAL",
+  //   // stwic : "STARTS_WITH_IGNORE_CASE",
+  //   cnts : "CONTAINS"
+  // };
 
   constructor() { }
   isNotBlank(value:any){
@@ -193,40 +195,44 @@ export class CoreFunctionService {
     });
     return objWithoutNull;
   }
-  getOperators(type:string,dataTye?:string){
-    let operatorList = {...this.commonOperators};
-    switch (type){
-      case "date":
-        operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
-        operatorList['lt'] = 'LESS_THAN';
-        operatorList['lte'] = "RANGE_BORDER_LESS_THAN_INCLUSIVE";
-        operatorList['gt'] = 'GREATER_THAN';
-        operatorList['gte'] = 'RANGE_BORDER_GREATER_THAN_INCLUSIVE';
-        break;
-      case "number":
-        operatorList['lt'] = 'LESS_THAN';
-        operatorList['lte'] = "RANGE_BORDER_LESS_THAN_INCLUSIVE";
-        operatorList['gt'] = 'GREATER_THAN';
-        operatorList['gte'] = 'RANGE_BORDER_GREATER_THAN_INCLUSIVE';
-        break;
-      case "string":
-        operatorList['stw'] = "STARTS_WITH";
-        operatorList['stwic'] = "STARTS_WITH_IGNORE_CASE";
-        operatorList['edw'] = 'ENDS_WITH';
-        operatorList['edwic'] = 'ENDS_WITH_IGNORE_CASE';
-        operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
-        operatorList['ncnts'] = 'NOT_CONTAINS';
-        operatorList['ncntsic'] = 'NOT_CONTAINS_IGNORE_CASE';
-        break;
-      default:
-        break;
-    }
-    let sortValue = this.sortOperators(operatorList);
-    if(dataTye == 'list'){
-      return this.mapObjectToListOfString(sortValue);
-    }else{
-      return sortValue;
-    }
+  // getOperators(type:string,dataTye?:string){
+  //   let operatorList = {...this.commonOperators};
+  //   switch (type){
+  //     case "date":
+  //       operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
+  //       operatorList['lt'] = 'LESS_THAN';
+  //       operatorList['lte'] = "RANGE_BORDER_LESS_THAN_INCLUSIVE";
+  //       operatorList['gt'] = 'GREATER_THAN';
+  //       operatorList['gte'] = 'RANGE_BORDER_GREATER_THAN_INCLUSIVE';
+  //       break;
+  //     case "number":
+  //       operatorList['lt'] = 'LESS_THAN';
+  //       operatorList['lte'] = "RANGE_BORDER_LESS_THAN_INCLUSIVE";
+  //       operatorList['gt'] = 'GREATER_THAN';
+  //       operatorList['gte'] = 'RANGE_BORDER_GREATER_THAN_INCLUSIVE';
+  //       break;
+  //     case "string":
+  //       operatorList['stw'] = "STARTS_WITH";
+  //       operatorList['stwic'] = "STARTS_WITH_IGNORE_CASE";
+  //       operatorList['edw'] = 'ENDS_WITH';
+  //       operatorList['edwic'] = 'ENDS_WITH_IGNORE_CASE';
+  //       operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
+  //       operatorList['ncnts'] = 'NOT_CONTAINS';
+  //       operatorList['ncntsic'] = 'NOT_CONTAINS_IGNORE_CASE';
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  //   let sortValue = this.sortOperators(operatorList);
+  //   if(dataTye == 'list'){
+  //     return this.mapObjectToListOfString(sortValue);
+  //   }else{
+  //     return sortValue;
+  //   }
+  // }
+
+  getOperators(type: OperatorType,name:string){
+    return Operator.getOperators(type,name);
   }
 
   sortOperators(operatorList:any){
