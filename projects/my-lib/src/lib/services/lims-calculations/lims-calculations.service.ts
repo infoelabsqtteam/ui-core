@@ -2549,7 +2549,7 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
   private mapSlabWiseCategoryParameterCount(templateValue: any) {
     if (templateValue['quotation_param_methods'] != '' && templateValue['quotation_param_methods'].length > 0) {
       const mappedCategoryWiseList: any = [];
-      const quotationParamMethods = templateValue['quotation_param_methods'].filter((element: any) => element.pricingType != undefined && element.pricingType != '' && element.pricingType == 'Slab Wise Rate').reduce((groupArray: any, element: any) => {
+      const quotationParamMethods = templateValue['quotation_param_methods'].filter((element: any) => element.pricingType != undefined && element.pricingType != '' && element.pricingType == 'Slab Wise Rate' && element.parameterInvoicingStatus).reduce((groupArray: any, element: any) => {
         const key = element.param_category.name;
         if (!groupArray[key]) {
           groupArray[key] = [];
