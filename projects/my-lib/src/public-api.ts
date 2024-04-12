@@ -35,6 +35,7 @@ export * from './lib/shared/enums/common.enum';
 export * from './lib/shared/enums/end-point.enum';
 export * from './lib/shared/enums/storage-token-status.enum';
 export * from './lib/shared/enums/keycodes.enum';
+export * from './lib/shared/enums/operator_type.enum';
 export * from './lib/services/data-share/auth-data-share/auth-data-share.service';
 export * from './lib/services/data-share/common-app-data-share/common-app-data-share.service';
 export * from './lib/services/fileHandler/file-handler.service';
@@ -48,5 +49,4 @@ export * from './lib/services/api/api-call-responce/api-call-responce.service';
 export * from './lib/services/form/multiple-form/multiple-form.service';
 export * from './lib/services/download/download.service';
 export * from './lib/services/userPrefrence/user-prefrence.service';
-
 
