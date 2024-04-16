@@ -515,6 +515,8 @@ constructor(
           return '-';
         }
       case "file":
+      case "file_with_preview":
+      case "file_with_print":
         if (value && value != '') {
           if(this.storageService.checkPlatForm() == 'mobile'){
             return '<span class="material-symbols-outlined cursor-pointer">text_snippet</span>';

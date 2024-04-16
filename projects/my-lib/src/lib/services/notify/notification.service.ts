@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
-
+import { ApiService } from '../api/api.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -11,6 +11,7 @@ export class NotificationService {
 
   constructor(
     private _snackBar: MatSnackBar,
+    private apiService: ApiService,
   ) { }
 
 
@@ -23,6 +24,17 @@ export class NotificationService {
         verticalPosition: this.verticalPosition
       });
     }
+  }
+
+  markUsRead(data:any){
+    if (data.notificationStatus === 'UNREAD') {
+        data.notificationStatus = 'READ';
+        const payload = {
+            curTemp: 'user_notification_master',
+            data: data
+        };
+        this.apiService.SaveFormData(payload);
+    }    
   }
 
 }
