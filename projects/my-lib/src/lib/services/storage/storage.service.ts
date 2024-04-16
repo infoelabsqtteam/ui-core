@@ -602,7 +602,7 @@ export class StorageService {
     return adminEmail;
   }
   getApplicationValueByKey(key:any){
-    let value = "";
+    let value:any = "";
     let applicationSetting = this.getApplicationSetting();
     if(applicationSetting && applicationSetting[key] != undefined && applicationSetting[key] != null && applicationSetting[key] != ""){
       value = applicationSetting[key];
