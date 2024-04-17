@@ -2560,10 +2560,12 @@ calculate_quotation_with_subsequent(templateValue:any, lims_segment:any, field: 
       if(quotationParamMethods && Object.keys(quotationParamMethods).length > 0){
         Object.keys(quotationParamMethods).forEach((categoryName: any) => {
           templateValue['quotation_param_methods'].forEach((element: any) => {
-            if (categoryName != '' && element.param_category != '' && element.param_category.name == categoryName) {
-              if (!mappedCategoryWiseList.includes(categoryName)) {
-                element['slabRateParamCount'] = quotationParamMethods[categoryName].length;
-                mappedCategoryWiseList.push(categoryName);
+            if(element.pricingType != undefined && element.pricingType != '' && element.pricingType == 'Slab Wise Rate'){
+              if (categoryName != '' && element.param_category != '' && element.param_category.name == categoryName) {
+                if (!mappedCategoryWiseList.includes(categoryName)) {
+                  element['slabRateParamCount'] = quotationParamMethods[categoryName].length;
+                  mappedCategoryWiseList.push(categoryName);
+                }
               }
             }
           });
