@@ -581,7 +581,7 @@ export class StorageService {
       let domainName = this.document.location['hostname'];
 
       host = this.cookiesService.getCookieByName(domainName);
-      this.setHostNameDinamically(host);
+      if (host && host !="") this.setHostNameDinamically(host);
       return host;
     }
   }

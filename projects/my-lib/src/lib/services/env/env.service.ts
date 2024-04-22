@@ -36,7 +36,7 @@ export class EnvService {
     let baseUrl:any;
     const host = this.storageService.getHostNameDinamically();
     if(this.coreFunctionService.isNotBlank(host)){
-      baseUrl = this.storageService.getHostNameDinamically()
+      baseUrl = host;
     }else{
       baseUrl = this.serverHostname +'/rest/';
       // baseUrl = environment.serverhost
@@ -108,12 +108,12 @@ export class EnvService {
     let setHostName = this.storageService.getHostNameDinamically();
     let serverHostName = this.serverHostname;
     // let themedata = this.getHostKeyValue('theme_setting');    
-    this.setApplicationSetting();
     if(serverHostName != "" || serverHostName != setHostName && setHostName) {      
       const hostName = serverHostName +'/rest/';
       this.storageService.setHostNameDinamically(hostName);
       //this.setThemeSetting(themedata);
     }
+    this.setApplicationSetting();
   }
   
   getHostKeyValue(keyName:string){
