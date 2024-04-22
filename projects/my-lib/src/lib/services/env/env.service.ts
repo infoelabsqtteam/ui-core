@@ -116,40 +116,36 @@ export class EnvService {
     }
   }
   
-  // getHostKeyValue(keyName:string){
-  //   let hostname:any ="";
-  //   let key_Name:string = '';
-  //   if(this.storageService.checkPlatForm() == 'mobile'){
-  //     hostname = this.storageService.getClientName();
-  //     key_Name = 'clientCode';
-  //   }else{
-  //     hostname = this.getHostName('hostname');
-  //     key_Name = 'clientEndpoint';
-  //   }
-  //   let value:any = '';  
-  //   if(hostname == 'localhost'){
-  //     value = this.storageService.getClientCodeEnviorment().serverhost;
-  //   }else{
-  //     value = this.serverHostname;
-  //   }
-  //   if(serverHostList && serverHostList.length > 0){
-  //     for (let index = 0; index < serverHostList.length; index++) {
-  //       const element:any = serverHostList[index];
-  //       if(hostname == element[key_Name]){
-  //         if(keyName == "object"){
-  //           value = element;
-  //           break;
-  //         }else{
-  //           value = element[keyName];
-  //           break;
-  //         }
+  getHostKeyValue(keyName:string){
+    let hostname:any ="";
+    let key_Name:string = '';
+    if(this.storageService.checkPlatForm() == 'mobile'){
+      hostname = this.storageService.getClientName();
+      key_Name = 'clientCode';
+    }else{
+      hostname = this.getHostName('hostname');
+      key_Name = 'clientEndpoint';
+    }
+    let value:any = '';  
+    if(hostname == 'localhost'){
+      value = this.storageService.getClientCodeEnviorment().serverhost;
+    }else if(serverHostList && serverHostList.length > 0){
+      for (let index = 0; index < serverHostList.length; index++) {
+        const element:any = serverHostList[index];
+        if(hostname == element[key_Name]){
+          if(keyName == "object"){
+            value = element;
+            break;
+          }else{
+            value = element[keyName];
+            break;
+          }
           
-  //       }        
-  //     }
-  //   }
-
-  //   return value;
-  // }
+        }        
+      }
+    }
+    return value;
+  }
 
 
   getHostName(key:string){
