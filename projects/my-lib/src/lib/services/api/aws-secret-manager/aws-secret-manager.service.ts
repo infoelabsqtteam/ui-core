@@ -51,11 +51,11 @@ export class AwsSecretManagerService {
    }
 
 
-   async getserverHostByAwsOrLocal(client:string){
-    let response = await this.getServerHostFromAwsSecretManager(client);
+   async getserverHostByAwsOrLocal(domain:string){
+    let response = await this.getServerHostFromAwsSecretManager(domain);
     if ( !response || response == ""){
       if(this.storageService.checkPlatForm() == 'mobile'){
-        this.storageService.setClientNAme(client);
+        this.storageService.setClientNAme(domain);
       }
       response = this.envService.getHostKeyValue("serverEndpoint")
     }
