@@ -35,12 +35,7 @@ export class AwsSecretManagerService {
 
 
  async getServerAndAppSetting (){
-    let hostname:any ="";
-    if(this.storageService.checkPlatForm() == 'mobile'){
-      hostname = this.storageService.getClientName();
-    }else{
-      hostname = this.envService.getHostName('hostname');
-    }
+    let hostname:any  = this.envService.getHostName('hostname');
     if(hostname == 'localhost'){
       hostname = this.storageService.getClientCodeEnviorment().serverhost;
     }else{
@@ -56,9 +51,12 @@ export class AwsSecretManagerService {
    }
 
 
-   async getserverHostByAwsOrLocal(domain:string){
-    let response = await this.getServerHostFromAwsSecretManager(domain);
+   async getserverHostByAwsOrLocal(client:string){
+    let response = await this.getServerHostFromAwsSecretManager(client);
     if ( !response || response == ""){
+      if(this.storageService.checkPlatForm() == 'mobile'){
+        this.storageService.setClientNAme(client);
+      }
       response = this.envService.getHostKeyValue("serverEndpoint")
     }
     return response;
