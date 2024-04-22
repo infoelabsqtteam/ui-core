@@ -108,12 +108,14 @@ export class EnvService {
     let setHostName = this.storageService.getHostNameDinamically();
     let serverHostName = this.serverHostname;
     // let themedata = this.getHostKeyValue('theme_setting');    
-    if(serverHostName != "" || serverHostName != setHostName && setHostName) {      
+    //this.setApplicationSetting();
+    if(setHostName && serverHostName && serverHostName != setHostName ) {      
       const hostName = serverHostName +'/rest/';
       this.storageService.setHostNameDinamically(hostName);
       //this.setThemeSetting(themedata);
+    } else {
+      this.dataShareService.getServerEndPoint();
     }
-    this.setApplicationSetting();
   }
   
   getHostKeyValue(keyName:string){
