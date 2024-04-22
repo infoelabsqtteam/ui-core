@@ -146,8 +146,6 @@ export class EnvService {
     }
     return value;
   }
-
-
   getHostName(key:string){
     let mydocument:any = this.document;
     return mydocument.location[key];
