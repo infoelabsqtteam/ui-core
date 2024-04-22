@@ -126,7 +126,7 @@ export class EnvService {
       hostname = this.getHostName('hostname');
       key_Name = 'clientEndpoint';
     }
-    let value:any = '';  
+    let value:any = '';   
     if(hostname == 'localhost'){
       value = this.storageService.getClientCodeEnviorment().serverhost;
     }else if(serverHostList && serverHostList.length > 0){
