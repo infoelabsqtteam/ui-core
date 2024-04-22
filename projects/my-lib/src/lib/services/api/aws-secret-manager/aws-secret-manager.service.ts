@@ -44,7 +44,7 @@ export class AwsSecretManagerService {
     if(hostname == 'localhost'){
       hostname = this.storageService.getClientCodeEnviorment().serverhost;
     }else{
-      hostname =await this.getServerHostFromAwsSecretManager(hostname);
+      hostname =await this.getserverHostByAwsOrLocal(hostname);
     }
     if(hostname && hostname!=''){
       this.storageService.setHostNameDinamically(hostname+"/rest/");
@@ -55,6 +55,14 @@ export class AwsSecretManagerService {
     }
    }
 
+
+   async getserverHostByAwsOrLocal(domain:string){
+    let response = await this.getServerHostFromAwsSecretManager(domain);
+    if ( !response || response == ""){
+      response = this.envService.getHostKeyValue("serverEndpoint")
+    }
+    return response;
+   }
 
   async getServerHostFromAwsSecretManager (key: string) {
     let secret_name = 'prod/ui';
