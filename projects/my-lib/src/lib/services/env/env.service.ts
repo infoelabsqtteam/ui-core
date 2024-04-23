@@ -1,5 +1,5 @@
 import { Injectable,Inject } from '@angular/core';
-import { from, of, Observable } from 'rxjs';//fromPromise
+import { from, of, Observable, Subscription } from 'rxjs';//fromPromise
 import { DOCUMENT } from '@angular/common';
 import { Common } from '../../shared/enums/common.enum';
 import { EndPoint } from '../../shared/enums/end-point.enum';
@@ -8,6 +8,7 @@ import { serverHostList } from './serverHostList';
 import { StorageService } from '../../services/storage/storage.service';
 import { CoreFunctionService } from '../../services/common-utils/core-function/core-function.service';
 import { PLATFORM_NAME } from '../../shared/platform';
+import { DataShareService } from '../data-share/data-share.service';
 
 
 @Injectable({
@@ -15,21 +16,31 @@ import { PLATFORM_NAME } from '../../shared/platform';
 })
 export class EnvService {
   requestType: any = '';
+  serverHostname : string = '';
+  serverHostnameSubscription : Subscription
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private storageService: StorageService,
     private coreFunctionService:CoreFunctionService,
-  ) { }
+    private dataShareService : DataShareService,  
+  ) {
+      this.serverHostnameSubscription = this.dataShareService.serverHostname.subscribe(data=>{
+        if(data && data != ''){
+          this.serverHostname = data;
+        }
+      })
+   }
   
 
   getBaseUrl(){
     let baseUrl:any;
     const host = this.storageService.getHostNameDinamically();
     if(this.coreFunctionService.isNotBlank(host)){
-      baseUrl = this.storageService.getHostNameDinamically()
+      baseUrl = host;
     }else{
+      baseUrl = this.serverHostname +'/rest/';
       // baseUrl = environment.serverhost
-      baseUrl = this.getHostKeyValue('serverEndpoint') +'/rest/';
+      // baseUrl = this.getHostKeyValue('serverEndpoint') +'/rest/';
       this.setDinamicallyHost();
     }
     return baseUrl;
@@ -95,13 +106,15 @@ export class EnvService {
 
   setDinamicallyHost(){
     let setHostName = this.storageService.getHostNameDinamically();
-    let serverHostName = this.getHostKeyValue('serverEndpoint');
-    //let themedata = this.getHostKeyValue('theme_setting');    
+    let serverHostName = this.serverHostname;
+    // let themedata = this.getHostKeyValue('theme_setting');    
     //this.setApplicationSetting();
-    if(serverHostName != '' || serverHostName != setHostName) {      
+    if(setHostName && serverHostName && serverHostName != setHostName ) {      
       const hostName = serverHostName +'/rest/';
       this.storageService.setHostNameDinamically(hostName);
       //this.setThemeSetting(themedata);
+    } else {
+      this.dataShareService.getServerEndPoint(true);
     }
   }
   
@@ -138,6 +151,9 @@ export class EnvService {
   getHostName(key:string){
     let mydocument:any = this.document;
     return mydocument.location[key];
+  }
+  getServerHostname(){
+    return this.serverHostname;
   }
 
   setGoogleLocation(geolocation:any){
@@ -202,6 +218,5 @@ export class EnvService {
   getVerifyType(){
     return this.storageService.getClientCodeEnviorment().verify_type;
   }
-  
-  
+
 }
