@@ -336,8 +336,8 @@ export class DataShareService {
   shareServerHostName(serverHostname:any){
     this.serverHostname.next(serverHostname);
   }
-  getServerEndPoint(){
-    this.serverEndPoint.next(true);
+  getServerEndPoint(req:boolean){
+    this.serverEndPoint.next(req);
   }
    //For App
   collectionData(responce:any){

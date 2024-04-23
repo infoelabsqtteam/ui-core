@@ -114,7 +114,7 @@ export class EnvService {
       this.storageService.setHostNameDinamically(hostName);
       //this.setThemeSetting(themedata);
     } else {
-      this.dataShareService.getServerEndPoint();
+      this.dataShareService.getServerEndPoint(true);
     }
   }
   
