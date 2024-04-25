@@ -7,6 +7,8 @@ import { catchError, debounceTime, distinctUntilChanged, map, tap, switchMap } f
 import { StorageTokenStatus } from '../../shared/enums/storage-token-status.enum';
 import { PLATFORM_NAME } from '../../shared/platform';
 import { Common } from '../../shared/enums/common.enum';
+import { CookiesService } from './cookies.service';
+import { DOCUMENT } from '@angular/common';
 
 
 
@@ -52,8 +54,10 @@ export class StorageService {
   constructor(
     private http: HttpClient,
     @Inject('env') private env:any,
+    @Inject(DOCUMENT) private document: Document,
     private encryptionService:EncryptionService,
-    private coreFunctionService:CoreFunctionService
+    private coreFunctionService:CoreFunctionService,
+    private cookiesService:CookiesService
     ) { }
 
   load(): Observable<any>{
@@ -561,11 +565,25 @@ export class StorageService {
   // }
 
   setHostNameDinamically(host:string){
+    let domainName = this.document.location['hostname'];
+
     localStorage.setItem(this.HOST_NAME, host);
+    if(domainName!="localhost" && this.cookiesService.isCookieExpired(domainName)){
+      this.cookiesService.setCookieByName(domainName,host,30);
+    }
   }
 
   getHostNameDinamically(){
-    return localStorage.getItem(this.HOST_NAME);
+    let host = localStorage.getItem(this.HOST_NAME);
+    if(this.coreFunctionService.isNotBlank(host)){ 
+      return host;
+    }else{
+      let domainName = this.document.location['hostname'];
+
+      host = this.cookiesService.getCookieByName(domainName);
+      if (host && host !="") this.setHostNameDinamically(host);
+      return host;
+    }
   }
   getLogoPath(){
     let projectFolderName = this.getApplicationValueByKey('folder')
