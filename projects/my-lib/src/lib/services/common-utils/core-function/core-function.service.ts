@@ -54,12 +54,12 @@ export class CoreFunctionService {
                     if(submenu && submenu.details){
                       submenuObj = submenu.details;
                     }
-                    this.setTabOrPermission(submenu,permissionList);
+                    this.setTabOrPermission(submenu,permissionList,submenuObj);
                     submenuList.push(submenuObj);
                   });
                 }
               }else{
-                this.setTabOrPermission(menu,permissionList);
+                this.setTabOrPermission(menu,permissionList,menuobj);
               }
               if(submenuList && submenuList.length > 0){
                 menuobj['submenu'] = this.sortMenu(submenuList);
@@ -85,11 +85,13 @@ export class CoreFunctionService {
     utvn['rollList'] = rollList;
     return utvn;
   }
-  setTabOrPermission(menu:any,permissionList:any){
+  setTabOrPermission(menu:any,permissionList:any,menuObj:any){
+    let tabList:any=[];
     if(menu && menu.templateTabMap){
       let tabsMap = menu.templateTabMap;
       if(Object.keys(tabsMap).length > 0){
         Object.keys(tabsMap).forEach((tkey,l) => {
+          tabList.push(tkey);
           let tab = tabsMap[tkey];
           if(tkey in permissionList){
             if(tab && tab.access){
@@ -112,6 +114,7 @@ export class CoreFunctionService {
         });
       }
     }
+    menuObj['tabList']=tabList;
   }
   setDefaultIndexForModules(modules:any){
     if(modules?.length>0){
