@@ -49,6 +49,7 @@ export class StorageService {
   CLIENT_NAME:any = 'CLIENT_NAME';
   ALL_TEMPLATE:any = 'ALL_TEMPLATE';
   TEMPLATE_INDEX:any = "TEMPLATE_INDEX";
+  TAB_COUNTS:any="TAB_COUNTS";
 
 
   constructor(
@@ -575,7 +576,7 @@ export class StorageService {
 
   getHostNameDinamically(){
     let host = localStorage.getItem(this.HOST_NAME);
-    if(this.coreFunctionService.isNotBlank(host)){ 
+    if(this.coreFunctionService.isNotBlank(host)){
       return host;
     }else{
       let domainName = this.document.location['hostname'];
@@ -746,6 +747,17 @@ export class StorageService {
       return templateList[name];
     }else{
       return null;
+    }
+  }
+  SetTabCounts(tabCounts: any) {
+    localStorage.setItem(this.TAB_COUNTS, JSON.stringify(tabCounts));
+  }
+  GetTabCounts() {
+    let counts = JSON.parse(<any>localStorage.getItem(this.TAB_COUNTS));
+    if(counts != null){
+      return counts;
+    }else{
+      return {};
     }
   }
 

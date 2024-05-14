@@ -91,8 +91,12 @@ export class CoreFunctionService {
       let tabsMap = menu.templateTabMap;
       if(Object.keys(tabsMap).length > 0){
         Object.keys(tabsMap).forEach((tkey,l) => {
-          tabList.push(tkey);
           let tab = tabsMap[tkey];
+          const modifyTab:any = {};
+          modifyTab['field_name'] = tkey;
+          modifyTab['label'] = tab?.label;
+          modifyTab['grid'] = tab?.grid;
+          tabList.push(modifyTab);
           if(tkey in permissionList){
             if(tab && tab.access){
               let oldPermissoin:Array<string> = permissionList[tkey];

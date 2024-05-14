@@ -115,6 +115,7 @@ gridCountDataCall(payload:object){
 }
 
 setGridCountData(data:any){
+  const localGridCount:any = this.stroageService.GetTabCounts();
   const gridCountData:any = this.dataShareService.getGridCountData();
   const count:any = {};
   const dataCount:any = {};
@@ -122,10 +123,12 @@ setGridCountData(data:any){
     data.forEach((element:any) => {
       gridCountData[element.field] = element.data_size;
       count[element.field] = element.data_size;
+      localGridCount[element.field] = element.data_size;
     });
   }
   dataCount['gridCountData'] = gridCountData;
   dataCount['count'] = count;
+  this.stroageService.SetTabCounts(localGridCount)
   this.dataShareService.shareGridCountData(dataCount);
 }
 resetGridCountAllData(){
