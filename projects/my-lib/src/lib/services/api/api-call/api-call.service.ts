@@ -199,7 +199,7 @@ export class ApiCallService {
     });
     return crList;
   }
-  getTabsCountPyload(tabs:any){
+  getTabsPayloadForCountList(tabs:any){
     let payloads:any = [];
     if(tabs && tabs.length >= 1 ){
       tabs.forEach((element: any) => {
@@ -212,6 +212,10 @@ export class ApiCallService {
         payloads.push(payload);
       });
     }
+    return payloads;
+  }
+  getTabsCountPyload(tabs:any){
+    let payloads = this.getTabsPayloadForCountList(tabs);
     if(payloads && payloads.length > 0){
       this.apiService.getGridCountData(payloads);
     }
@@ -338,7 +342,7 @@ export class ApiCallService {
   }
   getfilterCrlist(headElements:any,formValue:any) {
     const filterList:any = []
-    if(formValue != undefined){
+    if(formValue != undefined && headElements && headElements.length > 0){
       const criteria:any = [];
       headElements.forEach((element: any) => {
         if(element != null && element.type != null){

@@ -108,6 +108,17 @@ getGridCountData(payloads:string){
       }
   )
 }
+getTabCountData(payloads:any){
+  let api = this.envService.getApi('GET_COUNT_DATA');
+  this.http.post(api, payloads).subscribe(
+    (respData:any) => {
+      this.setGridCountData(respData['success'])
+      },
+    (error) => {
+        console.log(error);
+      }
+  )
+}
 
 gridCountDataCall(payload:object){
   let api = this.envService.getApi('GET_COUNT_DATA');

@@ -96,6 +96,9 @@ export class CoreFunctionService {
           modifyTab['field_name'] = tkey;
           modifyTab['label'] = tab?.label;
           modifyTab['grid'] = tab?.grid;
+          if(tab && tab.details && tab.details._id){
+            modifyTab['_id'] = tab.details._id
+          }
           tabList.push(modifyTab);
           if(tkey in permissionList){
             if(tab && tab.access){
