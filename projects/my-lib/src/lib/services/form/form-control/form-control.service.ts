@@ -81,7 +81,7 @@ export class FormControlService {
                         let custmizedKey = this.commonFunctionService.custmizedKey(element);
                         if (!responce.dataListForUpload[custmizedKey]) responce.dataListForUpload[custmizedKey] = {};
                         if (!responce.dataListForUpload[custmizedKey][data.field_name]) responce.dataListForUpload[custmizedKey][data.field_name] = [];
-                        
+
                         responce.dataListForUpload[custmizedKey][data.field_name] = this.fileHandlerService.modifyUploadFiles(JSON.parse(JSON.stringify(object[data.field_name])));
                         //responce.dataListForUpload[custmizedKey][data.field_name] = JSON.parse(JSON.stringify(object[data.field_name]));
                         const value = this.fileHandlerService.modifyFileSetValue(object[data.field_name]);
@@ -478,7 +478,7 @@ export class FormControlService {
             responce.getAddress = true;
             //this.getAddress(responce.latitude,responce.longitude)
           }
-          responce.templateForm.controls[fieldName].setValue(object) 
+          responce.templateForm.controls[fieldName].setValue(object)
         }
         break;
       case "daterange":
