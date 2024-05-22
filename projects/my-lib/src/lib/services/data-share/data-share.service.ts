@@ -85,6 +85,7 @@ export class DataShareService {
   childgridfields:any;
   roleChange:Subject<any> = new Subject<any>();
   dashbordSerchKey:Subject<any> = new Subject<any>();
+  addAndUpdateResponce:Subject<any> = new Subject<any>();
 
   constructor() { }
 
@@ -356,6 +357,9 @@ export class DataShareService {
   }
   shareDashbordSerach(key:string){
     this.dashbordSerchKey.next(key);
+  }
+  shareAddAndUpdateResponce(responce:string){
+    this.addAndUpdateResponce.next(responce);
   }
   //End For App
 
