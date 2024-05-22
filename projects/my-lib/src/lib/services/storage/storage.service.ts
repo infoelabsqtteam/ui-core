@@ -741,9 +741,8 @@ export class StorageService {
   }
   getTemplate(tempName:string,moduleName:string){
     let templateList:any = this.getAllTemplateList();
-    //console.log(templateList);
-    if(templateList && templateList[tempName]){
-      let name = moduleName+"_"+tempName;
+    let name = moduleName+"_"+tempName;
+    if(templateList && templateList[name]){
       return templateList[name];
     }else{
       return null;
