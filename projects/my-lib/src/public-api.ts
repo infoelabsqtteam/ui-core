@@ -50,5 +50,5 @@ export * from './lib/services/download/download.service';
 export * from './lib/services/userPrefrence/user-prefrence.service';
 export * from './lib/services/api/aws-secret-manager/aws-secret-manager.service';
 export * from './lib/services/storage/cookies.service';
-
+export * from './lib/services/router/router.service';
 

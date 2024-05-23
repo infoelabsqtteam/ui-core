@@ -6,6 +6,8 @@ import { CheckIfService } from '../../check-if/check-if.service';
 import { StorageService } from '../../storage/storage.service';
 import { DatePipe,CurrencyPipe } from '@angular/common';
 import { DataShareService } from '../../data-share/data-share.service';
+import { ApiCallService } from '../../api/api-call/api-call.service';
+import { ApiService } from '../../api/api.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -19,7 +21,9 @@ constructor(
   private storageService:StorageService,
   private datePipe: DatePipe,
   private CurrencyPipe: CurrencyPipe,
-  private dataShareService: DataShareService
+  private dataShareService: DataShareService,
+  private apiCallService:ApiCallService,
+  private apiService:ApiService
 ) { }
   modifyGridData(gridData:any,gridColumns:any,field:any,editableGridColumns:any,typegrapyCriteriaList:any){
     let modifiedData = [];
@@ -128,11 +132,11 @@ constructor(
   getGridColumnWidth(column:any,listOfGridFieldName:any) {
     if (column.width && column.width != '0') {
       return column.width;
-    } 
+    }
     // else {
     //   if (listOfGridFieldName.length > 8) {
     //     return '150px';
-    //   } 
+    //   }
       else {
         return '';
       }
@@ -630,20 +634,17 @@ constructor(
       default: return value;
     }
   }
-
   getNoOfItems(grid:any, defaultNoOfItem:any) {
     if(grid && grid.details && grid.details.numberOfItems) {
       defaultNoOfItem = grid.details.numberOfItems;
     }
     return defaultNoOfItem;
   }
-
-
   setOldTabCount(tab:any) {
-    let dataCount:any = {};  
-    let count:any = {};    
+    let dataCount:any = {};
+    let count:any = {};
     let totalDataCount:any = {};
-    const currentTabName = this.storageService.GetActiveMenu()['name'];        
+    const currentTabName = this.storageService.GetActiveMenu()['name'];
     const key = currentTabName+"_"+tab.name;
     totalDataCount = this.dataShareService.getGridCountData();
     let oldDataSize = totalDataCount[key];
@@ -652,8 +653,6 @@ constructor(
     dataCount['gridCountData'] = totalDataCount;
     this.dataShareService.shareGridCountData(dataCount);
   }
-
-
   compareAuditHistoryData(formFieldsData:any,currentObjectData:any,previousObjectData:any){
       let formFields = formFieldsData;
       let currentObj = {};
@@ -675,13 +674,11 @@ constructor(
                 isChanged = true;
               }
             }
-            field['isChanged'] = isChanged; 
+            field['isChanged'] = isChanged;
             formFieldsData[i] = field;
         }
       }
   }
-
-
   copmareListOfFields(fields:any,currentObjectData:any,previousObjectData:any){
     let currentData:any[] = currentObjectData[fields.field_name];
     let previousData:any[] = previousObjectData[fields.field_name];
@@ -713,20 +710,111 @@ constructor(
             }
           }
         }
-        field['isChanged'] = isChanged; 
+        field['isChanged'] = isChanged;
         fields[i] = field;
       }
     }
   }
-
-
-
-
-
-
-
-
-
-
-
+  getPage(page: number,selectContact:any,tabFilterData:any,tab:any,currentMenu:any,headElements:any,filterFormValue:any,sortingColumnName:string,recordId:any,rowId:any,queryParams:any,itemNumOfGrid:any,gridDisable:any,modifyGridData:any,elements:any) {
+    let responce = {
+      "pageNumber":page,
+      "modifyGridData":modifyGridData,
+      "elements":elements
+    }
+    // this.pageNumber = page;
+    let contact:any = {};
+    let leadId = '';
+    if(selectContact != ''){
+      tabFilterData.forEach((element:any) => {
+        if(element._id == selectContact['_id']){
+          contact  = element;
+        }
+      });
+      if(contact['lead'] && contact['lead']._id){
+        leadId = contact['lead']._id;
+      }
+    }
+    const pagePayload:any = this.apiCallService.getPage(page,tab,currentMenu,headElements,filterFormValue,leadId)
+    if(sortingColumnName && sortingColumnName != undefined){
+      pagePayload["path"] = sortingColumnName;
+    }
+    let crList = pagePayload.data.crList;
+    let criteriaList = [];
+    if(recordId){
+      let criteria = "_id;eq;"+recordId+";STATIC";
+      criteriaList.push(criteria);
+    }
+    if(rowId){
+      let criteria = "serialId;eq;"+rowId+";STATIC";
+      criteriaList.push(criteria);
+    }
+    if(Object.keys(queryParams).length > 0){
+      Object.keys(queryParams).forEach(key =>{
+        let criteria = key+";eq;"+queryParams[key]+";STATIC";
+        criteriaList.push(criteria);
+      })
+    }
+    if(criteriaList.length > 0){
+      this.apiCallService.getCriteriaList(criteriaList,{}).forEach((element:any) => {
+        crList.push(element);
+      });
+      pagePayload.data.crList = crList;
+    }
+    pagePayload.data.pageSize = itemNumOfGrid;
+    this.getGridPayloadData(pagePayload,filterFormValue,gridDisable,tab,responce);
+    return responce;
+  }
+  onSort(columnObject:any,filterFormValue:any,gridDisable:boolean,tab:any,modifyGridData:any,elements:any,sortingColumnName:any,sortIcon:any,orderBy:any,headElements:any,currentMenu:any,pageNumber:number,itemNumOfGrid:number) {
+    let responce = {
+      "modifyGridData":modifyGridData,
+      "elements":elements,
+      "sortingColumnName":sortingColumnName,
+      "sortIcon":sortIcon,
+      "orderBy":orderBy
+    }
+    responce.sortingColumnName = responce.orderBy + columnObject.field_name;
+    const value = filterFormValue;
+    const getSortData = {
+      data: {
+        crList: this.apiCallService.getfilterCrlist(headElements,value),
+        refCode: this.storageService.getRefCode(),
+        key2: this.storageService.getAppId(),
+        log: this.storageService.getUserLog(),
+        value: currentMenu.name,
+        pageNo: pageNumber - 1,
+        pageSize: itemNumOfGrid
+      },
+      path: responce.sortingColumnName
+    }
+    //this.store.dispatch(new CusTemGenAction.GetGridData(getSortData))
+    // this.getGridPayloadData(getSortData);
+    this.getGridPayloadData(getSortData,filterFormValue,gridDisable,tab,responce);
+    if (responce.orderBy == '-') {
+      responce.orderBy = '';
+    } else {
+      responce.orderBy = '-';
+    }
+    responce.sortIcon=="down"? (responce.sortIcon="up-alt"): (responce.sortIcon="down");
+    return responce;
+  }
+  applyFilter(modifyGridData:any,elements:any,tab:any,currentMenu:any,headElements:any,filterValue:any,selectContact:any,itemNumOfGrid:any,gridDisable:boolean) {
+    let responce = {
+      "modifyGridData":modifyGridData,
+      "elements":elements,
+      "pageNumber":1
+    }
+    let pagePayload = this.apiCallService.getDataForGrid(responce.pageNumber,tab,currentMenu,headElements,filterValue,selectContact);
+    pagePayload.data.pageSize = itemNumOfGrid;
+    this.getGridPayloadData(pagePayload,filterValue,gridDisable,tab,responce);
+    return responce;
+  }
+  getGridPayloadData(pagePayload:any,value:any,gridDisable:boolean,tab:any,responce:any) {
+    if(this.checkIfService.checkCallGridData(value,gridDisable)){
+      this.apiService.getGridData(pagePayload);
+    }else {
+      responce.modifyGridData = [];
+      responce.elements = [];
+      this.setOldTabCount(tab);
+    }
+  }
 }

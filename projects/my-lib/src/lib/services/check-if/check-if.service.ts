@@ -2,6 +2,7 @@ import { StorageService } from './../storage/storage.service';
 import { Injectable } from '@angular/core';
 import { UntypedFormGroup, Validators } from '@angular/forms';
 import { CommonFunctionService } from '../common-utils/common-function.service';
+import { NotificationService } from '../notify/notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,8 @@ export class CheckIfService {
 
   constructor(
     private commonFunctionService:CommonFunctionService,
-    private storageService:StorageService
+    private storageService:StorageService,
+    private notificationService:NotificationService
   ) { }
   checkIsDisable(parent:any,chield:any,updateMode:boolean,formValue:any,templateForm:UntypedFormGroup){
     let responce = {
@@ -746,6 +748,33 @@ export class CheckIfService {
       check = true;
     }
     return check;
+  }
+
+  checkUpdatePermission(rowdata:any,details:any){
+    if(details && details.permission_key && details.permission_key != '' && details.permission_value && details.permission_value != ''){
+      const value = this.commonFunctionService.getObjectValue(details.permission_key,rowdata)
+      if(value == details.permission_value){
+        this.notificationService.notify("btn-danger","Cannot be update!!!")
+        return true;
+      }else{
+        return false;
+      }
+    }else{
+      return false;
+    }
+  }
+
+  checkFieldsAvailability(formName:string,tab:any,gridButtons:any){
+    if(tab && tab.forms){
+      let form = this.commonFunctionService.getForm(tab.forms,formName,gridButtons);
+      if(form['tableFields'] && form['tableFields'] != undefined && form['tableFields'] != null){
+        return true;
+      }else{
+        return false;
+      }
+    }else{
+      return false;
+    }
   }
 
 }
