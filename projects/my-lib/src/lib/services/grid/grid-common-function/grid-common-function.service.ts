@@ -199,7 +199,11 @@ constructor(
             const cData = data[fieldName];
             if(Array.isArray(cData) && cData.length > 0){
               const gridColumns = element.gridColumns;
-              const modifyList = this.modifyGridData(cData,gridColumns,element,[],[]);
+              let typegrapyCriteriaList = [];
+              if(element['colorCriteria'] && element['colorCriteria'].length > 0){
+                typegrapyCriteriaList = element['colorCriteria'];
+              }
+              const modifyList = this.modifyGridData(cData,gridColumns,element,[],typegrapyCriteriaList);
               modifyData[fieldName] = modifyList;
               element.gridColumns = this.modifyGridColumns(gridColumns,object);
               modifyObject.field_index = i;
