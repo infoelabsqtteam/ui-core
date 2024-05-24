@@ -21,7 +21,6 @@ export class ApiCallResponceService {
         msg : "",
         class : ""
       },
-      saveDuplicateData: false,
       showNotify:showNotify,
       updateMode:updateMode,
       next:false,
