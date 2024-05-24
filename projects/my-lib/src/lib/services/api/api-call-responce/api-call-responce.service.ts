@@ -113,15 +113,7 @@ export class ApiCallResponceService {
         result.showNotify = false;
         result.dataSaveInProgress = true;
         result.resetResponce = true;
-      }else if (saveFromDataRsponce.confirmationRequired && saveFromDataRsponce.confirmationRequired != '' && result.showNotify) {
-        result.message.msg = saveFromDataRsponce.confirmationRequired;
-        result.message.class = "bg-warning";
-        result.showNotify = false;
-        result.dataSaveInProgress = true;
-        result.resetResponce = true;
-        result.saveDuplicateData= true;
-      }
-      else{
+      }else{
         if(result.showNotify){
           result.showNotify = false;
           result.message.msg = "No data return";
