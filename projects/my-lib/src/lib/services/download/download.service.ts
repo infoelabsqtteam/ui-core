@@ -36,7 +36,7 @@ export class DownloadService {
     link.remove();
   }
 
-  exportCsv(tempNme:any,headElements:any[],tab:any,currentMenu:any,userInfo:any,filterForm: FormGroup){
+  exportCsv(tempNme:any,headElements:any[],tab:any,currentMenu:any,userInfo:any,filterForm:any){
     let fiteredList: any[]=[];
     headElements.forEach(element => {
       if(element && element.display){
