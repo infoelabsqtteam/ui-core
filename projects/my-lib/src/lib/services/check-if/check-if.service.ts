@@ -634,7 +634,7 @@ export class CheckIfService {
       let alreadyExist = false;
       if(typeof incomingData == 'object'){
         alreadyDataAddedlist.forEach((element:any) => {
-          if(element._id == incomingData._id){
+          if(element._id && element._id == incomingData._id){
             alreadyExist =  true;
           }
         });

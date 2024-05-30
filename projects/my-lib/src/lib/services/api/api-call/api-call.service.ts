@@ -565,6 +565,36 @@ export class ApiCallService {
     this.apiService.getAplicationsThemeSetting(payload);
   }
   getDataForGrid(page:any,tab:any,currentMenu:any,headElements:any,filterForm:any,selectContact:any){
+    // let grid_api_params_criteria = [];
+    // if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
+    //   this.itemNumOfGrid = tab.grid.grid_page_size;
+    // }
+    // if(this.checkIfService.isGridFieldExist(tab,"api_params_criteria")){
+    //   grid_api_params_criteria = tab.grid.api_params_criteria;
+    // }
+    //const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
+    let  crList=[];
+    this.getfilterCrlist(headElements,filterForm).forEach((element: any) => {
+      crList.push(element);
+    });
+    if(selectContact != ''){
+      const tabFilterCrlist = {
+        "fName": 'account._id',
+        "fValue": selectContact,
+        "operator": 'eq'
+      }
+      crList.push(tabFilterCrlist);
+    }
+    return this.getDataForGridFilter(page,tab,currentMenu,crList);
+    // const getFilterData = {
+    //   data: data,
+    //   path: null
+    // }
+    // return getFilterData;
+  }
+
+
+  getDataForGridFilter(page:any,tab:any,currentMenu:any,crList:any){
     let grid_api_params_criteria = [];
     if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
       this.itemNumOfGrid = tab.grid.grid_page_size;
@@ -573,16 +603,9 @@ export class ApiCallService {
       grid_api_params_criteria = tab.grid.api_params_criteria;
     }
     const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
-    this.getfilterCrlist(headElements,filterForm).forEach((element: any) => {
-      data.crList.push(element);
-    });
-    if(selectContact != ''){
-      const tabFilterCrlist = {
-        "fName": 'account._id',
-        "fValue": selectContact,
-        "operator": 'eq'
-      }
-      data.crList.push(tabFilterCrlist);
+
+    if(crList && crList.length>0){
+      data.crList = crList;
     }
     const getFilterData = {
       data: data,
