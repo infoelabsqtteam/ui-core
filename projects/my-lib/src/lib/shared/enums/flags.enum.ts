@@ -13,5 +13,6 @@ export enum Flags {
     CreateFilterFormgroup = 'createFilterFormgroup',
     CreateFilterHeadElement = 'createFilterHeadElement',
     UpdateNotification = 'updateNotification',
-    HeavyDownload = 'heavyDownload'
+    HeavyDownload = 'heavyDownload',
+    IsAdFilter = 'isAdFilter'
   }

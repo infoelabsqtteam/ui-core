@@ -48,5 +48,6 @@ export enum Config {
     TypegrapyCriteriaList = 'typegrapyCriteriaList',
     PreviewData = 'previewData',
     DownloadClick = 'downloadClick',
-    Forms = 'forms'    
+    Forms = 'forms',
+    AdFilterList = 'adFilterList'
 }

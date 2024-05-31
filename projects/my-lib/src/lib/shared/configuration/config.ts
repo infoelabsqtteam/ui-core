@@ -19,6 +19,7 @@ export const AppConfig = {
     [Flags.CreateFilterHeadElement] : true,
     [Flags.UpdateNotification] : true,
     [Flags.HeavyDownload] : false,
+    [Flags.IsAdFilter] : false,
 
     //All configuration varaiable default value assigned
     [Config.Fixedcolwidth] : 150,
@@ -70,7 +71,8 @@ export const AppConfig = {
     [Config.TypegrapyCriteriaList] : [],
     [Config.PreviewData] : '',
     [Config.DownloadClick] : '',
-    [Config.Forms] : {}
+    [Config.Forms] : {},
+    [Config.AdFilterList] : []
  };
 
  export interface AppConfigInterface {
@@ -89,6 +91,7 @@ export const AppConfig = {
     createFilterHeadElement:boolean,
     updateNotification:boolean,
     heavyDownload:boolean,
+    isAdFilter:boolean,
 
     fixedcolwidth:any,
     sortingColumnName:any,
@@ -140,4 +143,5 @@ export const AppConfig = {
     previewData:any,
     downloadClick:any,
     forms:any,
+    adFilterList:any
   }
