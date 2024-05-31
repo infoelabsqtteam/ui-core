@@ -1082,6 +1082,22 @@ export class CommonFunctionService {
 
      return obj;
    }
+   getDay(data:any):String{
+    let createdDate = data.createdDate;
+    if(createdDate){
+      let obj = this.dateDiff(createdDate);
+      if(obj && obj['days'] == 0){
+        if(obj['hours'] == 0){
+          return obj['minutes']+" Minutes ago";
+        }else{        
+          return obj['hours'] +" hours "+obj['minutes']+" Minutes ago";
+        }      
+      }else{
+        return obj['days'] +" days ago";
+      }
+    }
+    return "";
+  }
   updateFieldInList(fieldName:any,list:any){
     let modifyList:any = [];
     if(list && list.length > 0){

@@ -118,6 +118,7 @@ constructor(
             case "image":
             case "icon":
             case "download_file":
+            case "redirect":
             case "color":
               field['hideCopy']=true;
               break;
@@ -550,6 +551,16 @@ constructor(
           return '<span class="material-symbols-outlined cursor-pointer">' + field.field_class + '</span>';
         }else{
           return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';
+        }
+      case "redirect":
+        if (value && value != '') {
+          if(this.storageService.checkPlatForm() == 'mobile'){
+            return '<i class="fa fa-external-link" aria-hidden="true"></i>';
+          }else{
+            return '<i class="fa fa-external-link" aria-hidden="true"></i>';
+          }
+        }else{
+          return '-';
         }
       case "download_file":
         if (value && value != '') {

@@ -549,8 +549,10 @@ export class ApiCallService {
     let user = this.storageService.GetUserInfo();
     const userId = user._id;
     if(userId && userId != null && userId != ''){
-      const criteria:any = "userId._id;eq;"+userId+";STATIC";
-      const payload = this.setPageNoAndSize(this.getPaylodWithCriteria('user_notification','',[criteria],{}),pageNo);
+      let criteraiList:any=[];
+      criteraiList.push("userId._id;eq;"+userId+";STATIC");
+      criteraiList.push("notificationStatus;eq;UNREAD;STATIC");
+      const payload = this.setPageNoAndSize(this.getPaylodWithCriteria('user_notification_master','',criteraiList,{}),pageNo);
       const callPayload = {
         "path" : null,
         "data": payload
@@ -558,6 +560,10 @@ export class ApiCallService {
       this.apiService.getUserNotification(callPayload);
     }
   }
+    getUserNotificationSetting(){
+    this.apiService.getUserNotificationSetting();
+  }
+
   getApplicationAllSettings() {
     const payload1 = this.setPageNoAndSize(this.getPaylodWithCriteria("application_setting", "", [], {}), 1);
     this.apiService.getAplicationsSetting(payload1);

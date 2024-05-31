@@ -65,6 +65,7 @@ export class DataShareService {
   auditVersionList:Subject<any> = new Subject<any>();
   applicationSettings:Subject<any> = new Subject<any>();
   userNotification:Subject<any> = new Subject<any>();
+  userNotificationSetting:Subject<any> = new Subject<any>();
   userPreference:Subject<any> = new Subject<any>();
   moduleIndex:Subject<any> = new Subject<any>();
   menuIndexs:Subject<any> = new Subject<any>();
@@ -299,6 +300,9 @@ export class DataShareService {
 
   shareUserNotification(responce:any){
     this.userNotification.next(responce);
+  }
+  shareUserNotificationSetting(responce:any){
+    this.userNotificationSetting.next(responce);
   }
   setUserPreference(userPreference:any){
     this.userPreference.next(userPreference);
