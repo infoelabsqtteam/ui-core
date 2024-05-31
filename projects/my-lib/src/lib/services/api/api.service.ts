@@ -108,6 +108,17 @@ getGridCountData(payloads:string){
       }
   )
 }
+getTabCountData(payloads:any){
+  let api = this.envService.getApi('GET_COUNT_DATA');
+  this.http.post(api, payloads).subscribe(
+    (respData:any) => {
+      this.setGridCountData(respData['success'])
+      },
+    (error) => {
+        console.log(error);
+      }
+  )
+}
 
 gridCountDataCall(payload:object){
   let api = this.envService.getApi('GET_COUNT_DATA');
@@ -115,6 +126,7 @@ gridCountDataCall(payload:object){
 }
 
 setGridCountData(data:any){
+  const localGridCount:any = this.stroageService.GetTabCounts();
   const gridCountData:any = this.dataShareService.getGridCountData();
   const count:any = {};
   const dataCount:any = {};
@@ -122,10 +134,12 @@ setGridCountData(data:any){
     data.forEach((element:any) => {
       gridCountData[element.field] = element.data_size;
       count[element.field] = element.data_size;
+      localGridCount[element.field] = element.data_size;
     });
   }
   dataCount['gridCountData'] = gridCountData;
   dataCount['count'] = count;
+  this.stroageService.SetTabCounts(localGridCount)
   this.dataShareService.shareGridCountData(dataCount);
 }
 resetGridCountAllData(){

@@ -84,6 +84,10 @@ export class DataShareService {
   childGrid:Subject<any> = new Subject<any>();
   childgridfields:any;
   roleChange:Subject<any> = new Subject<any>();
+  dashbordSerchKey:Subject<any> = new Subject<any>();
+  addAndUpdateResponce:Subject<any> = new Subject<any>();
+  private selectedRowIndexSource = new BehaviorSubject<number | null>(null);
+  selectedRowIndex$ = this.selectedRowIndexSource.asObservable();
 
   constructor() { }
 
@@ -352,6 +356,15 @@ export class DataShareService {
   }
   shareRoleChange(role:any){
     this.roleChange.next(role);
+  }
+  shareDashbordSerach(key:string){
+    this.dashbordSerchKey.next(key);
+  }
+  shareAddAndUpdateResponce(responce:string){
+    this.addAndUpdateResponce.next(responce);
+  }
+  updateSelectedRowIndex(index: number) {
+    this.selectedRowIndexSource.next(index);
   }
   //End For App
 

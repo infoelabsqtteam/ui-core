@@ -35,10 +35,12 @@ export * from './lib/shared/enums/common.enum';
 export * from './lib/shared/enums/end-point.enum';
 export * from './lib/shared/enums/storage-token-status.enum';
 export * from './lib/shared/enums/keycodes.enum';
+export * from './lib/shared/enums/operator_type.enum';
 export * from './lib/services/data-share/auth-data-share/auth-data-share.service';
 export * from './lib/services/data-share/common-app-data-share/common-app-data-share.service';
 export * from './lib/services/fileHandler/file-handler.service';
 export * from './lib/shared/configuration/editor-config';
+export * from './lib/shared/configuration/config';
 export * from './lib/services/form/form-creation/form-creation.service';
 export * from './lib/services/form/form-value/form-value.service';
 export * from './lib/services/api/api-call/api-call.service';
@@ -50,5 +52,5 @@ export * from './lib/services/download/download.service';
 export * from './lib/services/userPrefrence/user-prefrence.service';
 export * from './lib/services/api/aws-secret-manager/aws-secret-manager.service';
 export * from './lib/services/storage/cookies.service';
-
+export * from './lib/services/router/router.service';
 

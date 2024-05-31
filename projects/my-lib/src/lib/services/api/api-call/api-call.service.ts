@@ -199,7 +199,7 @@ export class ApiCallService {
     });
     return crList;
   }
-  getTabsCountPyload(tabs:any){
+  getTabsPayloadForCountList(tabs:any){
     let payloads:any = [];
     if(tabs && tabs.length >= 1 ){
       tabs.forEach((element: any) => {
@@ -212,6 +212,10 @@ export class ApiCallService {
         payloads.push(payload);
       });
     }
+    return payloads;
+  }
+  getTabsCountPyload(tabs:any){
+    let payloads = this.getTabsPayloadForCountList(tabs);
     if(payloads && payloads.length > 0){
       this.apiService.getGridCountData(payloads);
     }
@@ -338,7 +342,7 @@ export class ApiCallService {
   }
   getfilterCrlist(headElements:any,formValue:any) {
     const filterList:any = []
-    if(formValue != undefined){
+    if(formValue != undefined && headElements && headElements.length > 0){
       const criteria:any = [];
       headElements.forEach((element: any) => {
         if(element != null && element.type != null){
@@ -561,6 +565,36 @@ export class ApiCallService {
     this.apiService.getAplicationsThemeSetting(payload);
   }
   getDataForGrid(page:any,tab:any,currentMenu:any,headElements:any,filterForm:any,selectContact:any){
+    // let grid_api_params_criteria = [];
+    // if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
+    //   this.itemNumOfGrid = tab.grid.grid_page_size;
+    // }
+    // if(this.checkIfService.isGridFieldExist(tab,"api_params_criteria")){
+    //   grid_api_params_criteria = tab.grid.api_params_criteria;
+    // }
+    //const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
+    let  crList=[];
+    this.getfilterCrlist(headElements,filterForm).forEach((element: any) => {
+      crList.push(element);
+    });
+    if(selectContact != ''){
+      const tabFilterCrlist = {
+        "fName": 'account._id',
+        "fValue": selectContact,
+        "operator": 'eq'
+      }
+      crList.push(tabFilterCrlist);
+    }
+    return this.getDataForGridFilter(page,tab,currentMenu,crList);
+    // const getFilterData = {
+    //   data: data,
+    //   path: null
+    // }
+    // return getFilterData;
+  }
+
+
+  getDataForGridFilter(page:any,tab:any,currentMenu:any,crList:any){
     let grid_api_params_criteria = [];
     if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
       this.itemNumOfGrid = tab.grid.grid_page_size;
@@ -569,16 +603,9 @@ export class ApiCallService {
       grid_api_params_criteria = tab.grid.api_params_criteria;
     }
     const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
-    this.getfilterCrlist(headElements,filterForm).forEach((element: any) => {
-      data.crList.push(element);
-    });
-    if(selectContact != ''){
-      const tabFilterCrlist = {
-        "fName": 'account._id',
-        "fValue": selectContact,
-        "operator": 'eq'
-      }
-      data.crList.push(tabFilterCrlist);
+
+    if(crList && crList.length>0){
+      data.crList = crList;
     }
     const getFilterData = {
       data: data,
