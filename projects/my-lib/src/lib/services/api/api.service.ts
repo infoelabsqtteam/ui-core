@@ -708,6 +708,18 @@ getUserNotification(payload:any){
       }
   )
 }
+
+getUserNotificationSetting(){
+  let api = this.envService.getApi('GET_NOTIFICATION_SETTING');
+  this.http.post(api,{}).subscribe(
+    (respData) => {
+        this.dataShareService.shareUserNotificationSetting(respData)
+      },
+    (error) => {
+        console.log(error);
+      }
+  )
+}
 resetUserNotification(){
   this.dataShareService.shareUserNotification([])
 }
