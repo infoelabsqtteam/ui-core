@@ -124,7 +124,7 @@ export class CustomvalidationService {
           if (this.validatePattern(gstin)) {
             const check = gstin[14];
             const checkCondition = check === this.calcCheckSum(gstin.toUpperCase())
-            if(checkCondition){
+            if(this.validatePattern(gstin)){
               resolve(null);
               const object = {
                 "name" : "gst_number",
@@ -175,7 +175,7 @@ export class CustomvalidationService {
   validatePattern(gstin:any) {
     // eslint-disable-next-line max-len
     // var gstinRegexPattern = /^([0-2][0-9]|[3][0-8])[A-Z]{3}[ABCFGHLJPTK][A-Z]\d{4}[A-Z][A-Z0-9][Z][A-Z0-9]$/;
-    const regex = new RegExp('^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$');
+    const regex = new RegExp('^[0-9]{2}[A-Z]{4}[A-Z0-9]{1}[0-9]{4}[A-Z]{1}[1-9]{1}[A-Z]{1}[A-Z0-9]{1}$');
     const valid = regex.test(gstin);
     return valid;
     //return gstinRegexPattern.test(gstin);
