@@ -21,6 +21,7 @@ export class ApiCallResponceService {
         msg : "",
         class : ""
       },
+      saveDuplicateData: false,
       showNotify:showNotify,
       updateMode:updateMode,
       next:false,
@@ -39,7 +40,7 @@ export class ApiCallResponceService {
         getFormData:{},
         url:""
       }
-    }
+    }  
     if (saveFromDataRsponce) {
       if (saveFromDataRsponce.success && saveFromDataRsponce.success != '' && result.showNotify) {
         if (saveFromDataRsponce.success == 'success') {
@@ -112,7 +113,15 @@ export class ApiCallResponceService {
         result.showNotify = false;
         result.dataSaveInProgress = true;
         result.resetResponce = true;
-      }else{
+      }else if (saveFromDataRsponce.confirmationRequired && saveFromDataRsponce.confirmationRequired != '' && result.showNotify) {
+        result.message.msg = saveFromDataRsponce.confirmationRequired;
+        result.message.class = "bg-warning";
+        result.showNotify = false;
+        result.dataSaveInProgress = true;
+        result.resetResponce = true;
+        result.saveDuplicateData= true;
+      }
+      else{
         if(result.showNotify){
           result.showNotify = false;
           result.message.msg = "No data return";
