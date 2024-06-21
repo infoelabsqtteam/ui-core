@@ -124,7 +124,7 @@ export class CustomvalidationService {
           if (this.validatePattern(gstin)) {
             const check = gstin[14];
             const checkCondition = check === this.calcCheckSum(gstin.toUpperCase())
-            if(this.validatePattern(gstin)){
+            if(checkCondition){
               resolve(null);
               const object = {
                 "name" : "gst_number",
