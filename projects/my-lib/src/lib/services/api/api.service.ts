@@ -52,7 +52,7 @@ staticDataCall(payload:object){
 setStaticData(data:any){
   const staticData:any = this.dataShareService.getStatiData();
   const currentData:any = {};
-  if(data.length > 0){
+  if(data && data.length > 0){
     data.forEach((element:any) => {
       if(element.adkeys){
           if(element.adkeys.totalRows && element.adkeys.totalRows != ''){
@@ -76,7 +76,7 @@ setStaticData(data:any){
       }
     });
   }
-  if(data['staticDataMessgae'] != null && data['staticDataMessgae'] != ''){
+  if(data && data['staticDataMessgae'] != null && data['staticDataMessgae'] != ''){
     staticData['staticDataMessgae'] = data['staticDataMessgae'];
     currentData['staticDataMessgae'] = data['staticDataMessgae'];
   }
