@@ -21,18 +21,18 @@ constructor(
   private CurrencyPipe: CurrencyPipe,
   private dataShareService: DataShareService
 ) { }
-  modifyGridData(gridData:any,gridColumns:any,field:any,editableGridColumns:any,typegrapyCriteriaList:any){
+  modifyGridData(gridData:any,gridColumns:any,field:any,editableGridColumns:any,typographyCrList:any){
     let modifiedData = [];
     if(gridColumns.length > 0){
       for (let i = 0; i < gridData.length; i++) {
         const row = gridData[i];
-        let modifyRow = this.rowModify(row,field,gridColumns,editableGridColumns,typegrapyCriteriaList);
+        let modifyRow = this.rowModify(row,field,gridColumns,editableGridColumns,typographyCrList);
         modifiedData.push(modifyRow);
       }
     }
     return modifiedData;
   }
-  rowModify(row:any,field:any,gridColumns:any,editableGridColumns:any,typegrapyCriteriaList:any){
+  rowModify(row:any,field:any,gridColumns:any,editableGridColumns:any,typographyCrList:any){
     let modifyRow = JSON.parse(JSON.stringify(row));
     modifyRow["disabled"] = this.checkIfService.checkRowIf(row,field);
     for (let j = 0; j < gridColumns.length; j++) {
@@ -60,8 +60,8 @@ constructor(
     if(editableGridColumns && editableGridColumns.length == 0 && field && Object.keys(field).length > 0){
       modifyRow['actionBtnDisplay'] = this.checkRowDisabledIf(field,row);
     }
-    if(typegrapyCriteriaList && typegrapyCriteriaList.length > 0){
-      modifyRow['background-color'] = this.checkTypgraphCondition(typegrapyCriteriaList,row,'background-color');
+    if(typographyCrList && typographyCrList.length > 0){
+      modifyRow['background-color'] = this.checkTypgraphCondition(typographyCrList,row,'background-color');
     }
     return modifyRow;
   }
@@ -128,11 +128,11 @@ constructor(
   getGridColumnWidth(column:any,listOfGridFieldName:any) {
     if (column.width && column.width != '0') {
       return column.width;
-    } 
+    }
     // else {
     //   if (listOfGridFieldName.length > 8) {
     //     return '150px';
-    //   } 
+    //   }
       else {
         return '';
       }
@@ -199,7 +199,11 @@ constructor(
             const cData = data[fieldName];
             if(Array.isArray(cData) && cData.length > 0){
               const gridColumns = element.gridColumns;
-              const modifyList = this.modifyGridData(cData,gridColumns,element,[],[]);
+              let typographyCrList = [];
+              if(element['colorCriteria'] && element['colorCriteria'].length > 0){
+                typographyCrList = element['colorCriteria'];
+              }
+              const modifyList = this.modifyGridData(cData,gridColumns,element,[],typographyCrList);
               modifyData[fieldName] = modifyList;
               element.gridColumns = this.modifyGridColumns(gridColumns,object);
               modifyObject.field_index = i;
@@ -319,13 +323,13 @@ constructor(
     }
     return true;
   }
-  checkTypgraphCondition(typegrapyCriteriaList:any,object:any,name:any){
+  checkTypgraphCondition(typographyCrList:any,object:any,name:any){
     let background = '';
-    if(typegrapyCriteriaList && typegrapyCriteriaList.length >= 1){
+    if(typographyCrList && typographyCrList.length >= 1){
       let criteriaMatched = false;
       let matchedelement:any = {};
-      for (let index = 0; index < typegrapyCriteriaList.length; index++) {
-        const element = typegrapyCriteriaList[index];
+      for (let index = 0; index < typographyCrList.length; index++) {
+        const element = typographyCrList[index];
         let crList = element['crList'];
         let childConditionsMatched = false;
         for (let j = 0; j < crList.length; j++) {
@@ -339,7 +343,7 @@ constructor(
           }
         }
         if(childConditionsMatched){
-          matchedelement = typegrapyCriteriaList[index]
+          matchedelement = typographyCrList[index]
           criteriaMatched = true;
           break;
         }else{
@@ -644,10 +648,10 @@ constructor(
 
 
   setOldTabCount(tab:any) {
-    let dataCount:any = {};  
-    let count:any = {};    
+    let dataCount:any = {};
+    let count:any = {};
     let totalDataCount:any = {};
-    const currentTabName = this.storageService.GetActiveMenu()['name'];        
+    const currentTabName = this.storageService.GetActiveMenu()['name'];
     const key = currentTabName+"_"+tab.name;
     totalDataCount = this.dataShareService.getGridCountData();
     let oldDataSize = totalDataCount[key];
@@ -679,7 +683,7 @@ constructor(
                 isChanged = true;
               }
             }
-            field['isChanged'] = isChanged; 
+            field['isChanged'] = isChanged;
             formFieldsData[i] = field;
         }
       }
@@ -717,7 +721,7 @@ constructor(
             }
           }
         }
-        field['isChanged'] = isChanged; 
+        field['isChanged'] = isChanged;
         fields[i] = field;
       }
     }
