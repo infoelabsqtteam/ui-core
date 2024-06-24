@@ -199,7 +199,11 @@ constructor(
             const cData = data[fieldName];
             if(Array.isArray(cData) && cData.length > 0){
               const gridColumns = element.gridColumns;
-              const modifyList = this.modifyGridData(cData,gridColumns,element,[],[]);
+              let typegrapyCriteriaList = [];
+              if(element['colorCriteria'] && element['colorCriteria'].length > 0){
+                typegrapyCriteriaList = element['colorCriteria'];
+              }
+              const modifyList = this.modifyGridData(cData,gridColumns,element,[],typegrapyCriteriaList);
               modifyData[fieldName] = modifyList;
               element.gridColumns = this.modifyGridColumns(gridColumns,object);
               modifyObject.field_index = i;
@@ -281,7 +285,11 @@ constructor(
       case "list_of_fields":
         if (Array.isArray(listOfField[item.field_name]) && listOfField[item.field_name].length > 0 && listOfField[item.field_name] != null && listOfField[item.field_name] != undefined && listOfField[item.field_name] != '') {
           item['hideCopy']=true;
-          return '<i class="fa fa-eye cursor-pointer"></i>';
+          if(this.storageService.checkPlatForm() == 'mobile'){
+            return '<span class="material-symbols-outlined cursor-pointer">visibility</span>';
+          }else{
+            return '<i class="fa fa-eye cursor-pointer"></i>';
+          }
         } else {
           return '-';
         }
