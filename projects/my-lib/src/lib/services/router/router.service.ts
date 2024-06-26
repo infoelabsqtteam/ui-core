@@ -43,14 +43,14 @@ export class RouterService {
         })
       }
       if(routeQuery && routeQuery != ''){
-        this._location.go(currentBrowseUrl+"?"+routeQuery);
+        this._location.go(responce.currentBrowseUrl+"?"+routeQuery);
       }else {
-        this._location.go(currentBrowseUrl);
+        this._location.go(responce.currentBrowseUrl);
       }
     }else{
-      let routUrl = currentBrowseUrl;
-      if(currentBrowseUrl != ''){
-        let url = currentBrowseUrl.split('?');
+      let routUrl = responce.currentBrowseUrl;
+      if(responce.currentBrowseUrl != ''){
+        let url = responce.currentBrowseUrl.split('?');
         if(url && url.length > 0){
           routUrl = url[0];
         }
