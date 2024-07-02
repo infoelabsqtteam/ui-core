@@ -557,9 +557,9 @@ constructor(
           return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';
         }
       case "redirect":
-        if (value && value != '') {
+        if (value) {
           if(this.storageService.checkPlatForm() == 'mobile'){
-            return '<i class="fa fa-external-link" aria-hidden="true"></i>';
+            return '<span class="fa fa-external-link" aria-hidden="true"></span>';
           }else{
             return '<i class="fa fa-external-link" aria-hidden="true"></i>';
           }

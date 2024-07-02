@@ -432,7 +432,7 @@ constructor(
   }
   getModulesFromObject(obj: any) {
     let modules: any[] = [];
-    
+
     const processModule = (moduleKey: string, module: any) => {
       let moduleObj: any = { keyName: moduleKey };
       if (module.reference) {
@@ -442,7 +442,7 @@ constructor(
       moduleObj.menu_list = this.getMenuList(module.menus);
       modules.push(moduleObj);
     };
-  
+
     if (obj.notifications) {
       obj = obj.notifications;
       if (obj && Object.keys(obj).length > 0) {
@@ -451,7 +451,7 @@ constructor(
         });
       }
     }
-  
+
     return modules;
   }
 
@@ -464,7 +464,7 @@ constructor(
           menuObj = { ...menuObj, ...menu.reference };
         }
         menuObj.submenu = this.getMenuList(menu.submenus);
-        if(!menuObj?.submenu){menuObj.templateTabs = this.getTabList(menu.templateTabs);} 
+        if(!menuObj?.submenu){menuObj.templateTabs = this.getTabList(menu.templateTabs);}
         menuList.push(menuObj);
       });
     }
@@ -524,11 +524,11 @@ getTempDetails(tabs:any){
   let obj:any={};
   tabs.forEach((tab:any)=>{
     if(tab){
-      let tabName=tab.keyName;
+      let tabName=tab?.keyName;
       let tabDetails={
         reference:{
-          name:tab.name,
-          _id:tab._id
+          name:tab?.name,
+          _id:tab?._id
         },
         activeAlerts:this.getActiveAlerts(tab)
       }

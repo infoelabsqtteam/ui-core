@@ -97,8 +97,8 @@ export class DownloadService {
           grid_api_params_criteria = tab.grid.api_params_criteria;
         }
         const data = this.apiCallService.getPaylodWithCriteria(menuName,'',grid_api_params_criteria,'');
-        if(tab && tab.grid){
-          if(tab.grid.export_template && tab.grid.export_template != null){
+        if(tab && tab?.grid){
+          if(tab?.grid?.export_template){
             gridName = tab.grid.export_template;
           }else{
             gridName = tab.grid._id;

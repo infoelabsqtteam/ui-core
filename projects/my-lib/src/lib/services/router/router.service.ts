@@ -25,7 +25,7 @@ export class RouterService {
     let routeQuery = '';
     let routeQueryCriteri = ['serialId'];
     responce.currentBrowseUrl = this.getCurrentBrowseUrl();
-    if(record != ""){
+    if(record){
       let queryList:any = [];
       routeQueryCriteri.forEach((criteria:any) => {
         if(record && record[criteria]){
@@ -42,14 +42,14 @@ export class RouterService {
           }
         })
       }
-      if(routeQuery && routeQuery != ''){
+      if(routeQuery){
         this._location.go(responce.currentBrowseUrl+"?"+routeQuery);
       }else {
         this._location.go(responce.currentBrowseUrl);
       }
     }else{
       let routUrl = responce.currentBrowseUrl;
-      if(responce.currentBrowseUrl != ''){
+      if(responce?.currentBrowseUrl){
         let url = responce.currentBrowseUrl.split('?');
         if(url && url.length > 0){
           routUrl = url[0];

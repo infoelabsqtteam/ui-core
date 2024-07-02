@@ -839,10 +839,10 @@ export class FormCreationService {
       form = null
     }
     if(form != null){
-      if(form['tableFields'] && form['tableFields'] != undefined && form['tableFields'] != null){
+      if(form?.['tableFields'] && form?.['tableFields']?.length > 0){
         responce.fields = form['tableFields'];
       }
-      if(form['tab_list_buttons'] && form['tab_list_buttons'] != undefined && form['tab_list_buttons'] != null){
+      if(form?.['tab_list_buttons'] && form?.['tab_list_buttons']?.length > 0){
         responce.buttons = form['tab_list_buttons'];
       }
     }

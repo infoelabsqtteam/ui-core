@@ -765,9 +765,9 @@ export class CheckIfService {
   }
 
   checkFieldsAvailability(formName:string,tab:any,gridButtons:any){
-    if(tab && tab.forms){
+    if(tab && tab?.forms){
       let form = this.commonFunctionService.getForm(tab.forms,formName,gridButtons);
-      if(form['tableFields'] && form['tableFields'] != undefined && form['tableFields'] != null){
+      if(form && form?.['tableFields'] && form?.['tableFields']?.length > 0 ){
         return true;
       }else{
         return false;

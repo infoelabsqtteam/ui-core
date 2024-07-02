@@ -754,7 +754,7 @@ export class StorageService {
   }
   GetTabCounts() {
     let counts = JSON.parse(<any>localStorage.getItem(this.TAB_COUNTS));
-    if(counts != null){
+    if(counts){
       return counts;
     }else{
       return {};

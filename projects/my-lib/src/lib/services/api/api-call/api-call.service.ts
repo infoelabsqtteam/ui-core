@@ -602,7 +602,7 @@ export class ApiCallService {
 
   getDataForGridFilter(page:any,tab:any,currentMenu:any,crList:any){
     let grid_api_params_criteria = [];
-    if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
+    if(tab && tab?.grid && tab?.grid?.grid_page_size){
       this.itemNumOfGrid = tab.grid.grid_page_size;
     }
     if(this.checkIfService.isGridFieldExist(tab,"api_params_criteria")){
