@@ -483,10 +483,10 @@ export class CommonFunctionService {
             case "list_of_checkbox":
               if(validatField && element.is_mandatory){
                 if(formValueWithCust[element.field_name] && formValueWithCust[element.field_name].length > 0) {
-                  validatField = false;
+                  validatField = true;
+                }else {
+                  return {'msg': element.label + ' is mandatory. !!!'}
                 }
-              }else {
-                validatField = true;
               }
             break;
             default:
