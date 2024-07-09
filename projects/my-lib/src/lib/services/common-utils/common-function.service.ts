@@ -482,7 +482,7 @@ export class CommonFunctionService {
               break;
             case "list_of_checkbox":
               if(validatField){
-                if(this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length == 0) {
+                if(formValueWithCust[element.field_name] && this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length == 0) {
                   return {'msg': element.label + ' is mandatory. !!!'}
                 }
               }
