@@ -480,6 +480,13 @@ export class CommonFunctionService {
                 }
               }
               break;
+            case "list_of_checkbox":
+              if(validatField && element.is_mandatory){
+                if(formValueWithCust[element.field_name] && this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length == 0) {
+                  return {'msg': element.label + ' is mandatory. !!!'}
+                }
+              }
+            break;
             default:
               if(validatField){
 
@@ -1089,9 +1096,9 @@ export class CommonFunctionService {
       if(obj && obj['days'] == 0){
         if(obj['hours'] == 0){
           return obj['minutes']+" Minutes ago";
-        }else{        
+        }else{
           return obj['hours'] +" hours "+obj['minutes']+" Minutes ago";
-        }      
+        }
       }else{
         return obj['days'] +" days ago";
       }
