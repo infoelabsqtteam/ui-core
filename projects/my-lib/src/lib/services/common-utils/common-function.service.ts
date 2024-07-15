@@ -502,7 +502,7 @@ export class CommonFunctionService {
   applicableForValidation(field:any){
     if(field.is_mandatory){
       if(field.show_if != '' && field.show_if != null){
-        if(field['display']){
+        if(field['display'] || field['show']){
           return true;
         }else{
           return false;
