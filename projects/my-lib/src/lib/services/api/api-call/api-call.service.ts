@@ -199,7 +199,7 @@ export class ApiCallService {
     });
     return crList;
   }
-  getTabsCountPyload(tabs:any){
+  getTabsPayloadForCountList(tabs:any){
     let payloads:any = [];
     if(tabs && tabs.length >= 1 ){
       tabs.forEach((element: any) => {
@@ -212,6 +212,10 @@ export class ApiCallService {
         payloads.push(payload);
       });
     }
+    return payloads;
+  }
+  getTabsCountPyload(tabs:any){
+    let payloads = this.getTabsPayloadForCountList(tabs);
     if(payloads && payloads.length > 0){
       this.apiService.getGridCountData(payloads);
     }
@@ -338,7 +342,7 @@ export class ApiCallService {
   }
   getfilterCrlist(headElements:any,formValue:any) {
     const filterList:any = []
-    if(formValue != undefined){
+    if(formValue != undefined && headElements && headElements.length > 0){
       const criteria:any = [];
       headElements.forEach((element: any) => {
         if(element != null && element.type != null){
@@ -545,8 +549,10 @@ export class ApiCallService {
     let user = this.storageService.GetUserInfo();
     const userId = user._id;
     if(userId && userId != null && userId != ''){
-      const criteria:any = "userId._id;eq;"+userId+";STATIC";
-      const payload = this.setPageNoAndSize(this.getPaylodWithCriteria('user_notification','',[criteria],{}),pageNo);
+      let criteraiList:any=[];
+      criteraiList.push("userId._id;eq;"+userId+";STATIC");
+      criteraiList.push("notificationStatus;eq;UNREAD;STATIC");
+      const payload = this.setPageNoAndSize(this.getPaylodWithCriteria('user_notification_master','',criteraiList,{}),pageNo);
       const callPayload = {
         "path" : null,
         "data": payload
@@ -554,6 +560,10 @@ export class ApiCallService {
       this.apiService.getUserNotification(callPayload);
     }
   }
+    getUserNotificationSetting(){
+    this.apiService.getUserNotificationSetting();
+  }
+
   getApplicationAllSettings() {
     const payload1 = this.setPageNoAndSize(this.getPaylodWithCriteria("application_setting", "", [], {}), 1);
     this.apiService.getAplicationsSetting(payload1);
@@ -561,16 +571,17 @@ export class ApiCallService {
     this.apiService.getAplicationsThemeSetting(payload);
   }
   getDataForGrid(page:any,tab:any,currentMenu:any,headElements:any,filterForm:any,selectContact:any){
-    let grid_api_params_criteria = [];
-    if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
-      this.itemNumOfGrid = tab.grid.grid_page_size;
-    }
-    if(this.checkIfService.isGridFieldExist(tab,"api_params_criteria")){
-      grid_api_params_criteria = tab.grid.api_params_criteria;
-    }
-    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
+    // let grid_api_params_criteria = [];
+    // if(tab.grid && tab.grid.grid_page_size && tab.grid.grid_page_size != null && tab.grid.grid_page_size != ''){
+    //   this.itemNumOfGrid = tab.grid.grid_page_size;
+    // }
+    // if(this.checkIfService.isGridFieldExist(tab,"api_params_criteria")){
+    //   grid_api_params_criteria = tab.grid.api_params_criteria;
+    // }
+    //const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
+    let  crList=[];
     this.getfilterCrlist(headElements,filterForm).forEach((element: any) => {
-      data.crList.push(element);
+      crList.push(element);
     });
     if(selectContact != ''){
       const tabFilterCrlist = {
@@ -578,7 +589,29 @@ export class ApiCallService {
         "fValue": selectContact,
         "operator": 'eq'
       }
-      data.crList.push(tabFilterCrlist);
+      crList.push(tabFilterCrlist);
+    }
+    return this.getDataForGridFilter(page,tab,currentMenu,crList);
+    // const getFilterData = {
+    //   data: data,
+    //   path: null
+    // }
+    // return getFilterData;
+  }
+
+
+  getDataForGridFilter(page:any,tab:any,currentMenu:any,crList:any){
+    let grid_api_params_criteria = [];
+    if(tab && tab?.grid && tab?.grid?.grid_page_size){
+      this.itemNumOfGrid = tab.grid.grid_page_size;
+    }
+    if(this.checkIfService.isGridFieldExist(tab,"api_params_criteria")){
+      grid_api_params_criteria = tab.grid.api_params_criteria;
+    }
+    const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
+
+    if(crList && crList.length>0){
+      data.crList = crList;
     }
     const getFilterData = {
       data: data,

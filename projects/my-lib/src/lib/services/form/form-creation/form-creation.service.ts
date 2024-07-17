@@ -6,6 +6,7 @@ import { UntypedFormBuilder, UntypedFormGroup, UntypedFormControl, Validators } 
 import { StorageService } from '../../storage/storage.service';
 import { CustomvalidationService } from '../../customvalidation/customvalidation.service';
 import { CheckIfService } from '../../check-if/check-if.service';
+import { ModelService } from '../../model/model.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,8 @@ export class FormCreationService {
     private formBuilder: UntypedFormBuilder,
     private customvalidationService:CustomvalidationService,
     private apiCallService:ApiCallService,
-    private checkifService:CheckIfService
+    private checkifService:CheckIfService,
+    private modalService:ModelService
   ) {
       const currentYear = new Date().getFullYear();
       this.minDate = new Date(currentYear - 100, 0, 1);
@@ -812,6 +814,39 @@ export class FormCreationService {
       }
     });
     return donotResetFieldLists;
+  }
+  addNewForm(selectTabIndex:number,isBulkUpdate:boolean,bulkuploadList:any,selectedRowIndex:number,formName:string,selectContactAdd:any){
+    let formData:any = {}
+    formData['tabIndex'] = selectTabIndex;
+    formData['bulkUpdate'] = isBulkUpdate;
+    formData['bulkDataList'] = bulkuploadList;
+    formData['editedRowIndex'] = selectedRowIndex;
+    formData['formName'] = formName;
+    formData['selectContact'] = selectContactAdd;
+    this.modalService.open('form-modal',formData)
+  }
+  getFieldsFromForms(tab:any,formName:string,dinamic_form:any,gridButtons:any,tableFields:any,actionButtons:any){
+    let responce = {
+      "fields" : tableFields,
+      "buttons" : actionButtons
+    }
+    let form = null;
+    if(formName != 'DINAMIC_FORM' && tab && tab.forms){
+      form = this.commonFunctionService.getForm(tab.forms,formName,gridButtons);
+    }else if(formName == 'DINAMIC_FORM'){
+      form = dinamic_form;
+    }else{
+      form = null
+    }
+    if(form != null){
+      if(form?.['tableFields'] && form?.['tableFields']?.length > 0){
+        responce.fields = form['tableFields'];
+      }
+      if(form?.['tab_list_buttons'] && form?.['tab_list_buttons']?.length > 0){
+        responce.buttons = form['tab_list_buttons'];
+      }
+    }
+    return responce;
   }
 
 }
