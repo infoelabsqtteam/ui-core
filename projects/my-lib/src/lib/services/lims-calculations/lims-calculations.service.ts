@@ -1522,7 +1522,7 @@ export class LimsCalculationsService {
       tax_percentage = templateValue.tax_percentage;
     }
 
-    if((tax_type==null || tax_type==undefined || tax_type=='NA') && tax_percentage==0)
+    if(((tax_type==null || tax_type==undefined || tax_type=='NA') && tax_percentage==0) ||  tax_type=='Not Applicable')
     {
       net_payble = taxable_amount;
     }
@@ -1610,7 +1610,7 @@ export class LimsCalculationsService {
       tax_percentage = templateValue.tax_percentage;
     }
 
-    if((tax_type==null || tax_type==undefined || tax_type=='NA') && tax_percentage==0)
+    if(((tax_type==null || tax_type==undefined || tax_type=='NA') && tax_percentage==0 ) || tax_type=='Not Applicable')
     {
       net_payble = taxable_amount;
     }
