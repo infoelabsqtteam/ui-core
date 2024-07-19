@@ -201,15 +201,17 @@ export class ApiCallService {
   }
   getTabsPayloadForCountList(tabs:any){
     let payloads:any = [];
-    if(tabs && tabs.length >= 1 ){
-      tabs.forEach((element: any) => {
-        let grid_api_params_criteria = [];
-        if(this.checkIfService.isGridFieldExist(element,"api_params_criteria")){
-          grid_api_params_criteria = element.grid.api_params_criteria;
+    if(tabs && tabs.length >= 1){
+      tabs.forEach((tab: any) => {
+        if(tab.grid){
+          let grid_api_params_criteria = [];
+          if(this.checkIfService.isGridFieldExist(tab,"api_params_criteria")){
+            grid_api_params_criteria = tab.grid.api_params_criteria;
+          }
+          const payload = this.getPaylodWithCriteria(tab.tab_name,tab.tab_name+"_"+tab.name,grid_api_params_criteria,{});
+          payload['countOnly'] = true;
+          payloads.push(payload);
         }
-        const payload = this.getPaylodWithCriteria(element.tab_name,element.tab_name+"_"+element.name,grid_api_params_criteria,{});
-        payload['countOnly'] = true;
-        payloads.push(payload);
       });
     }
     return payloads;
