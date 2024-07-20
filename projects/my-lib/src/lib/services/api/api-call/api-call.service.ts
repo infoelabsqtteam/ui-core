@@ -613,7 +613,13 @@ export class ApiCallService {
     const data = this.setPageNoAndSize(this.getPaylodWithCriteria(currentMenu.name,'',grid_api_params_criteria,''),page);
 
     if(crList && crList.length>0){
-      data.crList = crList;
+      if(data && data?.crList && data.crList.length > 0){
+        crList.forEach((cr:any) => {
+          data.crList.push(cr);
+        });
+      }else{
+        data.crList = crList;
+      }
     }
     const getFilterData = {
       data: data,
