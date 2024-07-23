@@ -81,7 +81,7 @@ export class DownloadService {
 
       return getExportData;
   }
-  exportExcel(total:any,gridColumns:any,gridFilterValue:any,tab:any,menuName:string) {
+  exportExcel(total:any,gridColumns:any,gridFilterValue:any,tab:any,menuName:any) {
     let downloadLink = "";
     let totalGridData:number = this.storageService.getApplicationSetting()?.totalGridData;
     if(!totalGridData) {
@@ -89,14 +89,10 @@ export class DownloadService {
     }
     if(total && totalGridData > 0 && total < totalGridData) {
       this.modalService.open('download-progress-modal', {});
-      let tempNme = menuName;
+      let tempNme = menuName.name;
       if(this.permissionService.checkPermission(tempNme,'export')){
+        let data = this.apiCallService.preparePayloadWithCrlist(tab,menuName,gridColumns,gridFilterValue);
         let gridName = '';
-        let grid_api_params_criteria = [];
-        if(this.checkIfService.isGridFieldExist(tab,"api_params_criteria")){
-          grid_api_params_criteria = tab.grid.api_params_criteria;
-        }
-        const data = this.apiCallService.getPaylodWithCriteria(menuName,'',grid_api_params_criteria,'');
         if(tab && tab?.grid){
           if(tab?.grid?.export_template){
             gridName = tab.grid.export_template;
@@ -105,15 +101,7 @@ export class DownloadService {
           }
         }
         delete data.log;
-        delete data.key;
-        data['key'] = this.storageService.getRefCode();
         data['key3']=gridName;
-        const filtewCrlist = this.apiCallService.getfilterCrlist(gridColumns,gridFilterValue);
-        if(filtewCrlist.length > 0){
-          filtewCrlist.forEach((element:any) => {
-            data.crList.push(element);
-          });
-        }
         const getExportData = {
           data: {
             refCode: this.storageService.getRefCode(),
