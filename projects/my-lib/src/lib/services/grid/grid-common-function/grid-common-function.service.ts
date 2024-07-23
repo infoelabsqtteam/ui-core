@@ -754,7 +754,7 @@ constructor(
       }
     }
     const pagePayload:any = this.apiCallService.getPage(page,tab,currentMenu,headElements,filterFormValue,leadId)
-    if(sortingColumnName && sortingColumnName != undefined){
+    if(sortingColumnName){
       pagePayload["path"] = sortingColumnName;
     }
     let crList = pagePayload.data.crList;
@@ -808,7 +808,7 @@ constructor(
       "pageNumber":1
     }
     let pagePayload = this.apiCallService.getDataForGrid(responce.pageNumber,tab,currentMenu,headElements,filterValue,selectContact);
-    if(sortingColumnName && sortingColumnName != undefined){
+    if(sortingColumnName){
       pagePayload["path"] = sortingColumnName;
     }
     pagePayload.data.pageSize = itemNumOfGrid;
