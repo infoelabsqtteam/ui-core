@@ -783,30 +783,15 @@ constructor(
     this.getGridPayloadData(pagePayload,filterFormValue,gridDisable,tab,responce);
     return responce;
   }
-  onSort(columnObject:any,filterFormValue:any,gridDisable:boolean,tab:any,modifyGridData:any,elements:any,sortingColumnName:any,sortIcon:any,orderBy:any,headElements:any,currentMenu:any,pageNumber:number,itemNumOfGrid:number) {
+  onSort(columnObject:any,filterFormValue:any,gridDisable:boolean,tab:any,sortingColumnName:any,sortIcon:any,orderBy:any,headElements:any,currentMenu:any,pageNumber:number,crList:any) {
     let responce = {
-      "modifyGridData":modifyGridData,
-      "elements":elements,
       "sortingColumnName":sortingColumnName,
       "sortIcon":sortIcon,
       "orderBy":orderBy
     }
     responce.sortingColumnName = responce.orderBy + columnObject.field_name;
-    const value = filterFormValue;
-    const getSortData = {
-      data: {
-        crList: this.apiCallService.getfilterCrlist(headElements,value),
-        refCode: this.storageService.getRefCode(),
-        key2: this.storageService.getAppId(),
-        log: this.storageService.getUserLog(),
-        value: currentMenu.name,
-        pageNo: pageNumber - 1,
-        pageSize: itemNumOfGrid
-      },
-      path: responce.sortingColumnName
-    }
-    //this.store.dispatch(new CusTemGenAction.GetGridData(getSortData))
-    // this.getGridPayloadData(getSortData);
+    const getSortData = this.apiCallService.getDataForGridFilter(pageNumber,tab,currentMenu,headElements,filterFormValue);
+    getSortData['path'] = responce.sortingColumnName;
     this.getGridPayloadData(getSortData,filterFormValue,gridDisable,tab,responce);
     if (responce.orderBy == '-') {
       responce.orderBy = '';
