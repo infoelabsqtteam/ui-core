@@ -783,7 +783,7 @@ constructor(
     this.getGridPayloadData(pagePayload,filterFormValue,gridDisable,tab,responce);
     return responce;
   }
-  onSort(columnObject:any,filterFormValue:any,gridDisable:boolean,tab:any,sortingColumnName:any,sortIcon:any,orderBy:any,headElements:any,currentMenu:any,pageNumber:number,crList:any) {
+  onSort(columnObject:any,filterFormValue:any,gridDisable:boolean,tab:any,sortingColumnName:any,sortIcon:any,orderBy:any,headElements:any,currentMenu:any,pageNumber:number) {
     let responce = {
       "sortingColumnName":sortingColumnName,
       "sortIcon":sortIcon,
@@ -801,13 +801,16 @@ constructor(
     responce.sortIcon=="down"? (responce.sortIcon="up-alt"): (responce.sortIcon="down");
     return responce;
   }
-  applyFilter(modifyGridData:any,elements:any,tab:any,currentMenu:any,headElements:any,filterValue:any,selectContact:any,itemNumOfGrid:any,gridDisable:boolean) {
+  applyFilter(modifyGridData:any,elements:any,tab:any,currentMenu:any,headElements:any,filterValue:any,selectContact:any,itemNumOfGrid:any,gridDisable:boolean,sortingColumnName:any) {
     let responce = {
       "modifyGridData":modifyGridData,
       "elements":elements,
       "pageNumber":1
     }
     let pagePayload = this.apiCallService.getDataForGrid(responce.pageNumber,tab,currentMenu,headElements,filterValue,selectContact);
+    if(sortingColumnName && sortingColumnName != undefined){
+      pagePayload["path"] = sortingColumnName;
+    }
     pagePayload.data.pageSize = itemNumOfGrid;
     this.getGridPayloadData(pagePayload,filterValue,gridDisable,tab,responce);
     return responce;
