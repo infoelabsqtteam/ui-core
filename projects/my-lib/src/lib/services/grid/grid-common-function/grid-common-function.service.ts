@@ -754,7 +754,7 @@ constructor(
       }
     }
     const pagePayload:any = this.apiCallService.getPage(page,tab,currentMenu,headElements,filterFormValue,leadId)
-    if(sortingColumnName && sortingColumnName != undefined){
+    if(sortingColumnName){
       pagePayload["path"] = sortingColumnName;
     }
     let crList = pagePayload.data.crList;
@@ -783,30 +783,15 @@ constructor(
     this.getGridPayloadData(pagePayload,filterFormValue,gridDisable,tab,responce);
     return responce;
   }
-  onSort(columnObject:any,filterFormValue:any,gridDisable:boolean,tab:any,modifyGridData:any,elements:any,sortingColumnName:any,sortIcon:any,orderBy:any,headElements:any,currentMenu:any,pageNumber:number,itemNumOfGrid:number) {
+  onSort(columnObject:any,filterFormValue:any,gridDisable:boolean,tab:any,sortingColumnName:any,sortIcon:any,orderBy:any,headElements:any,currentMenu:any,pageNumber:number) {
     let responce = {
-      "modifyGridData":modifyGridData,
-      "elements":elements,
       "sortingColumnName":sortingColumnName,
       "sortIcon":sortIcon,
       "orderBy":orderBy
     }
     responce.sortingColumnName = responce.orderBy + columnObject.field_name;
-    const value = filterFormValue;
-    const getSortData = {
-      data: {
-        crList: this.apiCallService.getfilterCrlist(headElements,value),
-        refCode: this.storageService.getRefCode(),
-        key2: this.storageService.getAppId(),
-        log: this.storageService.getUserLog(),
-        value: currentMenu.name,
-        pageNo: pageNumber - 1,
-        pageSize: itemNumOfGrid
-      },
-      path: responce.sortingColumnName
-    }
-    //this.store.dispatch(new CusTemGenAction.GetGridData(getSortData))
-    // this.getGridPayloadData(getSortData);
+    const getSortData = this.apiCallService.getDataForGridFilter(pageNumber,tab,currentMenu,headElements,filterFormValue);
+    getSortData['path'] = responce.sortingColumnName;
     this.getGridPayloadData(getSortData,filterFormValue,gridDisable,tab,responce);
     if (responce.orderBy == '-') {
       responce.orderBy = '';
@@ -816,13 +801,16 @@ constructor(
     responce.sortIcon=="down"? (responce.sortIcon="up-alt"): (responce.sortIcon="down");
     return responce;
   }
-  applyFilter(modifyGridData:any,elements:any,tab:any,currentMenu:any,headElements:any,filterValue:any,selectContact:any,itemNumOfGrid:any,gridDisable:boolean) {
+  applyFilter(modifyGridData:any,elements:any,tab:any,currentMenu:any,headElements:any,filterValue:any,selectContact:any,itemNumOfGrid:any,gridDisable:boolean,sortingColumnName:any) {
     let responce = {
       "modifyGridData":modifyGridData,
       "elements":elements,
       "pageNumber":1
     }
     let pagePayload = this.apiCallService.getDataForGrid(responce.pageNumber,tab,currentMenu,headElements,filterValue,selectContact);
+    if(sortingColumnName){
+      pagePayload["path"] = sortingColumnName;
+    }
     pagePayload.data.pageSize = itemNumOfGrid;
     this.getGridPayloadData(pagePayload,filterValue,gridDisable,tab,responce);
     return responce;
