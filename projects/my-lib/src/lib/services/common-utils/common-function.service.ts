@@ -208,8 +208,8 @@ export class CommonFunctionService {
               break;
             case "number":
               if(validatField){
-                if(this.applicableForValidation(element) && formValue[element.field_name]<=0){
-                  return {'msg':' ' +element.label + ' should be greater than 0. !!!'}
+                if(this.applicableForValidation(element) && formValue[element.field_name]<0){
+                  return {'msg':' ' +element.label + ' should be greater than or equal 0. !!!'}
                 }
               }else if (!Number(formValue[element.field_name])) {
                 formValue[element.field_name] = 0;
