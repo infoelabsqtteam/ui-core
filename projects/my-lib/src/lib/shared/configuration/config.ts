@@ -72,7 +72,8 @@ export const AppConfig = {
     [Config.PreviewData] : '',
     [Config.DownloadClick] : '',
     [Config.Forms] : {},
-    [Config.AdFilterList] : []
+    [Config.AdFilterList] : [],
+    [Config.CurrentActionButton] : {}
  };
 
  export interface AppConfigInterface {
@@ -143,5 +144,6 @@ export const AppConfig = {
     previewData:any,
     downloadClick:any,
     forms:any,
-    adFilterList:any
+    adFilterList:any,
+    currentActionButton:any
   }
