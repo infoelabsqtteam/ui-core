@@ -43,7 +43,6 @@ OR
 ##To Install Specific Version of Library:
 npm install  @core/web-core@1.0.0
 
-
 #####Get latest library version
 
 export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ui-libs --region ap-south-1 --domain-owner 025066280539 --query authorizationToken --output text`
