@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    ########################### Elabs Aws - ###########################
+    ########################### Elabs Aws - #############################
     # Elabs Aws
     - name: Configure AWS credentials Elabs
       uses: aws-actions/configure-aws-credentials@v1
