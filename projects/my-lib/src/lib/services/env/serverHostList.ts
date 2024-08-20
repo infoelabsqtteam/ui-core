@@ -17,6 +17,7 @@ export const serverHostList = [
   {"clientCode": "ITC-ITC01-UAT", "clientEndpoint": "uat-itclabs.elabss.ai", "serverEndpoint": "https://uatserveritclabs.elabss.ai"},
   {"clientCode": "ITC-ITC01","clientEndpoint": "lims-itclabs.elabss.ai", "serverEndpoint": "https://prodserveritclabs.elabss.ai"},
   {"clientCode": "ITC-ITC01", "clientEndpoint": "lims.itclabs.com", "serverEndpoint": "https://prodserveritclabs.elabss.ai"},
+  {"clientCode": "ITC-ITC01","clientEndpoint": "itclims.elabss.ai", "serverEndpoint": "https://prodserveritclabs.elabss.ai"},
   {"clientEndpoint": "qualiteklab.elabss.ai", "serverEndpoint": "https://serverqualiteklab.elabss.ai"},
   {"clientEndpoint": "uat-qualiteklab.elabss.ai", "serverEndpoint": "https://uatserverqualiteklab.elabss.ai"},
   {"clientCode": "QUAL-QUALI01", "clientEndpoint": "lims.qualiteklab.com", "serverEndpoint": "https://prodserverqualiteklab.elabss.ai"},
