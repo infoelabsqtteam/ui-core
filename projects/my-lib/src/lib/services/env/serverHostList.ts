@@ -15,18 +15,19 @@ export const serverHostList = [
   {"clientEndpoint": "itclabs.elabss.ai", "serverEndpoint": "https://serveritclabs.elabss.ai"},
   {"clientEndpoint": "dev-itclabs.elabss.ai", "serverEndpoint": "https://devserveritclabs.elabss.ai"},
   {"clientCode": "ITC-ITC01-UAT", "clientEndpoint": "uat-itclabs.elabss.ai", "serverEndpoint": "https://uatserveritclabs.elabss.ai"},
-  {"clientEndpoint": "lims-itclabs.elabss.ai", "serverEndpoint": "https://prodserveritclabs.elabss.ai"},
+  {"clientCode": "ITC-ITC01","clientEndpoint": "lims-itclabs.elabss.ai", "serverEndpoint": "https://prodserveritclabs.elabss.ai"},
   {"clientCode": "ITC-ITC01", "clientEndpoint": "lims.itclabs.com", "serverEndpoint": "https://prodserveritclabs.elabss.ai"},
   {"clientEndpoint": "qualiteklab.elabss.ai", "serverEndpoint": "https://serverqualiteklab.elabss.ai"},
   {"clientEndpoint": "uat-qualiteklab.elabss.ai", "serverEndpoint": "https://uatserverqualiteklab.elabss.ai"},
   {"clientCode": "QUAL-QUALI01", "clientEndpoint": "lims.qualiteklab.com", "serverEndpoint": "https://prodserverqualiteklab.elabss.ai"},
+  {"clientCode": "QUAL-QUALI01", "clientEndpoint": "qualiteklab-lims.elabss.ai", "serverEndpoint": "https://prodserverqualiteklab.elabss.ai"},
   {"clientEndpoint": "dev-qualiteklab.elabss.ai", "serverEndpoint": "https://devserverqualiteklab.elabss.ai"},
   {"clientEndpoint": "sit-hitech.elabss.ai", "serverEndpoint": "https://sithitechserver.elabss.ai"},
   {"clientEndpoint": "lims-hitech.elabss.ai", "serverEndpoint": "https://prodhitechserver.elabss.ai"},
   {"clientEndpoint": "sit-aalbiosciences.elabss.ai", "serverEndpoint": "https://sitaalbiosciencesserver.elabss.ai"},
   {"clientCode": "AABIO-AABIO01", "clientEndpoint": "lims-aalbiosciences.elabss.ai", "serverEndpoint": "https://prodaalbiosciencesserver.elabss.ai"},
   {"clientCode": "QUAL-QUALI02", "clientEndpoint": "bbsr-lims.qualiteklab.com", "serverEndpoint": "https://prodserverbbsrqualiteklab.elabss.ai"},
-  {"clientEndpoint": "bbsr-lims.elabss.ai", "serverEndpoint": "https://prodserverbbsrqualiteklab.elabss.ai"},
+  {"clientCode": "QUAL-QUALI02","clientEndpoint": "bbsr-lims.elabss.ai", "serverEndpoint": "https://prodserverbbsrqualiteklab.elabss.ai"},
   {"clientEndpoint": "sit-multani.elabss.ai", "serverEndpoint": "https://sitmultaniserver.elabss.ai"},
   {"clientEndpoint": "app.multani.com", "serverEndpoint": "http://server.multani.com:30051"},
   {"clientEndpoint": "food.multani.com", "serverEndpoint": "http://server.multani.com:30051"},
@@ -43,6 +44,6 @@ export const serverHostList = [
   {"clientCode": "TICS-TICS01", "clientEndpoint": "lims.theticslab.com", "serverEndpoint": "https://prodservertheticslab.elabss.ai"},
   {"clientCode": "ITC-ITC01-DEV2", "clientEndpoint": "dev2.elabss.ai", "serverEndpoint": "https://dev2serverelabs.elabss.ai"},
   {"clientCode": "ITC-ITC01-SIT2", "clientEndpoint": "sit2.elabss.ai", "serverEndpoint": "https://sit2serverelabs.elabss.ai"},
-  {"clientCode": "ITC-ITC01-UAT2", "clientEndpoint": "uat2.elabss.ai", "serverEndpoint": "https://uat2serverelabs.elabss.ai"}
+  {"clientCode": "ITC-ITC01-UAT2", "clientEndpoint": "uat2.elabss.ai", "serverEndpoint": "https://uat2serverelabs.elabss.ai"},
+  {"clientCode": "ITC-ITC01-WP02", "clientEndpoint": "lims-ipsos.elabss.ai", "serverEndpoint": "https://prodserveripsos.elabss.ai"}
 ]
-
