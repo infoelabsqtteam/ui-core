@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { DataShareService } from '../data-share/data-share.service';
 
 @Injectable({
@@ -53,7 +53,7 @@ export class CustomvalidationService {
     return check;
   }
   checkDates(endDate: string, startDate: string) {
-    return (formGroup: FormGroup) => {
+    return (formGroup: UntypedFormGroup) => {
       const startDateControl = formGroup.controls[startDate];
       const endDateControl = formGroup.controls[endDate];
       const date1 =new Date(startDateControl.value);
@@ -67,7 +67,7 @@ export class CustomvalidationService {
  }
 
   MatchPassword(password: any, confirmPassword: any) {
-    return (formGroup: FormGroup):any => {
+    return (formGroup: UntypedFormGroup):any => {
       const passwordControl = formGroup.controls[password];
       const confirmPasswordControl = formGroup.controls[confirmPassword];
 
@@ -175,7 +175,7 @@ export class CustomvalidationService {
   validatePattern(gstin:any) {
     // eslint-disable-next-line max-len
     // var gstinRegexPattern = /^([0-2][0-9]|[3][0-8])[A-Z]{3}[ABCFGHLJPTK][A-Z]\d{4}[A-Z][A-Z0-9][Z][A-Z0-9]$/;
-    const regex = new RegExp('^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$');
+    const regex = new RegExp('^[0-9]{2}[A-Z]{4}[A-Z0-9]{1}[0-9]{4}[A-Z]{1}[1-9]{1}[A-Z]{1}[A-Z0-9]{1}$');
     const valid = regex.test(gstin);
     return valid;
     //return gstinRegexPattern.test(gstin);

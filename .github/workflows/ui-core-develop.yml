@@ -55,7 +55,7 @@ jobs:
     - name: Build, tag, and push image to Amazon ECR
       #  IMAGE_TAG: $VERSION-$GITHUB_RUN_NUMBER-$Availability -> not working
       run: |
-        aws codeartifact login --tool npm --repository ui-library --domain ui-libs --domain-owner 292474393014 --region ap-south-1
+        aws codeartifact login --tool npm --repository ui-library --domain ui-libs --domain-owner 025066280539 --region ap-south-1
         npm run my-lib-build
         ng build
         npm run my-lib-publish

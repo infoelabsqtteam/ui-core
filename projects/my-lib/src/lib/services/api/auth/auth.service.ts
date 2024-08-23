@@ -76,18 +76,27 @@ export class AuthService implements OnInit{
     this.resetData()
     this.redirectToSignPage();
   }
+
   GetUserInfoFromToken(payload:any, loginRedirect?:string){
     let response = {
       status: '',
       class: '',
       msg: ''
     };
-    let api = this.envService.getAuthApi('GET_USER_PERMISSION');
-    const reqBody = { key: payload };
+    let api = "";
+    let reqBody = {};
+    if(payload && payload.roleName && payload.roleName != ''){
+      api = this.envService.getAuthApi('GET_USER_PERMISSION')+"/"+payload.roleName;
+      reqBody = { key: payload.token };
+    }else{
+      api = this.envService.getAuthApi('GET_USER_PERMISSION')+"/"+null;
+      reqBody = { key: payload };
+    }
+
     this.http.post(api, reqBody).subscribe(
       (respData:any) =>{
         if (respData && respData.user) {
-          let modifyData = this.coreFunctionService.getModulesFormMapObject(respData);
+          let modifyData = this.coreFunctionService.getModulesFromMapObject(respData);
           this.storageService.SetUserInfo(modifyData);
           this.storageService.GetUserInfo();
           this.envService.setRequestType('PRIVATE');
@@ -95,7 +104,7 @@ export class AuthService implements OnInit{
           this.authDataShareService.restSettingModule('logged_in');
           this.apiService.gitVersion('');
           this.apiCallService.getUserPrefrerence(respData.user);
-          this.apiCallService.getUserNotification(1);
+          // this.apiCallService.getUserNotification(1);
           this.redirectionWithMenuType(loginRedirect);
           response.status = "success";
           this.authDataShareService.setUserInfo(response);
@@ -148,7 +157,8 @@ export class AuthService implements OnInit{
       status: '',
       class: '',
       msg: '',
-      message:''
+      message:'',
+      wrongLoginAttempt:0
     };
     let api = this.envService.getAuthApi('AU_SIGNIN');
     this.http.post(api, this.encryptionService.encryptRequest(payload)).subscribe(
@@ -170,6 +180,7 @@ export class AuthService implements OnInit{
           response.status = 'error';
           response.class = 'bg-danger';
           response.msg = respData['message'];
+          response.wrongLoginAttempt = respData?.wrongLoginAttempt;
         }else if (respData.hasOwnProperty('error')) {
             if (respData["error"] == "not_confirmed") {
                 response.msg = 'User Not Confirmed ';
@@ -180,6 +191,7 @@ export class AuthService implements OnInit{
             }
             response.status = 'error';
             response.class = 'bg-danger';
+            response.wrongLoginAttempt = respData?.wrongLoginAttempt;
         }
         this.authDataShareService.setSigninResponse(response);
       },
@@ -190,9 +202,11 @@ export class AuthService implements OnInit{
         }else if(error && error.error && error.error.message){
           console.log("Sign In Secong error handling." + JSON.stringify(error));
           response.msg = error.error.message;
+          response.wrongLoginAttempt = error.error?.wrongLoginAttempt;
         }else{
           console.log("Sign In Third error handling." + JSON.stringify(error));
           response.msg = error.message;
+          response.wrongLoginAttempt = error?.wrongLoginAttempt;
         }
         response.status = 'error';
         response.class = 'bg-danger';

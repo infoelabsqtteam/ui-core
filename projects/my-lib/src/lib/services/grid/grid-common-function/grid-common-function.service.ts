@@ -6,6 +6,8 @@ import { CheckIfService } from '../../check-if/check-if.service';
 import { StorageService } from '../../storage/storage.service';
 import { DatePipe,CurrencyPipe } from '@angular/common';
 import { DataShareService } from '../../data-share/data-share.service';
+import { ApiCallService } from '../../api/api-call/api-call.service';
+import { ApiService } from '../../api/api.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -19,20 +21,22 @@ constructor(
   private storageService:StorageService,
   private datePipe: DatePipe,
   private CurrencyPipe: CurrencyPipe,
-  private dataShareService: DataShareService
+  private dataShareService: DataShareService,
+  private apiCallService:ApiCallService,
+  private apiService:ApiService
 ) { }
-  modifyGridData(gridData:any,gridColumns:any,field:any,editableGridColumns:any,typegrapyCriteriaList:any){
+  modifyGridData(gridData:any,gridColumns:any,field:any,editableGridColumns:any,typographyCrList:any){
     let modifiedData = [];
     if(gridColumns.length > 0){
       for (let i = 0; i < gridData.length; i++) {
         const row = gridData[i];
-        let modifyRow = this.rowModify(row,field,gridColumns,editableGridColumns,typegrapyCriteriaList);
+        let modifyRow = this.rowModify(row,field,gridColumns,editableGridColumns,typographyCrList);
         modifiedData.push(modifyRow);
       }
     }
     return modifiedData;
   }
-  rowModify(row:any,field:any,gridColumns:any,editableGridColumns:any,typegrapyCriteriaList:any){
+  rowModify(row:any,field:any,gridColumns:any,editableGridColumns:any,typographyCrList:any){
     let modifyRow = JSON.parse(JSON.stringify(row));
     modifyRow["disabled"] = this.checkIfService.checkRowIf(row,field);
     for (let j = 0; j < gridColumns.length; j++) {
@@ -60,8 +64,8 @@ constructor(
     if(editableGridColumns && editableGridColumns.length == 0 && field && Object.keys(field).length > 0){
       modifyRow['actionBtnDisplay'] = this.checkRowDisabledIf(field,row);
     }
-    if(typegrapyCriteriaList && typegrapyCriteriaList.length > 0){
-      modifyRow['background-color'] = this.checkTypgraphCondition(typegrapyCriteriaList,row,'background-color');
+    if(typographyCrList && typographyCrList.length > 0){
+      modifyRow['background-color'] = this.checkTypgraphCondition(typographyCrList,row,'background-color');
     }
     return modifyRow;
   }
@@ -85,8 +89,13 @@ constructor(
         if (this.coreFunctionService.isNotBlank(field.show_if)) {
           if (!this.checkIfService.showIf(field, parentObject)) {
             field['display'] = false;
+            field['show'] = true;
           } else {
-            field['display'] = true;
+            if(field.hide != undefined && field.hide){
+              field['display'] = false;
+            }else{
+              field['display'] = true;
+            }
           }
         } else {
             if(field &&  field.hide) {
@@ -100,6 +109,23 @@ constructor(
           field['field_class'] = field['field_class'].trim();
         }
         field['width'] = this.getGridColumnWidth(field,gridColumns);
+        if(field && field.type && field.type !=''){
+          switch(field.type.toLowerCase()){
+            case "info":
+            case "html" :
+            case "file":
+            case "template":
+            case "image":
+            case "icon":
+            case "download_file":
+            case "redirect":
+            case "color":
+              field['hideCopy']=true;
+              break;
+            default:
+              break;
+        }
+      }
       };
     }
     return modifyGridColumns;
@@ -107,11 +133,11 @@ constructor(
   getGridColumnWidth(column:any,listOfGridFieldName:any) {
     if (column.width && column.width != '0') {
       return column.width;
-    } 
+    }
     // else {
     //   if (listOfGridFieldName.length > 8) {
     //     return '150px';
-    //   } 
+    //   }
       else {
         return '';
       }
@@ -178,7 +204,11 @@ constructor(
             const cData = data[fieldName];
             if(Array.isArray(cData) && cData.length > 0){
               const gridColumns = element.gridColumns;
-              const modifyList = this.modifyGridData(cData,gridColumns,element,[],[]);
+              let typographyCrList = [];
+              if(element['colorCriteria'] && element['colorCriteria'].length > 0){
+                typographyCrList = element['colorCriteria'];
+              }
+              const modifyList = this.modifyGridData(cData,gridColumns,element,[],typographyCrList);
               modifyData[fieldName] = modifyList;
               element.gridColumns = this.modifyGridColumns(gridColumns,object);
               modifyObject.field_index = i;
@@ -260,7 +290,11 @@ constructor(
       case "list_of_fields":
         if (Array.isArray(listOfField[item.field_name]) && listOfField[item.field_name].length > 0 && listOfField[item.field_name] != null && listOfField[item.field_name] != undefined && listOfField[item.field_name] != '') {
           item['hideCopy']=true;
-          return '<i class="fa fa-eye cursor-pointer"></i>';
+          if(this.storageService.checkPlatForm() == 'mobile'){
+            return '<span class="material-symbols-outlined cursor-pointer">visibility</span>';
+          }else{
+            return '<i class="fa fa-eye cursor-pointer"></i>';
+          }
         } else {
           return '-';
         }
@@ -294,13 +328,13 @@ constructor(
     }
     return true;
   }
-  checkTypgraphCondition(typegrapyCriteriaList:any,object:any,name:any){
+  checkTypgraphCondition(typographyCrList:any,object:any,name:any){
     let background = '';
-    if(typegrapyCriteriaList && typegrapyCriteriaList.length >= 1){
+    if(typographyCrList && typographyCrList.length >= 1){
       let criteriaMatched = false;
       let matchedelement:any = {};
-      for (let index = 0; index < typegrapyCriteriaList.length; index++) {
-        const element = typegrapyCriteriaList[index];
+      for (let index = 0; index < typographyCrList.length; index++) {
+        const element = typographyCrList[index];
         let crList = element['crList'];
         let childConditionsMatched = false;
         for (let j = 0; j < crList.length; j++) {
@@ -314,7 +348,7 @@ constructor(
           }
         }
         if(childConditionsMatched){
-          matchedelement = typegrapyCriteriaList[index]
+          matchedelement = typographyCrList[index]
           criteriaMatched = true;
           break;
         }else{
@@ -493,6 +527,8 @@ constructor(
           return '-';
         }
       case "file":
+      case "file_with_preview":
+      case "file_with_print":
         if (value && value != '') {
           if(this.storageService.checkPlatForm() == 'mobile'){
             return '<span class="material-symbols-outlined cursor-pointer">text_snippet</span>';
@@ -519,6 +555,16 @@ constructor(
           return '<span class="material-symbols-outlined cursor-pointer">' + field.field_class + '</span>';
         }else{
           return '<span class="material-icons cursor-pointer">' + field.field_class + '</span>';
+        }
+      case "redirect":
+        if (value) {
+          if(this.storageService.checkPlatForm() == 'mobile'){
+            return '<span class="fa fa-external-link" aria-hidden="true"></span>';
+          }else{
+            return '<i class="fa fa-external-link" aria-hidden="true"></i>';
+          }
+        }else{
+          return '-';
         }
       case "download_file":
         if (value && value != '') {
@@ -607,20 +653,17 @@ constructor(
       default: return value;
     }
   }
-
   getNoOfItems(grid:any, defaultNoOfItem:any) {
     if(grid && grid.details && grid.details.numberOfItems) {
       defaultNoOfItem = grid.details.numberOfItems;
     }
     return defaultNoOfItem;
   }
-
-
   setOldTabCount(tab:any) {
-    let dataCount:any = {};  
-    let count:any = {};    
+    let dataCount:any = {};
+    let count:any = {};
     let totalDataCount:any = {};
-    const currentTabName = this.storageService.GetActiveMenu()['name'];        
+    const currentTabName = this.storageService.GetActiveMenu()['name'];
     const key = currentTabName+"_"+tab.name;
     totalDataCount = this.dataShareService.getGridCountData();
     let oldDataSize = totalDataCount[key];
@@ -629,8 +672,6 @@ constructor(
     dataCount['gridCountData'] = totalDataCount;
     this.dataShareService.shareGridCountData(dataCount);
   }
-
-
   compareAuditHistoryData(formFieldsData:any,currentObjectData:any,previousObjectData:any){
       let formFields = formFieldsData;
       let currentObj = {};
@@ -652,13 +693,11 @@ constructor(
                 isChanged = true;
               }
             }
-            field['isChanged'] = isChanged; 
+            field['isChanged'] = isChanged;
             formFieldsData[i] = field;
         }
       }
   }
-
-
   copmareListOfFields(fields:any,currentObjectData:any,previousObjectData:any){
     let currentData:any[] = currentObjectData[fields.field_name];
     let previousData:any[] = previousObjectData[fields.field_name];
@@ -690,20 +729,99 @@ constructor(
             }
           }
         }
-        field['isChanged'] = isChanged; 
+        field['isChanged'] = isChanged;
         fields[i] = field;
       }
     }
   }
-
-
-
-
-
-
-
-
-
-
-
+  getPage(page: number,selectContact:any,tabFilterData:any,tab:any,currentMenu:any,headElements:any,filterFormValue:any,sortingColumnName:string,recordId:any,rowId:any,queryParams:any,itemNumOfGrid:any,gridDisable:any,modifyGridData:any,elements:any) {
+    let responce = {
+      "pageNumber":page,
+      "modifyGridData":modifyGridData,
+      "elements":elements
+    }
+    // this.pageNumber = page;
+    let contact:any = {};
+    let leadId = '';
+    if(selectContact != ''){
+      tabFilterData.forEach((element:any) => {
+        if(element._id == selectContact['_id']){
+          contact  = element;
+        }
+      });
+      if(contact['lead'] && contact['lead']._id){
+        leadId = contact['lead']._id;
+      }
+    }
+    const pagePayload:any = this.apiCallService.getPage(page,tab,currentMenu,headElements,filterFormValue,leadId)
+    if(sortingColumnName){
+      pagePayload["path"] = sortingColumnName;
+    }
+    let crList = pagePayload.data.crList;
+    let criteriaList = [];
+    if(recordId){
+      let criteria = "_id;eq;"+recordId+";STATIC";
+      criteriaList.push(criteria);
+    }
+    if(rowId){
+      let criteria = "serialId;eq;"+rowId+";STATIC";
+      criteriaList.push(criteria);
+    }
+    if(Object.keys(queryParams).length > 0){
+      Object.keys(queryParams).forEach(key =>{
+        let criteria = key+";eq;"+queryParams[key]+";STATIC";
+        criteriaList.push(criteria);
+      })
+    }
+    if(criteriaList.length > 0){
+      this.apiCallService.getCriteriaList(criteriaList,{}).forEach((element:any) => {
+        crList.push(element);
+      });
+      pagePayload.data.crList = crList;
+    }
+    pagePayload.data.pageSize = itemNumOfGrid;
+    this.getGridPayloadData(pagePayload,filterFormValue,gridDisable,tab,responce);
+    return responce;
+  }
+  onSort(columnObject:any,filterFormValue:any,gridDisable:boolean,tab:any,sortingColumnName:any,sortIcon:any,orderBy:any,headElements:any,currentMenu:any,pageNumber:number) {
+    let responce = {
+      "sortingColumnName":sortingColumnName,
+      "sortIcon":sortIcon,
+      "orderBy":orderBy
+    }
+    responce.sortingColumnName = responce.orderBy + columnObject.field_name;
+    const getSortData = this.apiCallService.getDataForGridFilter(pageNumber,tab,currentMenu,headElements,filterFormValue);
+    getSortData['path'] = responce.sortingColumnName;
+    this.getGridPayloadData(getSortData,filterFormValue,gridDisable,tab,responce);
+    if (responce.orderBy == '-') {
+      responce.orderBy = '';
+    } else {
+      responce.orderBy = '-';
+    }
+    responce.sortIcon=="down"? (responce.sortIcon="up-alt"): (responce.sortIcon="down");
+    return responce;
+  }
+  applyFilter(modifyGridData:any,elements:any,tab:any,currentMenu:any,headElements:any,filterValue:any,selectContact:any,itemNumOfGrid:any,gridDisable:boolean,sortingColumnName:any) {
+    let responce = {
+      "modifyGridData":modifyGridData,
+      "elements":elements,
+      "pageNumber":1
+    }
+    let pagePayload = this.apiCallService.getDataForGrid(responce.pageNumber,tab,currentMenu,headElements,filterValue,selectContact);
+    if(sortingColumnName){
+      pagePayload["path"] = sortingColumnName;
+    }
+    pagePayload.data.pageSize = itemNumOfGrid;
+    this.getGridPayloadData(pagePayload,filterValue,gridDisable,tab,responce);
+    return responce;
+  }
+  getGridPayloadData(pagePayload:any,value:any,gridDisable:boolean,tab:any,responce:any) {
+    if(this.checkIfService.checkCallGridData(value,gridDisable)){
+      this.apiService.getGridData(pagePayload);
+    }else {
+      responce.modifyGridData = [];
+      responce.elements = [];
+      this.setOldTabCount(tab);
+    }
+  }
 }

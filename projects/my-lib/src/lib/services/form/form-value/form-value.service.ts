@@ -7,7 +7,7 @@ import { EnvService } from '../../env/env.service';
 import { CommonFunctionService } from '../../common-utils/common-function.service';
 import { StorageService } from '../../storage/storage.service';
 import { GridCommonFunctionService } from '../../grid/grid-common-function/grid-common-function.service';
-
+import { MenuOrModuleCommonService } from '../../menu-or-module-common/menu-or-module-common.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -20,6 +20,7 @@ export class FormValueService {
     private envService:EnvService,
     private commonFunctionService:CommonFunctionService,
     private gridCommonFunctionService:GridCommonFunctionService,
+    private menuOrModuleCommonService:MenuOrModuleCommonService,
     private storageService:StorageService,
     private checkIfService:CheckIfService
   ) { }
@@ -411,6 +412,25 @@ export class FormValueService {
       this.permissionService.checkTokenStatusForPermission();
     }
     return responce;
+  }
+
+  transformArrayToObject(allModuleList:any){
+    let obj:any={}
+    allModuleList.forEach((module:any)=>{
+      if(module && module.name && module.notification && module.keyName){
+        let name=module.keyName;
+        let mod={
+            reference:{
+              name:module.name,
+              _id:module._id
+            },
+            menus:this.menuOrModuleCommonService.getMenuDetails(module?.menu_list),
+            notification:module.notification
+        }
+        obj[name]=mod
+      }
+    })
+    return obj;
   }
 
 }

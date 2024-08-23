@@ -1,9 +1,18 @@
 import { Injectable } from '@angular/core';
+import { Operator } from '../../operator/operator.service';
+import { OperatorType } from '../../../shared/enums/operator_type.enum';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CoreFunctionService {
+  // commonOperators:any={
+  //   eq :"EQUAL",
+  //   in : "IN",
+  //   neq : "NOT_EQUAL",
+  //   // stwic : "STARTS_WITH_IGNORE_CASE",
+  //   cnts : "CONTAINS"
+  // };
 
   constructor() { }
   isNotBlank(value:any){
@@ -13,9 +22,10 @@ export class CoreFunctionService {
       return false;
     }
   }
-  getModulesFormMapObject(obj:any){
+  getModulesFromMapObject(obj:any){
     let user = obj.user;
     let permissions = obj.permission;
+    let rollList = obj.rollList;
     let utvn:any = {};
     let modules:any = [];
     let permissionList = {};
@@ -46,12 +56,12 @@ export class CoreFunctionService {
                     if(submenu && submenu.details){
                       submenuObj = submenu.details;
                     }
-                    this.setTabOrPermission(submenu,permissionList);
+                    this.setTabOrPermission(submenu,permissionList,submenuObj);
                     submenuList.push(submenuObj);
                   });
                 }
               }else{
-                this.setTabOrPermission(menu,permissionList);
+                this.setTabOrPermission(menu,permissionList,menuobj);
               }
               if(submenuList && submenuList.length > 0){
                 menuobj['submenu'] = this.sortMenu(submenuList);
@@ -74,14 +84,24 @@ export class CoreFunctionService {
     utvn['modules'] = this.sortMenu(modifiedModules)
     utvn['permission'] = permissionList;
     utvn['user'] = user;
+    utvn['rollList'] = rollList;
     return utvn;
   }
-  setTabOrPermission(menu:any,permissionList:any){
+  setTabOrPermission(menu:any,permissionList:any,menuObj:any){
+    let tabList:any=[];
     if(menu && menu.templateTabMap){
       let tabsMap = menu.templateTabMap;
       if(Object.keys(tabsMap).length > 0){
         Object.keys(tabsMap).forEach((tkey,l) => {
           let tab = tabsMap[tkey];
+          const modifyTab:any = {};
+          modifyTab['field_name'] = tkey;
+          modifyTab['label'] = tab?.label;
+          modifyTab['grid'] = tab?.grid;
+          if(tab && tab.details && tab.details._id){
+            modifyTab['_id'] = tab.details._id
+          }
+          tabList.push(modifyTab);
           if(tkey in permissionList){
             if(tab && tab.access){
               let oldPermissoin:Array<string> = permissionList[tkey];
@@ -103,6 +123,7 @@ export class CoreFunctionService {
         });
       }
     }
+    menuObj['tabList']=tabList;
   }
   setDefaultIndexForModules(modules:any){
     if(modules?.length>0){
@@ -183,5 +204,63 @@ export class CoreFunctionService {
       }
     });
     return objWithoutNull;
+  }
+  // getOperators(type:string,dataTye?:string){
+  //   let operatorList = {...this.commonOperators};
+  //   switch (type){
+  //     case "date":
+  //       operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
+  //       operatorList['lt'] = 'LESS_THAN';
+  //       operatorList['lte'] = "RANGE_BORDER_LESS_THAN_INCLUSIVE";
+  //       operatorList['gt'] = 'GREATER_THAN';
+  //       operatorList['gte'] = 'RANGE_BORDER_GREATER_THAN_INCLUSIVE';
+  //       break;
+  //     case "number":
+  //       operatorList['lt'] = 'LESS_THAN';
+  //       operatorList['lte'] = "RANGE_BORDER_LESS_THAN_INCLUSIVE";
+  //       operatorList['gt'] = 'GREATER_THAN';
+  //       operatorList['gte'] = 'RANGE_BORDER_GREATER_THAN_INCLUSIVE';
+  //       break;
+  //     case "string":
+  //       operatorList['stw'] = "STARTS_WITH";
+  //       operatorList['stwic'] = "STARTS_WITH_IGNORE_CASE";
+  //       operatorList['edw'] = 'ENDS_WITH';
+  //       operatorList['edwic'] = 'ENDS_WITH_IGNORE_CASE';
+  //       operatorList['cntsic'] = 'CONTAINS_IGNORE_CASE';
+  //       operatorList['ncnts'] = 'NOT_CONTAINS';
+  //       operatorList['ncntsic'] = 'NOT_CONTAINS_IGNORE_CASE';
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  //   let sortValue = this.sortOperators(operatorList);
+  //   if(dataTye == 'list'){
+  //     return this.mapObjectToListOfString(sortValue);
+  //   }else{
+  //     return sortValue;
+  //   }
+  // }
+
+  getOperators(type: OperatorType,name:string){
+    return Operator.getOperators(type,name);
+  }
+
+  sortOperators(operatorList:any){
+    const sortedKeys = Object.keys(operatorList).sort();
+     const sortedOperatorList:any = {};
+     sortedKeys.forEach(key => {
+         sortedOperatorList[key] = operatorList[key];
+     });
+
+     return sortedOperatorList;
+  }
+  mapObjectToListOfString(mapObject:any){
+    let List:any = [];
+    if(mapObject && Object.keys(mapObject).length > 0){
+      Object.keys(mapObject).forEach((key)=>{
+        List.push(mapObject[key]);
+      })
+    }
+    return List;
   }
 }

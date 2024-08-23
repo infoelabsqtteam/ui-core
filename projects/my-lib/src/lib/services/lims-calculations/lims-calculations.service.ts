@@ -1,6 +1,6 @@
 import { ApiCallService } from './../api/api-call/api-call.service';
 import { Injectable, QueryList } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
+import { FormBuilder, UntypedFormGroup, UntypedFormControl, FormArray, Validators } from '@angular/forms';
 import { CommonFunctionService } from '../../services/common-utils/common-function.service';
 import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
 import { NotificationService } from '../notify/notification.service';
@@ -138,14 +138,14 @@ export class LimsCalculationsService {
       field: 'growth_per', value: value
     }
     fieldWithValueforgrowth.value.forEach((element:any) => {
-      (<FormGroup>templateForm.controls[fieldWithValueforgrowth.field]).controls[element.field].patchValue(element.value);
+      (<UntypedFormGroup>templateForm.controls[fieldWithValueforgrowth.field]).controls[element.field].patchValue(element.value);
     })
 
     const fieldWithValueforBudget = {
       field: 'budget_per', value: value1
     }
     fieldWithValueforBudget.value.forEach((element:any) => {
-      (<FormGroup>templateForm.controls[fieldWithValueforBudget.field]).controls[element.field].patchValue(element.value);
+      (<UntypedFormGroup>templateForm.controls[fieldWithValueforBudget.field]).controls[element.field].patchValue(element.value);
     })
   }
 
@@ -184,7 +184,6 @@ export class LimsCalculationsService {
       return;
     }
   }
-
   legacyQuotationParameterCalculation(data:any, fieldName:any) {
     let quantity = 0;
     let discount_percent = 0;
@@ -879,13 +878,89 @@ export class LimsCalculationsService {
     let discount_amount = 0;
     let taxable_amount = 0;
     let net_amount = 0;
+    let	gst_amount	=0;
+    let	cgst_amount	=0;
+    let	sgst_amount	=0;
+    let	igst_amount	=0;
+    let	tax_amount	=0;
+    let	sez_amount	=0;
+
+    let	net_payble	=0;
+
+    let	igst_percent	=0;
+    let	gst_percent	=0;
+    let	sez_percent	=0;
+    let cgst_percent=0;
+    let sgst_percent=0;
+    let tax_percentage = 0;
+    let tax_type = templateValue['tax_type'];
+
     let parentObjectValue = templateValue[calculate_on_field.parent];
     if (this.coreFunctionService.isNotBlank(parentObjectValue)) {
       if (this.coreFunctionService.isNotBlank(parentObjectValue[calculate_on_field.field_name])){
           taxable_amount = parentObjectValue[calculate_on_field.field_name];
       }
     }
-    templateValue = this.update_invoice_totatl(templateValue, gross_amount, discount_amount, discount_percent, net_amount, surcharge, taxable_amount);
+    
+    if(this.coreFunctionService.isNotBlank(templateValue.tax_percentage)){
+      tax_percentage = templateValue.tax_percentage;
+    }
+
+    if((tax_type==null || tax_type==undefined || tax_type=='NA') && tax_percentage==0)
+    {
+      net_payble = taxable_amount;
+    }
+    else
+    {
+      switch(tax_type){
+        case "GST" :
+         gst_amount = taxable_amount * tax_percentage/100;
+         gst_percent=tax_percentage;
+         cgst_percent = gst_percent/2;
+         sgst_percent= gst_percent/2;
+         cgst_amount = gst_amount/2;
+         sgst_amount = gst_amount/2;
+         net_payble = taxable_amount+gst_amount;
+         tax_amount=gst_amount;
+         igst_amount=0;
+         igst_percent=0;
+
+          break;
+        case "IGST" :
+          igst_amount = taxable_amount * tax_percentage/100;
+          igst_percent=tax_percentage;
+          net_payble = taxable_amount+igst_amount;
+          tax_amount=igst_amount;
+          break;
+          default :
+
+    }
+    }
+      if(gross_amount>0){
+        discount_percent = this.getDecimalAmount(100*discount_amount/gross_amount);
+      }
+      let total:any ={};
+      total['surcharge'] = this.getDecimalAmount(surcharge);
+      total['igst_percent'] = this.getDecimalAmount(igst_percent);
+      total['gst_percent'] = this.getDecimalAmount(gst_percent);
+      total['cgst_percent'] = this.getDecimalAmount(cgst_percent);
+      total['sgst_percent'] = this.getDecimalAmount(sgst_percent);
+
+      total['sez_percent'] = this.getDecimalAmount(sez_percent);
+      total['gross_amount'] = this.getDecimalAmount(gross_amount);
+      total['discount_percent'] = this.getDecimalAmount(discount_percent);
+      total['discount_amount'] = this.getDecimalAmount(discount_amount);
+      total['taxable_amount'] = this.getDecimalAmount(taxable_amount);
+      total['gst_amount'] = this.getDecimalAmount(gst_amount);
+      total['cgst_amount'] = this.getDecimalAmount(cgst_amount);
+      total['sgst_amount'] = this.getDecimalAmount(sgst_amount);
+      total['igst_amount'] = this.getDecimalAmount(igst_amount);
+      total['tax_amount'] = this.getDecimalAmount(tax_amount);
+      total['sez_amount'] = this.getDecimalAmount(sez_amount);
+      // total['net_amount'] = this.getDecimalAmount(net_amount);
+      total['net_payble'] = this.getDecimalAmount(net_payble);
+      templateValue = {};
+      templateValue['total_amount'] = total;
     return templateValue;
   }
 
@@ -1204,7 +1279,6 @@ export class LimsCalculationsService {
     } else {
       unit_price = templateValue["unit_price"];
     }
-
     templateValue['total'] = gross_amount;
     templateValue['discount_amount'] = this.getDecimalAmount(discount_amount);
     templateValue['net_amount'] = this.getDecimalAmount(net_amount);
@@ -1365,7 +1439,7 @@ export class LimsCalculationsService {
     return this.calculateQquoteAmount(templateValue, { field_name: "quotation_param_methods" });
   }
 
-  calculateInvoiceOrderAmount(templateForm: FormGroup, field: any) {
+  calculateInvoiceOrderAmount(templateForm: UntypedFormGroup, field: any) {
     var net_amount = 0;
     var discount_amount = 0;
     var igst_amount = 0;
@@ -1404,10 +1478,10 @@ export class LimsCalculationsService {
     }
     return this.setValueInVieldsForChild(templateForm, fieldWithValue);
   }
-  setValueInVieldsForChild(templateForm: FormGroup, field: any) {
-    (<FormGroup>templateForm.controls['total_amount']).addControl('discount_amount', new FormControl(''))
+  setValueInVieldsForChild(templateForm: UntypedFormGroup, field: any) {
+    (<UntypedFormGroup>templateForm.controls['total_amount']).addControl('discount_amount', new UntypedFormControl(''))
     field.value.forEach((element:any) => {
-      (<FormGroup>templateForm.controls[field.field]).controls[element.field].patchValue(element.value);
+      (<UntypedFormGroup>templateForm.controls[field.field]).controls[element.field].patchValue(element.value);
     });
     return templateForm;
   }
@@ -1448,7 +1522,7 @@ export class LimsCalculationsService {
       tax_percentage = templateValue.tax_percentage;
     }
 
-    if((tax_type==null || tax_type==undefined || tax_type=='NA') && tax_percentage==0)
+    if(((tax_type==null || tax_type==undefined || tax_type=='NA') && tax_percentage==0) ||  tax_type=='Not Applicable')
     {
       net_payble = taxable_amount;
     }
@@ -1536,7 +1610,7 @@ export class LimsCalculationsService {
       tax_percentage = templateValue.tax_percentage;
     }
 
-    if((tax_type==null || tax_type==undefined || tax_type=='NA') && tax_percentage==0)
+    if(((tax_type==null || tax_type==undefined || tax_type=='NA') && tax_percentage==0 ) || tax_type=='Not Applicable')
     {
       net_payble = taxable_amount;
     }
@@ -1666,7 +1740,7 @@ break;
 
 }
 
-setValueInVields(templateForm: FormGroup, field: any) {
+setValueInVields(templateForm: UntypedFormGroup, field: any) {
   field.forEach((element: any) => {
     if(templateForm.controls[element.field]!==undefined){
       if(typeof(element.value) == 'string'){
@@ -1680,7 +1754,7 @@ setValueInVields(templateForm: FormGroup, field: any) {
   return templateForm;
 }
 
-create_professional_email(templateForm: FormGroup){
+create_professional_email(templateForm: UntypedFormGroup){
   let templateValue = templateForm.getRawValue();
   let name = templateValue.name;
   let prof_email = "";
@@ -1930,7 +2004,7 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
         if (!this.coreFunctionService.isNotBlank(offer_rate)) {
           offer_rate = 0;
         }
-        if (offer_rate) {
+        // if (offer_rate >= 0 ) {
           if(data.subsequent_offer_rate && data.subsequent_offer_rate > 0 && data.no_of_injection2 && data.no_of_injection2 > 0 && quantity > 1){
             effectiveTotal = ((quantity - 1) * data.subsequent_offer_rate) + data.offer_rate;
           }else{
@@ -1982,13 +2056,13 @@ calculateQuotationParameterAmountForLimsWithSubsequent(data:any, fieldName:any) 
           //}
           this.populateParameterAmountWithSubsequent(data, net_amount, discount_percent, dis_amt, quantity, gross_amount,subsequent_discount_amount,subsequent_discount_percent);
 
-        }else{
-          if(incoming_field == "subsequent_offer_rate"){
-            data["subsequent_offer_rate"] = offer_rate;
-          }else{
-            data["offer_rate"] = offer_rate;
-          }
-        }
+        // }else{
+        //   if(incoming_field == "subsequent_offer_rate"){
+        //     data["subsequent_offer_rate"] = offer_rate;
+        //   }else{
+        //     data["offer_rate"] = offer_rate;
+        //   }
+        // }
         break;
       case "discount_amount":
       case "subsequent_discount_amount":

@@ -30,6 +30,9 @@ export class TreeComponentService {
       const node = new TodoItemNode();
       node.item = key;
       node.reference = value['reference'];
+      if(value && value.criteria){
+        node['criteria'] = value.criteria;
+      }
       node._id = pId;
       if(value['pId']){
         node.pId = value['pId'];
@@ -309,6 +312,9 @@ export class TreeComponentService {
     tree.forEach((child:any) => {
         let modifyObj:any = {};
         modifyObj['reference'] = child.reference;
+        if(child && child.criteria){
+          modifyObj['criteria'] = child.criteria;
+        }
         if(child.allSelected){
           modifyObj['reference']['allSelected'] = child.allSelected;
         }

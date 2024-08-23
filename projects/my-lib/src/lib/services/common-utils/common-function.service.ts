@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { StorageService } from '../../services/storage/storage.service';
 import { CoreFunctionService } from '../common-utils/core-function/core-function.service';
@@ -208,8 +208,8 @@ export class CommonFunctionService {
               break;
             case "number":
               if(validatField){
-                if(this.applicableForValidation(element) && formValue[element.field_name]<=0){
-                  return {'msg':' ' +element.label + ' should be greater than 0. !!!'}
+                if(this.applicableForValidation(element) && formValue[element.field_name]<0){
+                  return {'msg':' ' +element.label + ' should be greater than or equal 0. !!!'}
                 }
               }else if (!Number(formValue[element.field_name])) {
                 formValue[element.field_name] = 0;
@@ -480,6 +480,13 @@ export class CommonFunctionService {
                 }
               }
               break;
+            case "list_of_checkbox":
+              if(validatField && element.is_mandatory){
+                if(formValueWithCust[element.field_name] && this.isArray(formValueWithCust[element.field_name]) && formValueWithCust[element.field_name].length == 0) {
+                  return {'msg': element.label + ' is mandatory. !!!'}
+                }
+              }
+            break;
             default:
               if(validatField){
 
@@ -502,7 +509,7 @@ export class CommonFunctionService {
   applicableForValidation(field:any){
     if(field.is_mandatory){
       if(field.show_if != '' && field.show_if != null){
-        if(field['display']){
+        if(field['display'] || field['show']){
           return true;
         }else{
           return false;
@@ -590,7 +597,7 @@ export class CommonFunctionService {
     return result;
   }
 
-  populate_fields_for_report(templateForm: FormGroup) {
+  populate_fields_for_report(templateForm: UntypedFormGroup) {
     // templateForm.controls['reporting_fax'].setValue(templateForm.value['fax']);
     templateForm.controls['reporting_mobile'].setValue(templateForm.value['mobile']);
     templateForm.controls['reporting_tel'].setValue(templateForm.value['phone']);
@@ -1082,6 +1089,22 @@ export class CommonFunctionService {
 
      return obj;
    }
+   getDay(data:any):String{
+    let createdDate = data.createdDate;
+    if(createdDate){
+      let obj = this.dateDiff(createdDate);
+      if(obj && obj['days'] == 0){
+        if(obj['hours'] == 0){
+          return obj['minutes']+" Minutes ago";
+        }else{
+          return obj['hours'] +" hours "+obj['minutes']+" Minutes ago";
+        }
+      }else{
+        return obj['days'] +" days ago";
+      }
+    }
+    return "";
+  }
   updateFieldInList(fieldName:any,list:any){
     let modifyList:any = [];
     if(list && list.length > 0){
@@ -1200,13 +1223,13 @@ export class CommonFunctionService {
     }
   }
 
-  copyGridCellText(value:any){     
+  copyGridCellText(value:any){
     if(value){
       navigator.clipboard.writeText(value);
       this.notificationService.notify("bg-success","Text Copied");
-    }  
+    }
   }
-  
+
   copyGridColumnText(head:any,data:any,elements?:any){
     let columnData = "";
     if(data.length>0){
@@ -1220,9 +1243,9 @@ export class CommonFunctionService {
             if(ele[field_name] && this.isArray(ele[field_name]) && ele[field_name].length > 0){
               childData= ele[field_name].map((chidData:any) =>{
                 return chidData[childFieldName];
-              }).join('\n').trim();  
+              }).join('\n').trim();
             }
-            return childData;      
+            return childData;
           }).join('\n').trim();
         }
       }else{

@@ -9,6 +9,8 @@ export class DataShareService {
   sharedData:Subject<any> = new Subject();
   currentPage: Subject<any> = new Subject();
   currentpage:string = '';
+  serverHostname : Subject<any> = new BehaviorSubject<any>(null);
+  serverEndPoint : Subject<any> = new BehaviorSubject<any>(null);
   staticData: Subject<any> = new BehaviorSubject<any>(null);
   setStaticData={};
   gridCountData: Subject<any> = new BehaviorSubject<any>(null);
@@ -63,6 +65,7 @@ export class DataShareService {
   auditVersionList:Subject<any> = new Subject<any>();
   applicationSettings:Subject<any> = new Subject<any>();
   userNotification:Subject<any> = new Subject<any>();
+  userNotificationSetting:Subject<any> = new Subject<any>();
   userPreference:Subject<any> = new Subject<any>();
   moduleIndex:Subject<any> = new Subject<any>();
   menuIndexs:Subject<any> = new Subject<any>();
@@ -81,6 +84,11 @@ export class DataShareService {
   collectiondata:Subject<any> = new Subject<any>();
   childGrid:Subject<any> = new Subject<any>();
   childgridfields:any;
+  roleChange:Subject<any> = new Subject<any>();
+  dashbordSerchKey:Subject<any> = new Subject<any>();
+  addAndUpdateResponce:Subject<any> = new Subject<any>();
+  private selectedRowIndexSource = new BehaviorSubject<number | null>(null);
+  selectedRowIndex$ = this.selectedRowIndexSource.asObservable();
 
   constructor() { }
 
@@ -293,6 +301,9 @@ export class DataShareService {
   shareUserNotification(responce:any){
     this.userNotification.next(responce);
   }
+  shareUserNotificationSetting(responce:any){
+    this.userNotificationSetting.next(responce);
+  }
   setUserPreference(userPreference:any){
     this.userPreference.next(userPreference);
   }
@@ -330,6 +341,12 @@ export class DataShareService {
   shareGridRunningData(responce:any){
     this.gridRunningData.next(responce);
   }
+  shareServerHostName(serverHostname:any){
+    this.serverHostname.next(serverHostname);
+  }
+  getServerEndPoint(req:boolean){
+    this.serverEndPoint.next(req);
+  }
    //For App
   collectionData(responce:any){
     this.collectiondata.next(responce);
@@ -341,7 +358,18 @@ export class DataShareService {
   getChildGrid(){
     return this.childgridfields;
   }
+  shareRoleChange(role:any){
+    this.roleChange.next(role);
+  }
+  shareDashbordSerach(key:string){
+    this.dashbordSerchKey.next(key);
+  }
+  shareAddAndUpdateResponce(responce:string){
+    this.addAndUpdateResponce.next(responce);
+  }
+  updateSelectedRowIndex(index: number) {
+    this.selectedRowIndexSource.next(index);
+  }
   //End For App
-
 
 }

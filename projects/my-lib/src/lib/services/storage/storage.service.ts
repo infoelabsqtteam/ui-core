@@ -7,6 +7,8 @@ import { catchError, debounceTime, distinctUntilChanged, map, tap, switchMap } f
 import { StorageTokenStatus } from '../../shared/enums/storage-token-status.enum';
 import { PLATFORM_NAME } from '../../shared/platform';
 import { Common } from '../../shared/enums/common.enum';
+import { CookiesService } from './cookies.service';
+import { DOCUMENT } from '@angular/common';
 
 
 
@@ -20,6 +22,7 @@ export class StorageService {
   RESET_PASS_SESSION:string = 'RESET_PASS_SESSION';
   EXPIRY_IN:any= 'EXPIRY_IN';
   USER_KEY: string = 'USER';
+  ROLE:string = "ROLE";
   ACTIVE_MENU: string = 'MENU';
   MENU_TYPE: string = 'MENU_TYPE';
   ID_TOKEN_EXPIRY_TIME: string = 'ID_TOKEN_EXPIRY_TIME';
@@ -46,13 +49,16 @@ export class StorageService {
   CLIENT_NAME:any = 'CLIENT_NAME';
   ALL_TEMPLATE:any = 'ALL_TEMPLATE';
   TEMPLATE_INDEX:any = "TEMPLATE_INDEX";
+  TAB_COUNTS:any="TAB_COUNTS";
 
 
   constructor(
     private http: HttpClient,
     @Inject('env') private env:any,
+    @Inject(DOCUMENT) private document: Document,
     private encryptionService:EncryptionService,
-    private coreFunctionService:CoreFunctionService
+    private coreFunctionService:CoreFunctionService,
+    private cookiesService:CookiesService
     ) { }
 
   load(): Observable<any>{
@@ -203,6 +209,21 @@ export class StorageService {
     }else{
       return {};
     }
+  }
+  GetRoleList(){
+    const obj:any = JSON.parse(<any>localStorage.getItem(this.USER_KEY));
+    if(obj && obj.rollList){
+      return obj.rollList
+    }else{
+      return [];
+    }
+  }
+  setActiveRole(role:any){
+    localStorage.setItem(this.ROLE, JSON.stringify(role));
+  }
+  getActiveRole(){
+    const obj:any = JSON.parse(<any>localStorage.getItem(this.ROLE));
+    return obj;
   }
   GetUserReference() {
     let user = this.GetUserInfo();
@@ -545,11 +566,25 @@ export class StorageService {
   // }
 
   setHostNameDinamically(host:string){
+    let domainName = this.document.location['hostname'];
+
     localStorage.setItem(this.HOST_NAME, host);
+    if(domainName!="localhost" && this.cookiesService.isCookieExpired(domainName)){
+      this.cookiesService.setCookieByName(domainName,host,30);
+    }
   }
 
   getHostNameDinamically(){
-    return localStorage.getItem(this.HOST_NAME);
+    let host = localStorage.getItem(this.HOST_NAME);
+    if(this.coreFunctionService.isNotBlank(host)){
+      return host;
+    }else{
+      let domainName = this.document.location['hostname'];
+
+      host = this.cookiesService.getCookieByName(domainName);
+      if (host && host !="") this.setHostNameDinamically(host);
+      return host;
+    }
   }
   getLogoPath(){
     let projectFolderName = this.getApplicationValueByKey('folder')
@@ -586,7 +621,7 @@ export class StorageService {
     return adminEmail;
   }
   getApplicationValueByKey(key:any){
-    let value = "";
+    let value:any = "";
     let applicationSetting = this.getApplicationSetting();
     if(applicationSetting && applicationSetting[key] != undefined && applicationSetting[key] != null && applicationSetting[key] != ""){
       value = applicationSetting[key];
@@ -707,12 +742,22 @@ export class StorageService {
   }
   getTemplate(tempName:string,moduleName:string){
     let templateList:any = this.getAllTemplateList();
-    //console.log(templateList);
-    if(templateList && templateList[tempName]){
-      let name = moduleName+"_"+tempName;
+    let name = moduleName+"_"+tempName;
+    if(templateList && templateList[name]){
       return templateList[name];
     }else{
       return null;
+    }
+  }
+  SetTabCounts(tabCounts: any) {
+    localStorage.setItem(this.TAB_COUNTS, JSON.stringify(tabCounts));
+  }
+  GetTabCounts() {
+    let counts = JSON.parse(<any>localStorage.getItem(this.TAB_COUNTS));
+    if(counts){
+      return counts;
+    }else{
+      return {};
     }
   }
 
