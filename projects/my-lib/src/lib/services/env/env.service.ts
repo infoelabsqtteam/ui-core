@@ -32,7 +32,7 @@ export class EnvService {
    }
 
 
-  async getBaseUrl(){
+  getBaseUrl(){
     let baseUrl:any;
     const host = this.storageService.getHostNameDinamically();
     if(this.coreFunctionService.isNotBlank(host)){
