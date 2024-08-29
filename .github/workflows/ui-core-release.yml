@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    ########################### Elabs Aws - ###########################
+    ########################### Elabs Aws - #############################
     # Elabs Aws
     - name: Configure AWS credentials Elabs
       uses: aws-actions/configure-aws-credentials@v1
@@ -43,8 +43,8 @@ jobs:
 
     - name: Installing NPM and Angular
       run: |         
-        CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ui-libs --domain-owner 292474393014 --region ap-south-1 --query authorizationToken --output text`
-        aws codeartifact login --tool npm --repository ui-library --domain ui-libs --domain-owner 292474393014 --region ap-south-1
+        CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ui-libs --domain-owner 025066280539 --region ap-south-1 --query authorizationToken --output text`
+        aws codeartifact login --tool npm --repository ui-library --domain ui-libs --domain-owner 025066280539 --region ap-south-1
         echo $CODEARTIFACT_AUTH_TOKEN        
         npm install -g @angular/cli@15.2.10
         npm install
@@ -67,7 +67,7 @@ jobs:
     - name: Build, tag, and push image to Amazon ECR
       #  IMAGE_TAG: $VERSION-$GITHUB_RUN_NUMBER-$Availability -> not working
       run: |
-        aws codeartifact login --tool npm --repository ui-library --domain ui-libs --domain-owner 292474393014 --region ap-south-1
+        aws codeartifact login --tool npm --repository ui-library --domain ui-libs --domain-owner 025066280539 --region ap-south-1
         npm run my-lib-build
         ng build
         npm run my-lib-publish

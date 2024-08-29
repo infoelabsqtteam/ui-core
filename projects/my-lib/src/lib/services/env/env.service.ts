@@ -22,7 +22,7 @@ export class EnvService {
     @Inject(DOCUMENT) private document: Document,
     private storageService: StorageService,
     private coreFunctionService:CoreFunctionService,
-    private dataShareService : DataShareService,  
+    private dataShareService : DataShareService,
   ) {
       this.serverHostnameSubscription = this.dataShareService.serverHostname.subscribe(data=>{
         if(data && data != ''){
@@ -30,7 +30,7 @@ export class EnvService {
         }
       })
    }
-  
+
 
   getBaseUrl(){
     let baseUrl:any;
@@ -38,8 +38,14 @@ export class EnvService {
     if(this.coreFunctionService.isNotBlank(host)){
       baseUrl = host;
     }else{
-      baseUrl = this.serverHostname +'/rest/';
       // baseUrl = environment.serverhost
+      if(this.getHostKeyValue('serverEndpoint')){
+        baseUrl = this.getHostKeyValue('serverEndpoint') +'/rest/';
+      }else{
+        if(this.serverHostname){
+           baseUrl = this.serverHostname +'/rest/';
+        }
+      }
       // baseUrl = this.getHostKeyValue('serverEndpoint') +'/rest/';
       this.setDinamicallyHost();
     }
@@ -54,7 +60,7 @@ export class EnvService {
   getAppId(){
     return this.storageService.getClientCodeEnviorment().appId;
   }
-  baseUrl(applicationAction: string) {    
+  baseUrl(applicationAction: string) {
     return this.getBaseUrl() +  (<any>EndPoint)[applicationAction];
   }
   publicBaseUrl(applicationAction: string) {
@@ -97,9 +103,9 @@ export class EnvService {
     if (this.storageService != null && this.storageService.GetIdToken() != null) {
       if(this.storageService.GetIdTokenStatus() == StorageTokenStatus.ID_TOKEN_ACTIVE){
         return true;
-      }else{        
+      }else{
         return false;
-      }      
+      }
     }
     return false;
   }
@@ -107,9 +113,9 @@ export class EnvService {
   setDinamicallyHost(){
     let setHostName = this.storageService.getHostNameDinamically();
     let serverHostName = this.serverHostname;
-    // let themedata = this.getHostKeyValue('theme_setting');    
+    // let themedata = this.getHostKeyValue('theme_setting');
     //this.setApplicationSetting();
-    if(setHostName && serverHostName && serverHostName != setHostName ) {      
+    if(setHostName && serverHostName && serverHostName != setHostName ) {
       const hostName = serverHostName +'/rest/';
       this.storageService.setHostNameDinamically(hostName);
       //this.setThemeSetting(themedata);
@@ -117,7 +123,7 @@ export class EnvService {
       this.dataShareService.getServerEndPoint(true);
     }
   }
-  
+
   getHostKeyValue(keyName:string){
     let hostname:any ="";
     let key_Name:string = '';
@@ -128,7 +134,7 @@ export class EnvService {
       hostname = this.getHostName('hostname');
       key_Name = 'clientEndpoint';
     }
-    let value:any = '';   
+    let value:any = '';
     if(hostname == 'localhost'){
       value = this.storageService.getClientCodeEnviorment().serverhost;
     }else if(serverHostList && serverHostList.length > 0){
@@ -142,8 +148,8 @@ export class EnvService {
             value = element[keyName];
             break;
           }
-          
-        }        
+
+        }
       }
     }
     return value;
