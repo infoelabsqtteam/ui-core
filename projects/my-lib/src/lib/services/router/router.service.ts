@@ -65,4 +65,7 @@ export class RouterService {
     //return this.document.location.hash.substring(1);
     return this.document.location.pathname;
   }
+  openInSameTabWithoutHistory(url: string) {
+    window.location.replace(url);
+  }
 }
