@@ -855,7 +855,11 @@ export class CommonFunctionService {
     }else if (data._id != undefined) {
       index = this.getIndexInArrayById(gridData, data._id);
     } else {
-      index = indx;
+      if(typeof data == "string"){
+        index = this.getIndexInArrayById(gridData, data, 'string');
+      }else{
+        index = indx;
+      }
     }
     if(index && index != indx && filterValue == ''){
       index = indx;
@@ -873,7 +877,12 @@ export class CommonFunctionService {
               index = i;
             }
           }else{
-            const idValue = this.getObjectValue(key,element);
+            let idValue = "";
+            if(typeof element == "object"){
+              idValue = this.getObjectValue(key,element);
+            }else if(typeof element == "string"){
+              idValue = element;
+            }
             if(id && id == idValue){
               index = i;
               break;
