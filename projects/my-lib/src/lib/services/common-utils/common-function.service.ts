@@ -878,10 +878,10 @@ export class CommonFunctionService {
             }
           }else{
             let idValue = "";
-            if(typeof element == "object"){
-              idValue = this.getObjectValue(key,element);
-            }else if(typeof element == "string"){
+            if(typeof element == "string"){
               idValue = element;
+            }else{
+              idValue = this.getObjectValue(key,element);
             }
             if(id && id == idValue){
               index = i;
