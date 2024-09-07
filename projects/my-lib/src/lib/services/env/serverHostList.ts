@@ -43,6 +43,7 @@ export const serverHostList = [
   {"clientCode": "CENT-CENT01", "clientEndpoint": "central.elabss.ai", "serverEndpoint": "https://prodservercentral.elabss.ai"},
   {"clientCode": "UPMA-UPMA01", "clientEndpoint": "upma-lims.elabss.ai", "serverEndpoint": "https://prodserverupma.elabss.ai"},
   {"clientCode": "IIRT-IIRT01", "clientEndpoint": "erp.iirt.co.in", "serverEndpoint": "https://prodiirtserver.elabss.ai"},
+  {"clientCode": "IIRT-IIRT01", "clientEndpoint": "lims-iirt.elabss.ai", "serverEndpoint": "https://prodiirtserver.elabss.ai"},
   {"clientCode": "COMP-COMPASS01", "clientEndpoint": "compassgroup.elabss.ai", "serverEndpoint": "https://prodservercompassgroup.elabss.ai"},
   {"clientCode": "TICS-TICS01", "clientEndpoint": "lims.theticslab.com", "serverEndpoint": "https://prodservertheticslab.elabss.ai"},
   {"clientCode": "ITC-ITC01-DEV2", "clientEndpoint": "dev2.elabss.ai", "serverEndpoint": "https://dev2serverelabs.elabss.ai"},
