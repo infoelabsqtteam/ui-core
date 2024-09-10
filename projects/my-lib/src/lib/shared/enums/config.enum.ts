@@ -49,5 +49,6 @@ export enum Config {
     PreviewData = 'previewData',
     DownloadClick = 'downloadClick',
     Forms = 'forms',
-    AdFilterList = 'adFilterList'
+    AdFilterList = 'adFilterList',
+    CurrentActionButton = 'currentActionButton'
 }

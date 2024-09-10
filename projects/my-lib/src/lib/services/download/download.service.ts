@@ -26,7 +26,10 @@ export class DownloadService {
   ) { }
 
 
-  download(url:any,fileName:any){
+  download(url:any,fileName:any,button?:any){
+    if(button && button.openNewTab){
+      window.open(url, '_blank');
+    }
     let link = document.createElement('a');
     link.setAttribute('type', 'hidden');
     link.href = url;
