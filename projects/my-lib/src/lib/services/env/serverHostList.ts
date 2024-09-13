@@ -1,10 +1,10 @@
 export const serverHostList = [
   {"clientEndpoint": "localhost", "serverEndpoint": "http://localhost:8104"},
   {"clientCode": "ELABS-ELABS01-SIT", "clientEndpoint": "sit.elabss.ai", "serverEndpoint": "https://sitserverelabs.elabss.ai"},
-  {"clientCode": "ELABS-ELABS01-DEV", "clientEndpoint": "dev.elabss.ai", "serverEndpoint": "https://devserverelabs.elabss.ai"}, 
-  {"clientCode": "ELABS-ELABS01-UAT", "clientEndpoint": "uat.elabss.ai", "serverEndpoint": "https://uatserverelabs.elabss.ai"},  
+  {"clientCode": "ELABS-ELABS01-DEV", "clientEndpoint": "dev.elabss.ai", "serverEndpoint": "https://devserverelabs.elabss.ai"},
+  {"clientCode": "ELABS-ELABS01-UAT", "clientEndpoint": "uat.elabss.ai", "serverEndpoint": "https://uatserverelabs.elabss.ai"},
   {"clientCode": "SANS-SANS01-SIT", "clientEndpoint": "sit-sanskar.elabss.ai", "serverEndpoint": "https://sitsanskarserver.elabss.ai"},
-  {"clientCode": "SANS-SANS01", "clientEndpoint": "lims-sanskar.elabss.ai", "serverEndpoint": "https://prodsanskarserver.elabss.ai"},  
+  {"clientCode": "SANS-SANS01", "clientEndpoint": "lims-sanskar.elabss.ai", "serverEndpoint": "https://prodsanskarserver.elabss.ai"},
   {"clientEndpoint": "hardgoodslabs.elabss.ai", "serverEndpoint": "https://serverhardgoodlabs.elabss.ai"},
   {"clientCode": "DEMO-DEMO01", "clientEndpoint": "demolab.elabss.ai", "serverEndpoint": "https://serverhardgoodlabs.elabss.ai"},
   {"clientEndpoint": "lite-demolab.elabss.ai", "serverEndpoint": "https://serverhardgoodlabs.elabss.ai"},
@@ -13,7 +13,7 @@ export const serverHostList = [
   {"clientEndpoint": "uatclients.elabss.ai", "serverEndpoint": "https://sitserverascgroup.elabss.ai"},
   {"clientCode": "ASC-ASC01", "clientEndpoint": "erpsuite.ascgroup.co.in", "serverEndpoint": "https://prodserverascgroup.elabss.ai"},
   {"clientCode": "ASC-ASC01", "clientEndpoint": "lims-ascgroup.elabss.ai", "serverEndpoint": "https://prodserverascgroup.elabss.ai"},
-  {"clientEndpoint": "itclabs.elabss.ai", "serverEndpoint": "https://serveritclabs.elabss.ai"},
+  {"clientEndpoint": "sit-itclabs.elabss.ai", "serverEndpoint": "https://serveritclabs.elabss.ai"},
   {"clientEndpoint": "dev-itclabs.elabss.ai", "serverEndpoint": "https://devserveritclabs.elabss.ai"},
   {"clientCode": "ITC-ITC01-UAT", "clientEndpoint": "uat-itclabs.elabss.ai", "serverEndpoint": "https://uatserveritclabs.elabss.ai"},
   {"clientCode": "ITC-ITC01","clientEndpoint": "lims-itclabs.elabss.ai", "serverEndpoint": "https://prodserveritclabs.elabss.ai"},
@@ -35,7 +35,7 @@ export const serverHostList = [
   {"clientEndpoint": "food.multani.com", "serverEndpoint": "http://server.multani.com:30051"},
   {"clientEndpoint": "lims-pharma-multani.elabss.ai", "serverEndpoint": "https://prodmultaniserver.elabss.ai"},
   {"clientEndpoint": "lims-food-multani.elabss.ai", "serverEndpoint": "https://prodmultaniserver.elabss.ai"},
-  {"clientEndpoint": "lims-multani.elabss.ai", "serverEndpoint": "https://sitmultaniserver.elabss.ai"},  
+  {"clientEndpoint": "lims-multani.elabss.ai", "serverEndpoint": "https://sitmultaniserver.elabss.ai"},
   {"clientCode": "SAT-SAT01", "clientEndpoint": "web.sralabs.com", "serverEndpoint": "https://prodsatiateserver.elabss.ai"},
   {"clientCode": "SAT-SAT01", "clientEndpoint": "lims-sralabs.elabss.ai", "serverEndpoint": "https://prodsatiateserver.elabss.ai"},
   {"clientEndpoint": "app.elabss.ai", "serverEndpoint": "https://serverelabs.elabss.ai"},
@@ -49,5 +49,8 @@ export const serverHostList = [
   {"clientCode": "ITC-ITC01-DEV2", "clientEndpoint": "dev2.elabss.ai", "serverEndpoint": "https://dev2serverelabs.elabss.ai"},
   {"clientCode": "ITC-ITC01-SIT2", "clientEndpoint": "sit2.elabss.ai", "serverEndpoint": "https://sit2serverelabs.elabss.ai"},
   {"clientCode": "ITC-ITC01-UAT2", "clientEndpoint": "uat2.elabss.ai", "serverEndpoint": "https://uat2serverelabs.elabss.ai"},
-  {"clientCode": "ITC-ITC01-WP02", "clientEndpoint": "lims-ipsos.elabss.ai", "serverEndpoint": "https://prodserveripsos.elabss.ai"}
+  {"clientCode": "ITC-ITC01-WP02", "clientEndpoint": "lims-ipsos.elabss.ai", "serverEndpoint": "https://prodserveripsos.elabss.ai"},
+  {"clientEndpoint": "sit-qualiteklab.elabss.ai", "serverEndpoint": "https://sitserverqualiteklab.elabss.ai"},
+  {"clientEndpoint": "sit-qualiteklabbbsr.elabss.ai", "serverEndpoint": "https://sitserverbbsrqualiteklab.elabss.ai"}
+
 ]
