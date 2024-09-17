@@ -8,11 +8,14 @@ import { PermissionService } from '../permission/permission.service';
 import { ModelService } from '../model/model.service';
 import { ApiService } from '../api/api.service';
 import { NotificationService } from '../notify/notification.service';
+import { AppConfig, AppConfigInterface } from '../../shared/configuration/config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DownloadService {
+
+  public config:AppConfigInterface = AppConfig;
 
   constructor(
     @Inject(DOCUMENT) document:any,
@@ -85,22 +88,30 @@ export class DownloadService {
       return getExportData;
   }
   exportExcel(total:any,gridColumns:any,gridFilterValue:any,tab:any,menuName:any) {
-    let downloadLink = "";
-    let tempNme = menuName.name;
-    if(this.permissionService.checkPermission(tempNme,'export')){
+    let tempName = menuName.name;
+    if(this.permissionService.checkPermission(tempName,'export')){
       let totalGridData:number = this.storageService.getApplicationSetting()?.totalGridData;
+      // let totalGridData = 1000;
       if(!totalGridData) {
         totalGridData = 50000;
       }
       if(total && totalGridData > 0 && total < totalGridData) {
-        downloadLink = this.getExcelData(tab,menuName,gridColumns,gridFilterValue,tempNme,0,totalGridData);
+        this.getExcelData(tab,menuName,gridColumns,gridFilterValue,tempName,0,totalGridData);
       }else {
-        this.notificationService.notify("bg-danger", `Kindly filter data as download record size is : ${totalGridData} not ${total}`);
+        let data = {
+          'tab':tab,
+          'menuName':menuName,
+          'gridColumns':gridColumns,
+          'gridFilterValue':gridFilterValue,
+          'tempName':tempName,
+          'total':total,
+          'totalGridData':totalGridData
+        }
+        this.modalService.open('export-excel',data);
       }
     }else{
       this.permissionService.checkTokenStatusForPermission();
     }
-    return downloadLink;
   }
   getExcelData(tab:any,menuName:any,gridColumns:any,gridFilterValue:any,tempNme:any,pageNo:any,pageSize:any){
     let downloadLink = "";
@@ -131,7 +142,7 @@ export class DownloadService {
     fileName = fileName.charAt(0).toUpperCase() + fileName.slice(1)
     downloadLink = fileName + '-' + new Date().toLocaleDateString();
     this.apiService.GetExportExclLink(getExportData);
-    return downloadLink;
+    this.config.downloadClick = downloadLink;
   }
   downloadExcelFromLink(exportExcelLink:any,downloadClick:string){
     let link = document.createElement('a');
