@@ -7,6 +7,7 @@ import { StorageService } from '../../storage/storage.service';
 import { CustomvalidationService } from '../../customvalidation/customvalidation.service';
 import { CheckIfService } from '../../check-if/check-if.service';
 import { ModelService } from '../../model/model.service';
+// import { DatePipe } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,8 @@ export class FormCreationService {
     private customvalidationService:CustomvalidationService,
     private apiCallService:ApiCallService,
     private checkifService:CheckIfService,
-    private modalService:ModelService
+    private modalService:ModelService,
+    // private datePipe: DatePipe
   ) {
       const currentYear = new Date().getFullYear();
       this.minDate = new Date(currentYear - 100, 0, 1);
@@ -229,7 +231,8 @@ export class FormCreationService {
       forControl:{},
       showGridData:{},
       isStepper:false,
-      blankField:{fieldName:'',index:-1}
+      blankField:{fieldName:'',index:-1},
+      requestLocationPermission:false
     }
     for (let index = 0; index < tableFields.length; index++) {
       const element = tableFields[index];
@@ -239,186 +242,110 @@ export class FormCreationService {
         //this.notifyFieldValueIsNull(form.name,index+1);
         break;
       }
-      if(element.type == 'pdf_view'){
-        if(selectedRowIndex && selectedRowIndex != -1 && elements && elements.length > 0){
-          const object = elements[selectedRowIndex];
-          responce.staticModal.push(this.apiCallService.getPaylodWithCriteria(element.onchange_api_params,element.onchange_call_back_field,element.onchange_api_params_criteria,object));
+      if(!element.hideOnMobile){
+        if(element.type == 'pdf_view'){
+          if(selectedRowIndex && selectedRowIndex != -1 && elements && elements.length > 0){
+            const object = elements[selectedRowIndex];
+            responce.staticModal.push(this.apiCallService.getPaylodWithCriteria(element.onchange_api_params,element.onchange_call_back_field,element.onchange_api_params_criteria,object));
+          }
+          responce.editorTypeFieldList.push(element);
         }
-        responce.editorTypeFieldList.push(element);
-      }
-      if(element.type == 'info_html' || element.type == 'html_view') {
-        responce.editorTypeFieldList.push(element);
-        responce.filePreviewFields.push(element);
-      }
-      if(element.field_name && element.field_name != ''){
-        switch (element.type) {
-          case "list_of_checkbox":
-            this.createFormControl(responce.forControl, element, [], "list")
-            responce.checkBoxFieldListValue.push(element);
-            break;
-          case "checkbox":
-            this.createFormControl(responce.forControl, element, false, "checkbox")
-            break;
-          case "date":
-            let currentYear = new Date().getFullYear();
-            let value:any = "";
-            if(element.defaultValue && element.defaultValue != null && element.defaultValue != ''){
-              value = this.setDefaultDate(element);
-            }
-            if(element.datatype == 'object'){
-              this.minDate = new Date();
-              if(element.etc_fields && element.etc_fields != null){
-                if(element.etc_fields.minDate){
-                  if(element.etc_fields.minDate == '-1'){
-                    this.minDate = new Date(currentYear - 100, 0, 1);
-                  }else{
-                    this.minDate.setDate(new Date().getDate() - Number(element.etc_fields.minDate));
-                  }
-                }
+        if(element.type == 'info_html' || element.type == 'html_view') {
+          responce.editorTypeFieldList.push(element);
+          responce.filePreviewFields.push(element);
+        }
+        if(element.type == 'gmap' || element.type == 'gmapview') {
+          responce.requestLocationPermission = true;
+        }
+        if(element.field_name && element.field_name != ''){
+          switch (element.type) {
+            case "list_of_checkbox":
+              this.createFormControl(responce.forControl, element, [], "list")
+              responce.checkBoxFieldListValue.push(element);
+              break;
+            case "checkbox":
+              this.createFormControl(responce.forControl, element, false, "checkbox")
+              break;
+            case "date":
+              let currentYear = new Date().getFullYear();
+              let value:any = "";
+              if(element.defaultValue && element.defaultValue != null && element.defaultValue != ''){
+                value = this.setDefaultDate(element);
               }
-              this.maxDate = new Date();
-              if(element.etc_fields && element.etc_fields != null){
-                if(element.etc_fields.maxDate){
-                  if(element.etc_fields.maxDate == '-1'){
-                    this.maxDate = new Date(currentYear + 25, 11, 31);
-                  }else{
-                    this.maxDate.setDate(new Date().getDate() + Number(element.etc_fields.maxDate));
-                  }
-                }
-              }
-            }else{
-              this.minDate = new Date(currentYear - 100, 0, 1);
-              this.maxDate = new Date(currentYear + 25, 11, 31);
-            }
-            element['minDate'] = this.minDate
-            element['maxDate'] = this.maxDate;
-            this.createFormControl(responce.forControl, element, value, "text")
-            break;
-          case "daterange":
-            const date_range = {};
-            let list_of_dates = [
-              {field_name : 'start'},
-              {field_name : 'end'}
-            ]
-            if (list_of_dates.length > 0) {
-              list_of_dates.forEach((data) => {
-                this.createFormControl(date_range, data, '', "text")
-              });
-            }
-            this.createFormControl(responce.forControl, element, date_range, "group")
-            break;
-          case "list_of_fields":
-          case "group_of_fields":
-            const list_of_fields = {};
-            if(element){
-              if (element.list_of_fields && element.list_of_fields.length > 0) {
-                for (let j = 0; j < element.list_of_fields.length; j++) {
-                  const data = element.list_of_fields[j];
-                  if(data == null){
-                    responce.blankField.fieldName = element.name;
-                    responce.blankField.index = index+1+"->"+j+1;
-                    //this.notifyFieldValueIsNull(element.name,j+1);
-                    break;
-                  }
-                  if(element.type == 'list_of_fields' && element.datatype != 'key_value'){
-                    data['notDisplay'] = false;
-                  }
-                  let modifyData = JSON.parse(JSON.stringify(data));
-                  modifyData['parent'] = element.field_name;
-                  //show if handling
-                  if(data.show_if && data.show_if != ''){
-                    modifyData['parentIndex'] = index;
-                    modifyData['currentIndex'] = j;
-                    responce.showIfFieldList.push(modifyData);
-                  }
-                  //Mendetory If handling
-                  if(data.mandatory_if && data.mandatory_if != ''){
-                    responce.mendetoryIfFieldList.push(modifyData);
-                  }
-                  //disable if handling
-                  if((data.disable_if && data.disable_if != '') || (data.disable_on_update && data.disable_on_update != '' && data.disable_on_update != undefined && data.disable_on_update != null) || (data.disable_on_add && data.disable_on_add != '' && data.disable_on_add != undefined && data.disable_on_add != null)){
-                    responce.disableIfFieldList.push(modifyData);
-                  }
-                  if(element.type == 'list_of_fields'){
-                    modifyData.is_mandatory=false;
-                  }
-                  if(data.field_name && data.field_name != '' && element.datatype != "list_of_object_with_popup"){
-                    // Calculation onChange handling
-                    if (element.onchange_function && element.onchange_function_param && element.onchange_function_param != ""){
-                      responce.calculationFieldList.push(element);
-                    }
-                    switch (data.type) {
-                      case "list_of_checkbox":
-                        this.createFormControl(list_of_fields, modifyData, [], "list")
-                        responce.checkBoxFieldListValue.push(modifyData);
-                        break;
-                      case "checkbox":
-                        this.createFormControl(list_of_fields, modifyData, false, "checkbox")
-                        break;
-                      case "date":
-                        let currentYear = new Date().getFullYear();
-                        if(data.datatype == 'object'){
-                          this.minDate = new Date();
-                          if(data.etc_fields && data.etc_fields != null){
-                            if(data.etc_fields.minDate){
-                              if(data.etc_fields.minDate == '-1'){
-                                this.minDate = new Date(currentYear - 100, 0, 1);
-                              }else{
-                                this.minDate.setDate(new Date().getDate() - Number(data.etc_fields.minDate));
-                              }
-                            }
-                          }
-                          this.maxDate = new Date();
-                          if(data.etc_fields && data.etc_fields != null){
-                            if(data.etc_fields.maxDate){
-                              if(data.etc_fields.maxDate == '-1'){
-                                this.maxDate = new Date(currentYear + 25, 11, 31);
-                              }else{
-                                this.maxDate.setDate(new Date().getDate() + Number(data.etc_fields.maxDate));
-                              }
-                            }
-                          }
-                        }else{
-                          this.minDate = new Date(currentYear - 100, 0, 1);
-                          this.maxDate = new Date(currentYear + 25, 11, 31);
-                        }
-                        data['minDate'] = this.minDate
-                        data['maxDate'] = this.maxDate;
-                        this.createFormControl(list_of_fields, modifyData, '', "text")
-                        break;
-                      default:
-                        this.createFormControl(list_of_fields, modifyData, '', "text")
-                        break;
+              if(element.datatype == 'object'){
+                this.minDate = new Date();
+                if(element.etc_fields && element.etc_fields != null){
+                  if(element.etc_fields.minDate){
+                    if(element.etc_fields.minDate == '-1'){
+                      this.minDate = new Date(currentYear - 100, 0, 1);
+                    }else{
+                      this.minDate.setDate(new Date().getDate() - Number(element.etc_fields.minDate));
                     }
                   }
-                  data.field_class = this.commonFunctionService.getDivClass(data,(tableFields.length + element.list_of_fields.length));
                 }
+                this.maxDate = new Date();
+                if(element.etc_fields && element.etc_fields != null){
+                  if(element.etc_fields.maxDate){
+                    if(element.etc_fields.maxDate == '-1'){
+                      this.maxDate = new Date(currentYear + 25, 11, 31);
+                    }else{
+                      this.maxDate.setDate(new Date().getDate() + Number(element.etc_fields.maxDate));
+                    }
+                  }
+                }
+              }else{
+                this.minDate = new Date(currentYear - 100, 0, 1);
+                this.maxDate = new Date(currentYear + 25, 11, 31);
               }
-            }
-            this.createFormControl(responce.forControl, element, list_of_fields, "group")
-            // if(element.type == 'list_of_fields'){
-            //   this.list_of_fields.push(element);
-            // }
-            break;
-          // case 'html_view':
-          //   const field = {
-          //     field_name : 'html_view_1'
-          //   }
-          //   this.createFormControl(forControl, element, '', "text")
-          //   break;
-          case "stepper":
-            if(element.list_of_fields && element.list_of_fields.length > 0) {
-              element.list_of_fields.forEach((step:any) => {
-                if(step.list_of_fields != undefined && step.list_of_fields.length > 0){
-                  const stepper_of_fields = {};
-                  step.list_of_fields.forEach((data:any) =>{
+              element['minDate'] = this.minDate
+              element['maxDate'] = this.maxDate;
+              this.createFormControl(responce.forControl, element, value, "text")
+              break;
+            case "daterange":
+              const date_range = {};
+              let list_of_dates = [
+                {field_name : 'start'},
+                {field_name : 'end'}
+              ]
+              if (list_of_dates.length > 0) {
+                list_of_dates.forEach((data) => {
+                  this.createFormControl(date_range, data, '', "text")
+                });
+              }
+              this.createFormControl(responce.forControl, element, date_range, "group")
+              break;
+            case "list_of_fields":
+            case "group_of_fields":
+              const list_of_fields = {};
+              if(element){
+                if (element.list_of_fields && element.list_of_fields.length > 0) {
+                  for (let j = 0; j < element.list_of_fields.length; j++) {
+                    const data = element.list_of_fields[j];
+                    if(data == null){
+                      responce.blankField.fieldName = element.name;
+                      responce.blankField.index = index+1+"->"+j+1;
+                      //this.notifyFieldValueIsNull(element.name,j+1);
+                      break;
+                    }
+                    if(element.type == 'list_of_fields' && element.datatype != 'key_value'){
+                      data['notDisplay'] = false;
+                    }
                     let modifyData = JSON.parse(JSON.stringify(data));
-                    modifyData.parent = step.field_name;
+                    modifyData['parent'] = element.field_name;
+                    //is disable handling
+                    //if parent is disabled then it's non disabled list_of_field will be disabled
+                    if(element.is_disabled){
+                      if(!modifyData.is_disabled){
+                        modifyData.is_disabled = element.is_disabled;
+                      }
+                    }
                     //show if handling
                     if(data.show_if && data.show_if != ''){
+                      modifyData['parentIndex'] = index;
+                      modifyData['currentIndex'] = j;
                       responce.showIfFieldList.push(modifyData);
                     }
-                    //mendetory if handling
+                    //Mendetory If handling
                     if(data.mandatory_if && data.mandatory_if != ''){
                       responce.mendetoryIfFieldList.push(modifyData);
                     }
@@ -426,97 +353,185 @@ export class FormCreationService {
                     if((data.disable_if && data.disable_if != '') || (data.disable_on_update && data.disable_on_update != '' && data.disable_on_update != undefined && data.disable_on_update != null) || (data.disable_on_add && data.disable_on_add != '' && data.disable_on_add != undefined && data.disable_on_add != null)){
                       responce.disableIfFieldList.push(modifyData);
                     }
-                    // Calculation onChange handling
-                    if (element.onchange_function && element.onchange_function_param && element.onchange_function_param != ""){
-                      responce.calculationFieldList.push(element);
+                    if(element.type == 'list_of_fields'){
+                      modifyData.is_mandatory=false;
                     }
-
-                    this.createFormControl(stepper_of_fields, modifyData, '', "text")
-                    if(data.tree_view_object && data.tree_view_object.field_name != ""){
-                      let treeModifyData = JSON.parse(JSON.stringify(data.tree_view_object));
-                      treeModifyData.is_mandatory=false;
-                      this.createFormControl(stepper_of_fields, treeModifyData , '', "text")
+                    if(data.field_name && data.field_name != '' && element.datatype != "list_of_object_with_popup"){
+                      // Calculation onChange handling
+                      if (element.onchange_function && element.onchange_function_param && element.onchange_function_param != ""){
+                        responce.calculationFieldList.push(element);
+                      }
+                      switch (data.type) {
+                        case "list_of_checkbox":
+                          this.createFormControl(list_of_fields, modifyData, [], "list")
+                          responce.checkBoxFieldListValue.push(modifyData);
+                          break;
+                        case "checkbox":
+                          this.createFormControl(list_of_fields, modifyData, false, "checkbox")
+                          break;
+                        case "date":
+                          let currentYear = new Date().getFullYear();
+                          if(data.datatype == 'object'){
+                            this.minDate = new Date();
+                            if(data.etc_fields && data.etc_fields != null){
+                              if(data.etc_fields.minDate){
+                                if(data.etc_fields.minDate == '-1'){
+                                  this.minDate = new Date(currentYear - 100, 0, 1);
+                                }else{
+                                  this.minDate.setDate(new Date().getDate() - Number(data.etc_fields.minDate));
+                                }
+                              }
+                            }
+                            this.maxDate = new Date();
+                            if(data.etc_fields && data.etc_fields != null){
+                              if(data.etc_fields.maxDate){
+                                if(data.etc_fields.maxDate == '-1'){
+                                  this.maxDate = new Date(currentYear + 25, 11, 31);
+                                }else{
+                                  this.maxDate.setDate(new Date().getDate() + Number(data.etc_fields.maxDate));
+                                }
+                              }
+                            }
+                          }else{
+                            this.minDate = new Date(currentYear - 100, 0, 1);
+                            this.maxDate = new Date(currentYear + 25, 11, 31);
+                          }
+                          data['minDate'] = this.minDate
+                          data['maxDate'] = this.maxDate;
+                          this.createFormControl(list_of_fields, modifyData, '', "text")
+                          break;
+                        default:
+                          this.createFormControl(list_of_fields, modifyData, '', "text")
+                          break;
+                      }
                     }
-                  });
-                  this.createFormControl(responce.forControl, step, stepper_of_fields, "group")
+                    data.field_class = this.commonFunctionService.getDivClass(data,(tableFields.length + element.list_of_fields.length));
+                  }
                 }
-              });
-              responce.isStepper = true;
-            }
-            break;
-          case "pdf_view" :
-            if(selectedRowIndex && selectedRowIndex != -1 && elements && elements.length > 0){
-              const object = elements[selectedRowIndex];
-              responce.staticModal.push(this.apiCallService.getPaylodWithCriteria(element.onchange_api_params,element.onchange_call_back_field,element.onchange_api_params_criteria,object));
-            }
-            break;
-          case "input_with_uploadfile":
-            element.is_disabled = true;
-            this.createFormControl(responce.forControl, element, '', "text")
-            break;
-          case "grid_selection":
-            if(element && element.gridColumns && element.gridColumns.length > 0){
-              let colParField = JSON.parse(JSON.stringify(element));
-              colParField['mendetory_fields'] = [];
-              element.gridColumns.forEach((colField:any) => {
-                if(colField && colField.is_mandatory){
-                  colParField['mendetory_fields'].push(colField);
-                }
-              });
-              if(colParField && colParField['mendetory_fields'] && colParField['mendetory_fields'].length > 0){
-                responce.gridSelectionMendetoryList.push(colParField);
-                element['mendetory_fields'] = colParField['mendetory_fields'];
               }
-              responce.showGridData[element.field_name] = true;
-            }
-            if(element && element.addNewButtonIf && element.addNewButtonIf != ''){
-              element['fieldIndex'] = index;
-              responce.buttonIfList.push(element);
-            }
-            element['showButton'] = this.checkGridSelectionButtonCondition(element,'add',{},{});
-            this.createFormControl(responce.forControl, element, '', "text");
-            break;
-          case "tree_view":
-            // this.treeControl[element.field_name] = new FlatTreeControl<TodoItemFlatNode>(this.getLevel, this.isExpandable);
-            // this.dataSource[element.field_name] = new MatTreeFlatDataSource(this.treeControl[element.field_name], this.treeFlattener);
-            this.createFormControl(responce.forControl, element, '', "text");
-            break;
-          default:
-            if(element.defaultValue && element.defaultValue != null && element.defaultValue != ''){
-              const value = element.defaultValue;
-              this.createFormControl(responce.forControl, element, value, "text");
-            }else{
+              this.createFormControl(responce.forControl, element, list_of_fields, "group")
+              // if(element.type == 'list_of_fields'){
+              //   this.list_of_fields.push(element);
+              // }
+              break;
+            // case 'html_view':
+            //   const field = {
+            //     field_name : 'html_view_1'
+            //   }
+            //   this.createFormControl(forControl, element, '', "text")
+            //   break;
+            case "stepper":
+              if(element.list_of_fields && element.list_of_fields.length > 0) {
+                element.list_of_fields.forEach((step:any) => {
+                  if(step.list_of_fields != undefined && step.list_of_fields.length > 0){
+                    const stepper_of_fields = {};
+                    step.list_of_fields.forEach((data:any) =>{
+                      let modifyData = JSON.parse(JSON.stringify(data));
+                      modifyData.parent = step.field_name;
+                      //show if handling
+                      if(data.show_if && data.show_if != ''){
+                        responce.showIfFieldList.push(modifyData);
+                      }
+                      //mendetory if handling
+                      if(data.mandatory_if && data.mandatory_if != ''){
+                        responce.mendetoryIfFieldList.push(modifyData);
+                      }
+                      //disable if handling
+                      if((data.disable_if && data.disable_if != '') || (data.disable_on_update && data.disable_on_update != '' && data.disable_on_update != undefined && data.disable_on_update != null) || (data.disable_on_add && data.disable_on_add != '' && data.disable_on_add != undefined && data.disable_on_add != null)){
+                        responce.disableIfFieldList.push(modifyData);
+                      }
+                      // Calculation onChange handling
+                      if (element.onchange_function && element.onchange_function_param && element.onchange_function_param != ""){
+                        responce.calculationFieldList.push(element);
+                      }
+
+                      this.createFormControl(stepper_of_fields, modifyData, '', "text")
+                      if(data.tree_view_object && data.tree_view_object.field_name != ""){
+                        let treeModifyData = JSON.parse(JSON.stringify(data.tree_view_object));
+                        treeModifyData.is_mandatory=false;
+                        this.createFormControl(stepper_of_fields, treeModifyData , '', "text")
+                      }
+                    });
+                    this.createFormControl(responce.forControl, step, stepper_of_fields, "group")
+                  }
+                });
+                responce.isStepper = true;
+              }
+              break;
+            case "pdf_view" :
+              if(selectedRowIndex && selectedRowIndex != -1 && elements && elements.length > 0){
+                const object = elements[selectedRowIndex];
+                responce.staticModal.push(this.apiCallService.getPaylodWithCriteria(element.onchange_api_params,element.onchange_call_back_field,element.onchange_api_params_criteria,object));
+              }
+              break;
+            case "input_with_uploadfile":
+              element.is_disabled = true;
+              this.createFormControl(responce.forControl, element, '', "text")
+              break;
+            case "grid_selection":
+              if(element && element.gridColumns && element.gridColumns.length > 0){
+                let colParField = JSON.parse(JSON.stringify(element));
+                colParField['mendetory_fields'] = [];
+                element.gridColumns.forEach((colField:any) => {
+                  if(colField && colField.is_mandatory){
+                    colParField['mendetory_fields'].push(colField);
+                  }
+                });
+                if(colParField && colParField['mendetory_fields'] && colParField['mendetory_fields'].length > 0){
+                  responce.gridSelectionMendetoryList.push(colParField);
+                  element['mendetory_fields'] = colParField['mendetory_fields'];
+                }
+                responce.showGridData[element.field_name] = true;
+              }
+              if(element && element.addNewButtonIf && element.addNewButtonIf != ''){
+                element['fieldIndex'] = index;
+                responce.buttonIfList.push(element);
+              }
+              element['showButton'] = this.checkGridSelectionButtonCondition(element,'add',{},{});
               this.createFormControl(responce.forControl, element, '', "text");
-            }
-            break;
+              break;
+            case "tree_view":
+              // this.treeControl[element.field_name] = new FlatTreeControl<TodoItemFlatNode>(this.getLevel, this.isExpandable);
+              // this.dataSource[element.field_name] = new MatTreeFlatDataSource(this.treeControl[element.field_name], this.treeFlattener);
+              this.createFormControl(responce.forControl, element, '', "text");
+              break;
+            default:
+              if(element.defaultValue && element.defaultValue != null && element.defaultValue != ''){
+                const value = element.defaultValue;
+                this.createFormControl(responce.forControl, element, value, "text");
+              }else{
+                this.createFormControl(responce.forControl, element, '', "text");
+              }
+              break;
+          }
+          if(element.tree_view_object && element.tree_view_object.field_name != ""){
+            let treeModifyData = JSON.parse(JSON.stringify(element.tree_view_object));
+            treeModifyData.is_mandatory=false;
+            this.createFormControl(responce.forControl, treeModifyData , '', "text")
+          }
         }
-        if(element.tree_view_object && element.tree_view_object.field_name != ""){
-          let treeModifyData = JSON.parse(JSON.stringify(element.tree_view_object));
-          treeModifyData.is_mandatory=false;
-          this.createFormControl(responce.forControl, treeModifyData , '', "text")
+        //show if handling
+        if(element.show_if && element.show_if != ''){
+          responce.showIfFieldList.push(element);
         }
+        //mendatory if handling
+        if(element.mandatory_if && element.mandatory_if != ''){
+          responce.mendetoryIfFieldList.push(element);
+        }
+        //Customvalidation handling
+        if(element.compareFieldName && element.compareFieldName != ''){
+          responce.customValidationFiels.push(element);
+        }
+        //disable if handling
+        if((element.disable_if && element.disable_if != '') || (element.disable_on_update && element.disable_on_update != '' && element.disable_on_update != undefined && element.disable_on_update != null) || (element.disable_on_add && element.disable_on_add != '' && element.disable_on_add != undefined && element.disable_on_add != null)){
+          responce.disableIfFieldList.push(element);
+        }
+        // Calculation onChange handling
+        if (element.onchange_function && element.onchange_function_param && element.onchange_function_param != ""){
+          responce.calculationFieldList.push(element);
+        }
+        element.field_class = this.commonFunctionService.getDivClass(element,tableFields.length);
       }
-      //show if handling
-      if(element.show_if && element.show_if != ''){
-        responce.showIfFieldList.push(element);
-      }
-      //mendatory if handling
-      if(element.mandatory_if && element.mandatory_if != ''){
-        responce.mendetoryIfFieldList.push(element);
-      }
-      //Customvalidation handling
-      if(element.compareFieldName && element.compareFieldName != ''){
-        responce.customValidationFiels.push(element);
-      }
-      //disable if handling
-      if((element.disable_if && element.disable_if != '') || (element.disable_on_update && element.disable_on_update != '' && element.disable_on_update != undefined && element.disable_on_update != null) || (element.disable_on_add && element.disable_on_add != '' && element.disable_on_add != undefined && element.disable_on_add != null)){
-        responce.disableIfFieldList.push(element);
-      }
-      // Calculation onChange handling
-      if (element.onchange_function && element.onchange_function_param && element.onchange_function_param != ""){
-        responce.calculationFieldList.push(element);
-      }
-      element.field_class = this.commonFunctionService.getDivClass(element,tableFields.length);
     }
     if(formFieldButtons && formFieldButtons.length > 0){
       formFieldButtons.forEach((element:any) => {
