@@ -621,11 +621,14 @@ export class FormCreationService {
     return responce;
   }
   updateSelectContact(selectContact:any,tabFilterData:any,tableFields:any,templateForm:UntypedFormGroup,formValueWithCustomData:any,staticModal:any){
-    if(selectContact != '' && tabFilterData && tabFilterData.length > 0 && tableFields && tableFields.length > 0){
-      let selectContactObject = selectContact;
-      let account={};
-      let contact={};
-      let payload:any = {};
+    let account={};
+    let contact={};
+    let payload:any = {};
+    let selectContactObject:any = {};
+    if(selectContact){
+      selectContactObject = selectContact;
+    }
+    if(tabFilterData && tabFilterData.length > 0){
       tabFilterData.forEach((element:any) => {
         if(element && element._id){
           if(element._id == selectContact){
@@ -633,22 +636,25 @@ export class FormCreationService {
           }
         }
       });
-      if(selectContactObject && selectContactObject['_id']){
+    }
+    if(selectContactObject){
+      if(selectContactObject['_id']){
         contact = {
           "_id":selectContactObject['_id'],
           "name":selectContactObject['name'],
           "code":selectContactObject['serialId']
         }
-        if(selectContactObject['lead']){
-          account = selectContactObject['lead'];
-        }
       }
+      if(selectContactObject['lead']){
+        account = selectContactObject['lead'];
+      }
+    }
+    if(tableFields && tableFields.length > 0){
       tableFields.forEach((element:any) => {
         if(element && element.field_name && element.field_name != ''){
           let fieldName = element.field_name;
           if(fieldName == 'account'){
             templateForm.controls['account'].setValue(account);
-            //this.templateForm.get('account').setValue(account);
             if (element.onchange_api_params && element.onchange_call_back_field && !element.do_not_auto_trigger_on_edit) {
               payload = this.apiCallService.getPaylodWithCriteria(element.onchange_api_params, element.onchange_call_back_field, element.onchange_api_params_criteria, formValueWithCustomData)
               if(element.onchange_api_params.indexOf("FORM_GROUP") >= 0 || element.onchange_api_params.indexOf("QTMP") >= 0){
