@@ -297,13 +297,8 @@ export class FormCreationService {
                 this.minDate = new Date(currentYear - 100, 0, 1);
                 this.maxDate = new Date(currentYear + 25, 11, 31);
               }
-              // if(this.storageService.checkPlatForm() == 'mobile'){
-              //   element['minDate'] = this.datePipe.transform(this.minDate, "yyyy-MM-dd");
-              //   element['maxDate'] = this.datePipe.transform(this.maxDate, "yyyy-MM-dd");;
-              // }else{
-                element['minDate'] = this.minDate
-                element['maxDate'] = this.maxDate;
-              // }
+              element['minDate'] = this.minDate
+              element['maxDate'] = this.maxDate;
               this.createFormControl(responce.forControl, element, value, "text")
               break;
             case "daterange":
@@ -401,13 +396,8 @@ export class FormCreationService {
                             this.minDate = new Date(currentYear - 100, 0, 1);
                             this.maxDate = new Date(currentYear + 25, 11, 31);
                           }
-                          // if(this.storageService.checkPlatForm() == 'mobile'){
-                          //   data['minDate'] = this.datePipe.transform(this.minDate, "yyyy-MM-dd");
-                          //   data['maxDate'] = this.datePipe.transform(this.maxDate, "yyyy-MM-dd");;
-                          // }else{
-                            data['minDate'] = this.minDate
-                            data['maxDate'] = this.maxDate;
-                          // }
+                          data['minDate'] = this.minDate
+                          data['maxDate'] = this.maxDate;
                           this.createFormControl(list_of_fields, modifyData, '', "text")
                           break;
                         default:

@@ -88,7 +88,27 @@ export class FormValueService {
               if(element && element.date_format && element.date_format != ''){
                 selectedRow[element.field_name] = this.datePipe.transform(selectedRow[element.field_name],'dd/MM/yyyy');
               } else {
-                selectedRow[element.field_name] = formValue[element.field_name];
+                let value = formValue[element.field_name] == null ? null : formValue[element.field_name];
+                if(this.storageService.getPlatform() == 'mobile' && value){
+                  // required format 2022-06-30T00:00:00+05:30 (client) and 2022-06-29T18:30:00.000Z (server)
+                  let  Mdate = value.substring(0,11) + "00:00:00" + value.substring(19);
+                  let utcDate = this.datePipe.transform(Mdate,"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",'UTC');
+                  value = utcDate;
+                }
+                selectedRow[element.field_name] = value;
+              }
+              break;
+            case 'time':
+              if(element && element.time_format && element.time_format != ''){
+                selectedRow[element.field_name] = this.datePipe.transform(selectedRow[element.field_name],element.time_format);
+              }else{
+                // required format 01:30 PM (client) and 01:30 PM as String (server)
+                let value = formValue[element.field_name] == null ? null : formValue[element.field_name];
+                if(this.storageService.getPlatform() == 'mobile' && value){
+                  let splitHrMin:any = value.split(":"); 
+                  value = new Date(`2023-01-01T${splitHrMin[0]}:${splitHrMin[1]}:00`).toLocaleTimeString([], { hour: 'numeric', minute: 'numeric', hour12: true });
+                }
+                selectedRow[element.field_name] = value;
               }
               break;
             default:
@@ -152,7 +172,28 @@ export class FormValueService {
               if(element && element.date_format && element.date_format != ''){
                 modifyFormValue[element.field_name] = this.datePipe.transform(formValue[element.field_name],'dd/MM/yyyy');
               } else {
+                let value =  formValue[element.field_name] == null ? null : formValue[element.field_name];
+
+                //required format 2022-06-30T00:00:00+05:30 (client) and 2022-06-29T18:30:00.000Z (server)
+                if(this.storageService.getPlatform() == 'mobile' && value){
+                  let  Mdate = value.substring(0,11) + "00:00:00" + value.substring(19);
+                  let utcDate = this.datePipe.transform(Mdate,"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",'UTC');
+                  value = utcDate;
+                }
                 modifyFormValue[element.field_name] = formValue[element.field_name];
+              }
+              break;
+            case 'time':
+              if(element && element.time_format && element.time_format != ''){
+                modifyFormValue[element.field_name] = this.datePipe.transform(selectedRow[element.field_name],element.time_format);
+              }else{
+                // required format 01:30 PM (client) and 01:30 PM as String (server)
+                let value = formValue[element.field_name] == null ? null : formValue[element.field_name];
+                if(this.storageService.getPlatform() == 'mobile' && value){
+                  let splitHrMin:any = value.split(":"); 
+                  value = new Date(`2023-01-01T${splitHrMin[0]}:${splitHrMin[1]}:00`).toLocaleTimeString([], { hour: 'numeric', minute: 'numeric', hour12: true });
+                }
+                modifyFormValue[element.field_name] = value;
               }
               break;
             default:
@@ -374,6 +415,9 @@ export class FormValueService {
             }
             if(!formValue['appId'] || formValue['appId'] == '' || formValue['appId'] == null){
               formValue['appId'] = this.commonFunctionService.getAppId();
+            }
+            if(!formValue['platForm'] || formValue['platForm'] == '' || formValue['platForm'] == null){
+              formValue['platForm'] = this.storageService.getPlatform();              
             }
             if (updateMode) {
               if(formName == 'cancel'){

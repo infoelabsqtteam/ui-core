@@ -1,9 +1,11 @@
+import { StorageService } from '../../storage/storage.service';
 import { Injectable } from '@angular/core';
 import { UntypedFormArray, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { CommonFunctionService } from '../../common-utils/common-function.service';
 import { FileHandlerService } from '../../fileHandler/file-handler.service';
 import { GridCommonFunctionService } from '../../grid/grid-common-function/grid-common-function.service';
 import { TreeComponentService } from '../../tree-component/tree-component.service';
+import { DatePipe } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +16,9 @@ export class FormControlService {
     private commonFunctionService:CommonFunctionService,
     private fileHandlerService: FileHandlerService,
     private gridCommonFunctionService:GridCommonFunctionService,
-    private TreeComponentService:TreeComponentService
+    private TreeComponentService:TreeComponentService,
+    private storageService: StorageService,
+    private datePipe: DatePipe
   ) { }
 
   editeListFieldData(templateForm:UntypedFormGroup,custmizedFormValue:any,tableFields:any,field:any,index:any,listOfFieldsUpdateIndex:any,staticData:any,dataListForUpload:any){
@@ -118,11 +122,11 @@ export class FormControlService {
       longitude:longitude,
       latitude:latitude,
       zoom:zoom,
-      getAddress:false
-
+      getAddress:false,
+      typeAheadData:[],
     }
     tableFields.forEach((element:any) => {
-      if(element && element.field_name && element.field_name != ''){
+      if(element && element.field_name && element.field_name != '' && !element.hideOnMobile){
         let fieldName = element.field_name;
         let object = formValue[fieldName];
         if(object != null && object != undefined){
@@ -268,6 +272,9 @@ export class FormControlService {
         }else{
           if(object != null && object != undefined){
             const value = object;
+            if(this.storageService.checkPlatForm() == 'mobile'){
+              responce.typeAheadData = value;
+            }
             responce.templateForm.controls[fieldName].setValue(value)
           }
         }
@@ -344,7 +351,12 @@ export class FormControlService {
                       const value = new Date(formatedDate);
                       (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value)
                     }else{
-                      const value = formValue[fieldName][childFieldName] == null ? null : formValue[fieldName][childFieldName];
+                      let value = formValue[fieldName][childFieldName] == null ? null : formValue[fieldName][childFieldName];
+                      if(this.storageService.checkPlatForm() == 'mobile' && value){
+                        //need in this format 2022-06-30T00:00:00+05:30
+                        let localZonedDateTime = new Date(formValue[fieldName]).toLocaleString();
+                        value = this.datePipe.transform(localZonedDateTime,"yyyy-MM-dd'T'HH:mm:ssZZZZZ");              
+                      }                      
                       (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value);
                     }
                   }
@@ -504,8 +516,33 @@ export class FormControlService {
             const value = new Date(formatedDate);
             responce.templateForm.controls[fieldName].setValue(value)
           }else{
-            const value = formValue[fieldName] == null ? null : formValue[fieldName];
+            let value = formValue[fieldName];
+            if(this.storageService.checkPlatForm() == 'mobile' && formValue[fieldName]){
+              //need in this format 2022-06-30T00:00:00+05:30
+              let localZonedDateTime = new Date(formValue[fieldName]).toLocaleString();
+              value = this.datePipe.transform(localZonedDateTime,"yyyy-MM-dd'T'HH:mm:ssZZZZZ");              
+            }
             responce.templateForm.controls[fieldName].setValue(value);
+          }
+        }
+        break;
+      case "time":
+        if(object != null && object != undefined){
+          if(element.time_format && element.time_format != '' && typeof object === 'string'){
+            const time = object[fieldName];
+            responce.templateForm.controls[fieldName].setValue(time)
+          }else{
+            let value = formValue[element.field_name] == null ? null : formValue[element.field_name];
+            // let transformzonedTime :any;
+            if(this.storageService.checkPlatForm() == 'mobile' && value){
+              //new way required foramt for Ionic TimeFormat to convert into 24hr is "07:05:45 PM"
+              let splitServerValue = value.split(" ");
+              let addsec = splitServerValue[0] +":"+'00'+" "+splitServerValue[1];
+              let date = new Date("2023-01-01 " + addsec);
+              // Format the date object into a 24 hour time string
+              value = date.toLocaleTimeString([], { hour12: false });
+            }
+            responce.templateForm.controls[fieldName].setValue(value);                  
           }
         }
         break;
