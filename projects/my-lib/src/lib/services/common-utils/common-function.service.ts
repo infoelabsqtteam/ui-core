@@ -1257,7 +1257,7 @@ export class CommonFunctionService {
     }
   }
   getPageCount(total:number,pageSize:number){
-    let data:any = {}
+    let data:any = {'0':'All'}
     let pageNo=0;
     let reminder = total % pageSize;
     pageNo = Math.floor(total / pageSize);
