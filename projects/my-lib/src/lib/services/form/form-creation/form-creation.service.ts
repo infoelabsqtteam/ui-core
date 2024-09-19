@@ -654,7 +654,9 @@ export class FormCreationService {
         if(element && element.field_name && element.field_name != ''){
           let fieldName = element.field_name;
           if(fieldName == 'account'){
-            templateForm.controls['account'].setValue(account);
+            if(account && Object.keys(account).length > 0){
+              templateForm.controls['account'].setValue(account);
+            }
             if (element.onchange_api_params && element.onchange_call_back_field && !element.do_not_auto_trigger_on_edit) {
               payload = this.apiCallService.getPaylodWithCriteria(element.onchange_api_params, element.onchange_call_back_field, element.onchange_api_params_criteria, formValueWithCustomData)
               if(element.onchange_api_params.indexOf("FORM_GROUP") >= 0 || element.onchange_api_params.indexOf("QTMP") >= 0){
@@ -664,8 +666,9 @@ export class FormCreationService {
             }
           }
           if(element.field_name == 'contact'){
-            templateForm.controls['contact'].setValue(contact);
-            //this.templateForm.get('contact').setValue(contact);
+            if(contact && Object.keys(contact).length > 0){
+              templateForm.controls['contact'].setValue(contact);
+            }
             if (element.onchange_api_params && element.onchange_call_back_field && !element.do_not_auto_trigger_on_edit) {
               payload = this.apiCallService.getPaylodWithCriteria(element.onchange_api_params, element.onchange_call_back_field, element.onchange_api_params_criteria, formValueWithCustomData)
               if(element.onchange_api_params.indexOf("FORM_GROUP") >= 0 || element.onchange_api_params.indexOf("QTMP") >= 0){
