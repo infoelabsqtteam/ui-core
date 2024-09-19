@@ -90,8 +90,8 @@ export class DownloadService {
   exportExcel(total:any,gridColumns:any,gridFilterValue:any,tab:any,menuName:any) {
     let tempName = menuName.name;
     if(this.permissionService.checkPermission(tempName,'export')){
-      let totalGridData:number = this.storageService.getApplicationSetting()?.totalGridData;
-      // let totalGridData = 1000;
+      // let totalGridData:number = this.storageService.getApplicationSetting()?.totalGridData;
+      let totalGridData = 500;
       if(!totalGridData) {
         totalGridData = 50000;
       }
