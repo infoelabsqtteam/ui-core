@@ -1256,4 +1256,39 @@ export class CommonFunctionService {
       navigator.clipboard.writeText(columnData);
     }
   }
+  getPageCount(total:number,pageSize:number){
+    let data:any = {'0':'All'}
+    let pageNo=0;
+    let reminder = total % pageSize;
+    pageNo = Math.floor(total / pageSize);
+    if(reminder > 0){
+      pageNo = pageNo + 1;
+    }
+    if(pageNo > 0){
+      let record:any = [];
+      for (let index = 0; index < pageNo; index++) {
+        if(index == (pageNo-1) && reminder > 0){
+          record.push(total);
+        }else{
+          record.push(pageSize * (index+1));
+        }
+      }
+      if(record && record.length > 0){
+        let value = "";
+        record.forEach((val:any,i:any) => {
+          let preIndex = i - 1;
+          if(i == 0){
+            value +=  (i+1) + ' - ' + val;
+          }else if(i == (record.length -1)){
+            value += (record[preIndex]+1) + ' - ' +  val;
+          }else{
+            value += (record[preIndex]+1) + ' - ' + val;
+          }
+          data[i+1] = value;
+          value = '';
+        })
+      }
+    }
+    return data;
+  }
 }
