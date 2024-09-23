@@ -18,7 +18,6 @@ export class NotificationService {
     private apiService: ApiService,
     private storageService: StorageService
   ) {
-    /* DO not just unComment below code related to speech, It will cause HUGE Impact on Mobile APP */
     if(this.storageService.checkPlatForm() != 'mobile'){
       this.synth = window.speechSynthesis;
       this.voices = [];
@@ -57,7 +56,6 @@ export class NotificationService {
         this.apiService.SaveFormData(payload);
     }
   }
-  /* DO not just unComment below code related to speech, It will cause HUGE Impact on Mobile APP */
   setLanguage(language: string): void {
     this.selectedLanguage = language;
   }
