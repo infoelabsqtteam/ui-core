@@ -89,7 +89,7 @@ export class FormValueService {
                 selectedRow[element.field_name] = this.datePipe.transform(selectedRow[element.field_name],'dd/MM/yyyy');
               } else {
                 let value = formValue[element.field_name] == null ? null : formValue[element.field_name];
-                if(this.storageService.getPlatform() == 'mobile' && value){
+                if(this.storageService.checkPlatForm() == 'mobile' && value){
                   // required format 2022-06-30T00:00:00+05:30 (client) and 2022-06-29T18:30:00.000Z (server)
                   let  Mdate = value.substring(0,11) + "00:00:00" + value.substring(19);
                   let utcDate = this.datePipe.transform(Mdate,"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",'UTC');
@@ -104,7 +104,7 @@ export class FormValueService {
               }else{
                 // required format 01:30 PM (client) and 01:30 PM as String (server)
                 let value = formValue[element.field_name] == null ? null : formValue[element.field_name];
-                if(this.storageService.getPlatform() == 'mobile' && value){
+                if(this.storageService.checkPlatForm() == 'mobile' && value){
                   let splitHrMin:any = value.split(":"); 
                   value = new Date(`2023-01-01T${splitHrMin[0]}:${splitHrMin[1]}:00`).toLocaleTimeString([], { hour: 'numeric', minute: 'numeric', hour12: true });
                 }
@@ -173,14 +173,13 @@ export class FormValueService {
                 modifyFormValue[element.field_name] = this.datePipe.transform(formValue[element.field_name],'dd/MM/yyyy');
               } else {
                 let value =  formValue[element.field_name] == null ? null : formValue[element.field_name];
-
                 //required format 2022-06-30T00:00:00+05:30 (client) and 2022-06-29T18:30:00.000Z (server)
-                if(this.storageService.getPlatform() == 'mobile' && value){
+                if(this.storageService.checkPlatForm() == 'mobile' && value){
                   let  Mdate = value.substring(0,11) + "00:00:00" + value.substring(19);
                   let utcDate = this.datePipe.transform(Mdate,"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",'UTC');
                   value = utcDate;
                 }
-                modifyFormValue[element.field_name] = formValue[element.field_name];
+                modifyFormValue[element.field_name] = value;
               }
               break;
             case 'time':
@@ -189,7 +188,7 @@ export class FormValueService {
               }else{
                 // required format 01:30 PM (client) and 01:30 PM as String (server)
                 let value = formValue[element.field_name] == null ? null : formValue[element.field_name];
-                if(this.storageService.getPlatform() == 'mobile' && value){
+                if(this.storageService.checkPlatForm() == 'mobile' && value){
                   let splitHrMin:any = value.split(":"); 
                   value = new Date(`2023-01-01T${splitHrMin[0]}:${splitHrMin[1]}:00`).toLocaleTimeString([], { hour: 'numeric', minute: 'numeric', hour12: true });
                 }
@@ -417,7 +416,7 @@ export class FormValueService {
               formValue['appId'] = this.commonFunctionService.getAppId();
             }
             if(!formValue['platForm'] || formValue['platForm'] == '' || formValue['platForm'] == null){
-              formValue['platForm'] = this.storageService.getPlatform();              
+              formValue['platForm'] = this.storageService.checkPlatForm();              
             }
             if (updateMode) {
               if(formName == 'cancel'){

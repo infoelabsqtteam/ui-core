@@ -353,11 +353,30 @@ export class FormControlService {
                     }else{
                       let value = formValue[fieldName][childFieldName] == null ? null : formValue[fieldName][childFieldName];
                       if(this.storageService.checkPlatForm() == 'mobile' && value){
-                        //need in this format 2022-06-30T00:00:00+05:30
-                        let localZonedDateTime = new Date(formValue[fieldName]).toLocaleString();
-                        value = this.datePipe.transform(localZonedDateTime,"yyyy-MM-dd'T'HH:mm:ssZZZZZ");              
+                        /** need in this format 2022-06-30T00:00:00+05:30 */
+                        // let localZonedDateTime = new Date(formValue[fieldName]).toLocaleString();
+                        value = this.datePipe.transform(formValue[fieldName],"yyyy-MM-dd'T'HH:mm:ssZZZZZ");
                       }                      
                       (<UntypedFormGroup>responce.templateForm.controls[fieldName]).controls[childFieldName].setValue(value);
+                    }
+                  }
+                  break;
+                case "time":
+                  if(ChildFieldData && ChildFieldData[childFieldName] != null && ChildFieldData[childFieldName] != undefined && ChildFieldData[childFieldName] != ''){
+                    if(data.time_format && data.time_format != '' && typeof object === 'string'){
+                      const time = object[fieldName];
+                      responce.templateForm.controls[fieldName].setValue(time)
+                    }else{
+                      let value = ChildFieldData[childFieldName] == null ? null : ChildFieldData[childFieldName];
+                      if(this.storageService.checkPlatForm() == 'mobile' && value){
+                        /** new way required format for Ionic TimeFormat to convert into 24hr is "07:05:45 PM" */
+                        let splitServerValue = value.split(" ");
+                        let addsec = splitServerValue[0] +":"+'00'+" "+splitServerValue[1];
+                        let date = new Date("2023-01-01 " + addsec);
+                        /** Format the date object into a 12 or 24 hour time string */
+                        value = date.toLocaleTimeString([], { hour12: false });
+                      }
+                      responce.templateForm.controls[fieldName].setValue(value);                  
                     }
                   }
                   break;
@@ -517,10 +536,10 @@ export class FormControlService {
             responce.templateForm.controls[fieldName].setValue(value)
           }else{
             let value = formValue[fieldName];
-            if(this.storageService.checkPlatForm() == 'mobile' && formValue[fieldName]){
-              //need in this format 2022-06-30T00:00:00+05:30
-              let localZonedDateTime = new Date(formValue[fieldName]).toLocaleString();
-              value = this.datePipe.transform(localZonedDateTime,"yyyy-MM-dd'T'HH:mm:ssZZZZZ");              
+            if(this.storageService.checkPlatForm() == 'mobile' && value){
+              /** need in this format 2022-06-30T00:00:00+05:30 */
+              // let localZonedDateTime = new Date(formValue[fieldName]).toLocaleString();
+              value = this.datePipe.transform(formValue[fieldName],"yyyy-MM-dd'T'HH:mm:ssZZZZZ");
             }
             responce.templateForm.controls[fieldName].setValue(value);
           }
@@ -533,13 +552,12 @@ export class FormControlService {
             responce.templateForm.controls[fieldName].setValue(time)
           }else{
             let value = formValue[element.field_name] == null ? null : formValue[element.field_name];
-            // let transformzonedTime :any;
             if(this.storageService.checkPlatForm() == 'mobile' && value){
-              //new way required foramt for Ionic TimeFormat to convert into 24hr is "07:05:45 PM"
+              /** new way required format for Ionic TimeFormat to convert into 24hr is "07:05:45 PM" */
               let splitServerValue = value.split(" ");
               let addsec = splitServerValue[0] +":"+'00'+" "+splitServerValue[1];
               let date = new Date("2023-01-01 " + addsec);
-              // Format the date object into a 24 hour time string
+              /** Format the date object into a 12 or 24 hour time string */
               value = date.toLocaleTimeString([], { hour12: false });
             }
             responce.templateForm.controls[fieldName].setValue(value);                  

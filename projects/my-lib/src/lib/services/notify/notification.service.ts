@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
 import { ApiService } from '../api/api.service';
+import { StorageService } from '../storage/storage.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -15,15 +16,19 @@ export class NotificationService {
   constructor(
     private _snackBar: MatSnackBar,
     private apiService: ApiService,
+    private storageService: StorageService
   ) {
-    this.synth = window.speechSynthesis;
-    this.voices = [];
-    this.selectedLanguage = 'en-US'; // Default language
+    /* DO not just unComment below code related to speech, It will cause HUGE Impact on Mobile APP */
+    if(this.storageService.checkPlatForm() != 'mobile'){
+      this.synth = window.speechSynthesis;
+      this.voices = [];
+      this.selectedLanguage = 'en-US'; // Default language
 
-    // Load voices asynchronously
-    this.loadVoices();
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-      speechSynthesis.onvoiceschanged = this.loadVoices.bind(this);
+      // Load voices asynchronously
+      this.loadVoices();
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = this.loadVoices.bind(this);
+      }
     }
   }
 
@@ -36,7 +41,9 @@ export class NotificationService {
         horizontalPosition: this.horizontalPosition,
         verticalPosition: this.verticalPosition
       });
-      // this.speak(message);
+      if(this.storageService.checkPlatForm() != 'mobile'){
+        this.speak(message);
+      }
     }
   }
 
@@ -50,6 +57,7 @@ export class NotificationService {
         this.apiService.SaveFormData(payload);
     }
   }
+  /* DO not just unComment below code related to speech, It will cause HUGE Impact on Mobile APP */
   setLanguage(language: string): void {
     this.selectedLanguage = language;
   }
