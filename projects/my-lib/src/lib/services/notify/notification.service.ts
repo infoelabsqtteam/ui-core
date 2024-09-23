@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
 import { ApiService } from '../api/api.service';
+import { StorageService } from '../storage/storage.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -8,25 +9,27 @@ export class NotificationService {
 
   horizontalPosition: MatSnackBarHorizontalPosition = 'right';
   verticalPosition: MatSnackBarVerticalPosition = 'top';
-  /* DO not just unComment below code related to speech, It will cause HUGE Impact on Mobile APP */
-  // private synth: SpeechSynthesis;
-  // private voices: SpeechSynthesisVoice[];
-  // private selectedLanguage: string;
+  private synth: SpeechSynthesis;
+  private voices: SpeechSynthesisVoice[];
+  private selectedLanguage: string;
 
   constructor(
     private _snackBar: MatSnackBar,
     private apiService: ApiService,
+    private storageService: StorageService
   ) {
     /* DO not just unComment below code related to speech, It will cause HUGE Impact on Mobile APP */
-    // this.synth = window.speechSynthesis;
-    // this.voices = [];
-    // this.selectedLanguage = 'en-US'; // Default language
+    if(this.storageService.checkPlatForm() != 'mobile'){
+      this.synth = window.speechSynthesis;
+      this.voices = [];
+      this.selectedLanguage = 'en-US'; // Default language
 
-    // Load voices asynchronously
-    // this.loadVoices();
-    // if (speechSynthesis.onvoiceschanged !== undefined) {
-    //   speechSynthesis.onvoiceschanged = this.loadVoices.bind(this);
-    // }
+      // Load voices asynchronously
+      this.loadVoices();
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = this.loadVoices.bind(this);
+      }
+    }
   }
 
 
@@ -38,7 +41,9 @@ export class NotificationService {
         horizontalPosition: this.horizontalPosition,
         verticalPosition: this.verticalPosition
       });
-      // this.speak(message);
+      if(this.storageService.checkPlatForm() != 'mobile'){
+        this.speak(message);
+      }
     }
   }
 
@@ -53,44 +58,44 @@ export class NotificationService {
     }
   }
   /* DO not just unComment below code related to speech, It will cause HUGE Impact on Mobile APP */
-  // setLanguage(language: string): void {
-  //   this.selectedLanguage = language;
-  // }
-  // private getVoiceByLanguage(language: string): SpeechSynthesisVoice | null {
-  //   return this.voices.find(voice => voice.lang === language) || null;
-  // }
-  // private loadVoices(): void {
-  //   this.voices = this.synth.getVoices();
-  // }
-  // private getFemaleVoice(): SpeechSynthesisVoice | null {
-  //   // You can improve this function to better identify female voices
-  //   return this.voices.find((voice:any) => voice.name.includes('female') || voice.name.includes('Female') || voice.gender === 'female') || null;
-  // }
-  // speak(message: string): void {
-  //   if (this.synth.speaking) {
-  //     console.error('speechSynthesis.speaking');
-  //     return;
-  //   }
+  setLanguage(language: string): void {
+    this.selectedLanguage = language;
+  }
+  private getVoiceByLanguage(language: string): SpeechSynthesisVoice | null {
+    return this.voices.find(voice => voice.lang === language) || null;
+  }
+  private loadVoices(): void {
+    this.voices = this.synth.getVoices();
+  }
+  private getFemaleVoice(): SpeechSynthesisVoice | null {
+    // You can improve this function to better identify female voices
+    return this.voices.find((voice:any) => voice.name.includes('female') || voice.name.includes('Female') || voice.gender === 'female') || null;
+  }
+  speak(message: string): void {
+    if (this.synth.speaking) {
+      console.error('speechSynthesis.speaking');
+      return;
+    }
 
-  //   if (message !== '') {
-  //     const utterThis = new SpeechSynthesisUtterance(message);
-  //     const selectedVoice = this.getFemaleVoice();
-  //     // const selectedVoice = this.getVoiceByLanguage(this.selectedLanguage);
+    if (message !== '') {
+      const utterThis = new SpeechSynthesisUtterance(message);
+      const selectedVoice = this.getFemaleVoice();
+      // const selectedVoice = this.getVoiceByLanguage(this.selectedLanguage);
 
-  //     if (selectedVoice) {
-  //       utterThis.voice = selectedVoice;
-  //     }
+      if (selectedVoice) {
+        utterThis.voice = selectedVoice;
+      }
 
-  //     utterThis.onend = () => {
-  //       console.log('SpeechSynthesisUtterance.onend');
-  //     };
+      utterThis.onend = () => {
+        console.log('SpeechSynthesisUtterance.onend');
+      };
 
-  //     utterThis.onerror = (event) => {
-  //       console.error('SpeechSynthesisUtterance.onerror', event);
-  //     };
+      utterThis.onerror = (event) => {
+        console.error('SpeechSynthesisUtterance.onerror', event);
+      };
 
-  //     this.synth.speak(utterThis);
-  //   }
-  // }
+      this.synth.speak(utterThis);
+    }
+  }
 
 }
