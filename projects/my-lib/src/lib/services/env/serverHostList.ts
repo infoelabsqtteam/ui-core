@@ -6,7 +6,7 @@ export const serverHostList = [
   {"clientCode": "SANS-SANS01-SIT", "clientEndpoint": "sit-sanskar.elabss.ai", "serverEndpoint": "https://sitsanskarserver.elabss.ai"},
   {"clientCode": "SANS-SANS01", "clientEndpoint": "lims-sanskar.elabss.ai", "serverEndpoint": "https://prodsanskarserver.elabss.ai"},
   {"clientEndpoint": "hardgoodslabs.elabss.ai", "serverEndpoint": "https://serverhardgoodlabs.elabss.ai"},
-  {"clientCode": "DEMO-DEMO01", "clientEndpoint": "demolab.elabss.ai", "serverEndpoint": "https://serverhardgoodlabs.elabss.ai"},
+  {"clientCode": "DEMO-DEMO01", "clientEndpoint": "demolab.elabss.ai", "serverEndpoint": "https://serverdemolabs.elabss.ai"},
   {"clientEndpoint": "lite-demolab.elabss.ai", "serverEndpoint": "https://serverhardgoodlabs.elabss.ai"},
   {"clientEndpoint": "standard-demolab.elabss.ai", "serverEndpoint": "https://serverhardgoodlabs.elabss.ai"},
   {"clientCode": "ASC-ASC01-SIT", "clientEndpoint": "ascgroup.elabss.ai", "serverEndpoint": "https://sitserverascgroup.elabss.ai"},
