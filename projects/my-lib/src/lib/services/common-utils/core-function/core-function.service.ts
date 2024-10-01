@@ -138,7 +138,15 @@ export class CoreFunctionService {
   }
   sortMenu(menuList:any){
     let list:any=[];
-    let mlist = menuList.sort((a:any,b:any) =>  a.index - b.index);
+    let mlist = menuList.sort((a:any,b:any) => {
+      if (a.index === b.index) {
+        // If `index` is the same, sort by `name` alphabetically
+        return a.name.localeCompare(b.name);
+      } else {
+          // Otherwise, sort by `index`
+          return a.index - b.index;
+      }
+    });
     if(mlist && mlist.length > 0){
       mlist.forEach((m:any) => {
         list.push(m);
