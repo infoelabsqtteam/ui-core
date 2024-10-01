@@ -113,9 +113,17 @@ export class DownloadService {
       this.permissionService.checkTokenStatusForPermission();
     }
   }
-  getExcelData(tab:any,menuName:any,gridColumns:any,gridFilterValue:any,tempNme:any,pageNo:any,pageSize:any){
-    let downloadLink = "";
+  getExcelData(tab:any,menuName:any,gridColumns:any,gridFilterValue:any,tempName:any,pageNo:any,pageSize:any){
     this.modalService.open('download-progress-modal', {});
+    let responce = this.getExcelDataPayload(tab,menuName,gridColumns,gridFilterValue,tempName,pageNo,pageSize)
+    this.apiService.GetExportExclLink(responce.payload);
+    this.config.downloadClick = responce.downloadLink;
+  }
+  getExcelDataPayload(tab:any,menuName:any,gridColumns:any,gridFilterValue:any,tempNme:any,pageNo:any,pageSize:any){
+    let responce  ={
+      downloadLink : '',
+      payload : {}
+    }
     let data = this.apiCallService.preparePayloadWithCrlist(tab,menuName,gridColumns,gridFilterValue);
     let gridName = '';
     if(tab && tab?.grid){
@@ -129,7 +137,7 @@ export class DownloadService {
     data['key3']=gridName;
     data['pageNo'] = pageNo;
     data['pageSize'] = pageSize;
-    const getExportData = {
+    responce.payload = {
       data: {
         refCode: this.storageService.getRefCode(),
         log: this.storageService.getUserLog(),
@@ -140,11 +148,30 @@ export class DownloadService {
     }
     var fileName = tempNme;
     fileName = fileName.charAt(0).toUpperCase() + fileName.slice(1)
-    downloadLink = fileName + '-' + new Date().toLocaleDateString();
-    this.apiService.GetExportExclLink(getExportData);
-    this.config.downloadClick = downloadLink;
+    responce.downloadLink = fileName + '-' + new Date().toLocaleDateString();
+    return responce;
+  }
+  getAllExcelData(tab:any,menuName:any,gridColumns:any,gridFilterValue:any,tempName:any,pageSize:any,data:any){
+    if(data && data.length > 0){
+      let payloadList = [];
+      for (const obj of data) {
+        if(obj.value > 0){
+          let responce = this.getExcelDataPayload(tab,menuName,gridColumns,gridFilterValue,tempName,obj.value,pageSize);
+          payloadList.push(responce);
+        }
+      }
+      if(payloadList && payloadList.length > 0){
+        this.apiService.getListExcel(payloadList);
+      }
+    }
   }
   downloadExcelFromLink(exportExcelLink:any,downloadClick:string){
+    downloadClick = this.downloadExcelFile(exportExcelLink,downloadClick);
+    this.apiService.resetGetExportExclLink();
+    this.modalService.close('download-progress-modal');
+    return downloadClick;
+  }
+  downloadExcelFile(exportExcelLink:any,downloadClick:string){
     let link = document.createElement('a');
     link.setAttribute('type', 'hidden');
     const file = new Blob([exportExcelLink], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -155,8 +182,6 @@ export class DownloadService {
     link.click();
     link.remove();
     downloadClick = '';
-    this.apiService.resetGetExportExclLink();
-    this.modalService.close('download-progress-modal');
     return downloadClick;
   }
 
