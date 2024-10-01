@@ -1289,6 +1289,16 @@ export class CommonFunctionService {
         })
       }
     }
-    return data;
+    return this.transformAndSortOptions(data);
+  }
+  transformAndSortOptions(data:any) {
+    return Object.keys(data).map(key => ({
+      value: +key, // Convert key to number
+      label: data[key]
+    })).sort((a, b) => {
+      const numA = parseInt(a.label.split(' - ')[0]);
+      const numB = parseInt(b.label.split(' - ')[0]);
+      return numA - numB;
+    });
   }
 }
