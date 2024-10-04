@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
 import { ApiService } from '../api/api.service';
+import { isPlatformBrowser } from '@angular/common';
 @Injectable({
   providedIn: 'root'
 })
@@ -8,15 +9,20 @@ export class NotificationService {
 
   horizontalPosition: MatSnackBarHorizontalPosition = 'right';
   verticalPosition: MatSnackBarVerticalPosition = 'top';
-  private synth: SpeechSynthesis;
+  private synth: SpeechSynthesis | undefined;
   private voices: SpeechSynthesisVoice[];
   private selectedLanguage: string;
+  private isBrowser: boolean;
 
   constructor(
     private _snackBar: MatSnackBar,
     private apiService: ApiService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    this.synth = window.speechSynthesis;
+    this.isBrowser = isPlatformBrowser(this.platformId);
+    if (this.isBrowser && window.speechSynthesis) {
+      this.synth = window.speechSynthesis;
+    }
     this.voices = [];
     this.selectedLanguage = 'en-US'; // Default language
 
@@ -57,14 +63,14 @@ export class NotificationService {
     return this.voices.find(voice => voice.lang === language) || null;
   }
   private loadVoices(): void {
-    this.voices = this.synth.getVoices();
+    if(this.synth) this.voices = this.synth.getVoices();
   }
   private getFemaleVoice(): SpeechSynthesisVoice | null {
     // You can improve this function to better identify female voices
     return this.voices.find((voice:any) => voice.name.includes('female') || voice.name.includes('Female') || voice.gender === 'female') || null;
   }
   speak(message: string): void {
-    if (this.synth.speaking) {
+    if (this.synth && this.synth.speaking) {
       console.error('speechSynthesis.speaking');
       return;
     }
@@ -86,7 +92,7 @@ export class NotificationService {
         console.error('SpeechSynthesisUtterance.onerror', event);
       };
 
-      this.synth.speak(utterThis);
+      if(this.synth) this.synth.speak(utterThis);
     }
   }
 
