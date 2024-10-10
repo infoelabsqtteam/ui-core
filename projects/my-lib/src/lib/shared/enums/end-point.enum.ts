@@ -25,6 +25,7 @@ export enum EndPoint {
     AUTH_RESET_PASSWORD = "login/rp",
     AUTH_CHANGE_PASSWORD = "login/cp",
     TWO_FACTOR_AUTHENTICATION = "login/tfa",
+    LOG_OUT = "login/logout",
     GET_AUTH_APP = "user/auth/app/",
     SAVE_CONTACT_US = "ins/save/contact_us_query",
     SAVE_CAREER_WITH_US = "ins/save/career_with_us",

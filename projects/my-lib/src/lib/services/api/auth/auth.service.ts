@@ -6,10 +6,10 @@ import { StorageService } from '../../storage/storage.service';
 import { StorageTokenStatus } from '../../../shared/enums/storage-token-status.enum';
 import { Router } from '@angular/router';
 import { EncryptionService } from '../../encryption/encryption.service';
-import { CommonFunctionService } from '../../common-utils/common-function.service';
 import { ApiService } from '../api.service';
 import { CoreFunctionService } from '../../common-utils/core-function/core-function.service';
 import { AuthDataShareService } from '../../data-share/auth-data-share/auth-data-share.service';
+import { ModelService } from '../../model/model.service';
 
 
 @Injectable({
@@ -25,10 +25,10 @@ export class AuthService implements OnInit{
     private storageService:StorageService,
     private router:Router,
     private encryptionService:EncryptionService,
-    private commonFunctionService:CommonFunctionService,
     private coreFunctionService:CoreFunctionService,
     private authDataShareService: AuthDataShareService,
-    private apiCallService:ApiCallService
+    private apiCallService:ApiCallService,
+    private modelService:ModelService
     ) { }
 
 
@@ -37,9 +37,17 @@ export class AuthService implements OnInit{
   }
 
   Logout(payload:any){
-    this.resetData();
-    this.logOutRedirection();
-    this.authDataShareService.restSettingModule('logged_out');
+    let api = this.envService.getAuthApi('LOG_OUT');
+    this.http.post(api, payload).subscribe(
+      (respData:any) =>{
+        this.modelService.close('app-loader');
+        this.resetData();
+        this.logOutRedirection();
+        this.authDataShareService.restSettingModule('logged_out');
+      },
+      (error)=>{
+        console.log(error);
+      });
   }
   SessionExpired(payload?:any){
     let response = {
