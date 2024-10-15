@@ -8,11 +8,14 @@ import { PermissionService } from '../permission/permission.service';
 import { ModelService } from '../model/model.service';
 import { ApiService } from '../api/api.service';
 import { NotificationService } from '../notify/notification.service';
+import { AppConfig, AppConfigInterface } from '../../shared/configuration/config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DownloadService {
+
+  public config:AppConfigInterface = AppConfig;
 
   constructor(
     @Inject(DOCUMENT) document:any,
@@ -85,49 +88,89 @@ export class DownloadService {
       return getExportData;
   }
   exportExcel(total:any,gridColumns:any,gridFilterValue:any,tab:any,menuName:any) {
-    let downloadLink = "";
-    let totalGridData:number = this.storageService.getApplicationSetting()?.totalGridData;
-    if(!totalGridData) {
-      totalGridData = 50000;
-    }
-    if(total && totalGridData > 0 && total < totalGridData) {
-      this.modalService.open('download-progress-modal', {});
-      let tempNme = menuName.name;
-      if(this.permissionService.checkPermission(tempNme,'export')){
-        let data = this.apiCallService.preparePayloadWithCrlist(tab,menuName,gridColumns,gridFilterValue);
-        let gridName = '';
-        if(tab && tab?.grid){
-          if(tab?.grid?.export_template){
-            gridName = tab.grid.export_template;
-          }else{
-            gridName = tab.grid._id;
-          }
-        }
-        delete data.log;
-        data['key3']=gridName;
-        const getExportData = {
-          data: {
-            refCode: this.storageService.getRefCode(),
-            log: this.storageService.getUserLog(),
-            kvp: data
-          },
-          responce: { responseType: "arraybuffer" },
-          path: tempNme
-        }
-        var fileName = tempNme;
-        fileName = fileName.charAt(0).toUpperCase() + fileName.slice(1)
-        downloadLink = fileName + '-' + new Date().toLocaleDateString();
-        this.apiService.GetExportExclLink(getExportData);
-      }else{
-        this.permissionService.checkTokenStatusForPermission();
-        //this.notificationService.notify("bg-danger", "Permission denied !!!");
+    let tempName = menuName.name;
+    if(this.permissionService.checkPermission(tempName,'export')){
+      let totalGridData:number = this.storageService.getApplicationSetting()?.totalGridData;
+      if(!totalGridData) {
+        totalGridData = 50000;
       }
-    }else {
-      this.notificationService.notify("bg-danger", `Kindly filter data as download record size is : ${totalGridData} not ${total}`);
+      if(total && totalGridData > 0 && total < totalGridData) {
+        this.getExcelData(tab,menuName,gridColumns,gridFilterValue,tempName,0,totalGridData);
+      }else {
+        let data = {
+          'tab':tab,
+          'menuName':menuName,
+          'gridColumns':gridColumns,
+          'gridFilterValue':gridFilterValue,
+          'tempName':tempName,
+          'total':total,
+          'totalGridData':totalGridData
+        }
+        this.modalService.open('export-excel',data);
+      }
+    }else{
+      this.permissionService.checkTokenStatusForPermission();
     }
-    return downloadLink;
+  }
+  getExcelData(tab:any,menuName:any,gridColumns:any,gridFilterValue:any,tempName:any,pageNo:any,pageSize:any){
+    this.modalService.open('download-progress-modal', {});
+    let responce = this.getExcelDataPayload(tab,menuName,gridColumns,gridFilterValue,tempName,pageNo,pageSize)
+    this.apiService.GetExportExclLink(responce.payload);
+    this.config.downloadClick = responce.downloadLink;
+  }
+  getExcelDataPayload(tab:any,menuName:any,gridColumns:any,gridFilterValue:any,tempNme:any,pageNo:any,pageSize:any){
+    let responce  ={
+      downloadLink : '',
+      payload : {}
+    }
+    let data = this.apiCallService.preparePayloadWithCrlist(tab,menuName,gridColumns,gridFilterValue);
+    let gridName = '';
+    if(tab && tab?.grid){
+      if(tab?.grid?.export_template){
+        gridName = tab.grid.export_template;
+      }else{
+        gridName = tab.grid._id;
+      }
+    }
+    delete data.log;
+    data['key3']=gridName;
+    data['pageNo'] = pageNo;
+    data['pageSize'] = pageSize;
+    responce.payload = {
+      data: {
+        refCode: this.storageService.getRefCode(),
+        log: this.storageService.getUserLog(),
+        kvp: data
+      },
+      responce: { responseType: "arraybuffer" },
+      path: tempNme
+    }
+    var fileName = tempNme;
+    fileName = fileName.charAt(0).toUpperCase() + fileName.slice(1)
+    responce.downloadLink = fileName + '-' + new Date().toLocaleDateString();
+    return responce;
+  }
+  getAllExcelData(tab:any,menuName:any,gridColumns:any,gridFilterValue:any,tempName:any,pageSize:any,data:any){
+    if(data && data.length > 0){
+      let payloadList = [];
+      for (const obj of data) {
+        if(obj.value > 0){
+          let responce = this.getExcelDataPayload(tab,menuName,gridColumns,gridFilterValue,tempName,obj.value,pageSize);
+          payloadList.push(responce);
+        }
+      }
+      if(payloadList && payloadList.length > 0){
+        this.apiService.getListExcel(payloadList);
+      }
+    }
   }
   downloadExcelFromLink(exportExcelLink:any,downloadClick:string){
+    downloadClick = this.downloadExcelFile(exportExcelLink,downloadClick);
+    this.apiService.resetGetExportExclLink();
+    this.modalService.close('download-progress-modal');
+    return downloadClick;
+  }
+  downloadExcelFile(exportExcelLink:any,downloadClick:string){
     let link = document.createElement('a');
     link.setAttribute('type', 'hidden');
     const file = new Blob([exportExcelLink], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -138,8 +181,6 @@ export class DownloadService {
     link.click();
     link.remove();
     downloadClick = '';
-    this.apiService.resetGetExportExclLink();
-    this.modalService.close('download-progress-modal');
     return downloadClick;
   }
 

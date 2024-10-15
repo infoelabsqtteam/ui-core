@@ -1,18 +1,21 @@
 import { CoreFunctionService } from './../common-utils/core-function/core-function.service';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { map, tap, switchMap, mergeMap, catchError } from 'rxjs/operators';
+import { map, tap, switchMap, mergeMap, catchError,concatMap } from 'rxjs/operators';
 import { from, of, Observable } from 'rxjs';//fromPromise
 import { DataShareService } from '../data-share/data-share.service';
 import { EnvService } from '../env/env.service';
 import { ModelService } from '../model/model.service';
 import { StorageService } from '../storage/storage.service';
+import { AppConfig, AppConfigInterface } from '../../shared/configuration/config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
   serverReq:boolean = false;
+
+  public config:AppConfigInterface = AppConfig;
 
 constructor(
   private dataShareService: DataShareService,
@@ -107,6 +110,31 @@ getGridCountData(payloads:string){
         console.log(error);
       }
   )
+}
+getListExcel(payloads: {}[]) {
+  from(payloads)
+    .pipe(
+      concatMap((payload) => this.ExportExclLink(payload))
+    )
+    .subscribe(
+      (res: ArrayBuffer) => {
+        this.dataShareService.setExportExcelLink(res);
+      },
+      (error) => {
+        console.log(error);
+      },
+      () => {
+        console.log('All requests completed successfully');
+        this.modalService.close('download-progress-modal');
+      }
+    );
+}
+ExportExclLink(payloads:any){
+  this.modalService.open('download-progress-modal', {});
+  let payload = payloads.payload;
+  this.config.downloadClick = payloads.downloadLink;
+  let api = this.envService.getApi('EXPORT_GRID_DATA');
+  return this.http.post(api, payload.data, payload.responce);
 }
 getTabCountData(payloads:any){
   let api = this.envService.getApi('GET_COUNT_DATA');
