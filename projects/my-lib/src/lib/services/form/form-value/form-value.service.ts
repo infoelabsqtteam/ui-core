@@ -368,26 +368,14 @@ export class FormValueService {
           if (dataSaveInProgress) {
             responce.showNotify = true;
             responce.dataSaveInProgress = false;
-            formValue['log'] = this.storageService.getUserLog();
-            if(!formValue['refCode'] || formValue['refCode'] == '' || formValue['refCode'] == null){
-              formValue['refCode'] = this.commonFunctionService.getRefcode();
-            }
-            if(!formValue['appId'] || formValue['appId'] == '' || formValue['appId'] == null){
-              formValue['appId'] = this.commonFunctionService.getAppId();
-            }
+            this.addDefaultFieldInData(formValue);
             if (updateMode) {
               if(formName == 'cancel'){
                 formValue['status'] = 'CANCELLED';
               }
             }
-
-            const saveFromData = {
-              curTemp: currentMenu.name,
-              data: formValue
-            }
             responce.getSavePayload = true;
-            responce.data=saveFromData;
-
+            responce.data=this.getSavePayload(currentMenu.name,formValue);
           }
         }else{
           responce.getSavePayload = false;
@@ -412,6 +400,21 @@ export class FormValueService {
       this.permissionService.checkTokenStatusForPermission();
     }
     return responce;
+  }
+  addDefaultFieldInData(data:any){
+    data['log'] = this.storageService.getUserLog();
+    if(!data['refCode']){
+      data['refCode'] = this.commonFunctionService.getRefcode();
+    }
+    if(!data['appId']){
+      data['appId'] = this.commonFunctionService.getAppId();
+    }
+  }
+  getSavePayload(name:string,data:any){
+    return {
+      curTemp: name,
+      data: data
+    }
   }
 
   transformArrayToObject(allModuleList:any){
